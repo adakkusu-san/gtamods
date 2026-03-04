@@ -1,0 +1,161 @@
+{$CLEO .cs}
+{$NOSOURCE}
+{$USE ini}
+wait 950
+/*
+(above QWERTY)
+1 (0x31) // (maybe rebind?)
+2 (0x32) // (submission)
+3 (0x33)
+4 (0x34) // (radio change)
+5 (0x35) = goto grove
+6 (0x36) = move camera
+7 (0x37) = make picador
+8 (0x38) = make picador but facing the other way
+9 (0x39) = restore camera
+0 (0x30) = 
+- (0xBD) = end script
++ (0xBB) =  
+*/
+
+var
+0@ : int
+1@ : int
+2@ : int
+3@ : int
+4@ : int
+5@ : int
+end
+
+const
+PIKAKEY = 0@
+PIKAKEY2 = 1@
+GROVE = 2@
+CAMOVE = 3@
+RESCAM = 4@
+ENDSCRIPT = 5@
+end
+
+
+if does_file_exist "cleo\mszcammove.ini"
+then
+
+if not PIKAKEY = read_int_from_ini_file "cleo\mszcammove.ini" {section} "mszcfg" {key} "pika"
+then PIKAKEY = 0x37
+end
+if not PIKAKEY2 = read_int_from_ini_file "cleo\mszcammove.ini" {section} "mszcfg" {key} "pika2"
+then PIKAKEY2 = 0x38
+end
+if not GROVE = read_int_from_ini_file "cleo\mszcammove.ini" {section} "mszcfg" {key} "grove"
+then GROVE = 0x35
+end
+if not CAMOVE = read_int_from_ini_file "cleo\mszcammove.ini" {section} "mszcfg" {key} "camove"
+then CAMOVE = 0x36
+end
+if not RESCAM = read_int_from_ini_file "cleo\mszcammove.ini" {section} "mszcfg" {key} "rescam"
+then RESCAM = 0x39
+end
+if not ENDSCRIPT = read_int_from_ini_file "cleo\mszcammove.ini" {section} "mszcfg" {key} "endscript"
+then ENDSCRIPT = 0xBD
+end
+
+else
+PIKAKEY = 0x37
+PIKAKEY2 = 0x38
+GROVE = 0x35
+CAMOVE = 0x36
+RESCAM = 0x39
+ENDSCRIPT = 0xBD
+0ACC: print_string "cammove ini doesn't exist~n~Using default keys" 2000
+end
+
+
+
+while true
+wait 50
+
+if is_key_pressed PIKAKEY // 7 = picador
+then
+request_model 600
+while not has_model_loaded 600
+wait 500
+end
+0395: clear_area 2473.53 -1690.21 13.0 10 False
+0674: custom_plate_for_next_car 600 "_SHERM__"
+Car pika = create_car 600 at 2473.53 -1690.21 13.0
+0175: set_car_heading pika 0.0
+0229: change_car_colour pika 84 84
+01C3: mark_car_as_no_longer_needed pika
+0249: mark_model_as_no_longer_needed 600
+//0ACD: print_string_now "picador" 2000
+end
+
+if is_key_pressed PIKAKEY2 // 8 = picador but facing the other way
+then
+request_model 600
+while not has_model_loaded 600
+wait 500
+end
+0395: clear_area 2473.53 -1690.21 13.0 10 False
+0674: custom_plate_for_next_car 600 "_SHERM__"
+Car pika2 = create_car 600 at 2473.53 -1690.21 13.0
+0175: set_car_heading pika2 180.0
+0229: change_car_colour pika2 84 84
+01C3: mark_car_as_no_longer_needed pika2
+0249: mark_model_as_no_longer_needed 600
+//0ACD: print_string_now "picador but facing the other way" 2000
+end
+
+if is_key_pressed GROVE // 5 = goto grove
+then
+wait 0
+if
+00DF: is_char_in_any_car $scplayer
+then
+Car pikar = store_car_char_is_in_no_save $scplayer
+00AB: set_car_coordinates pikar 2488.56 -1666.84 13.38
+else
+00A1: set_char_coordinates $scplayer 2488.56 -1666.84 13.38
+end
+//0ACD: print_string_now "goto groove" 2000
+end
+
+if is_key_pressed CAMOVE // 6 = camera move
+then
+wait 0
+02A3: switch_widescreen True
+015F: set_fixed_camera_position 2498.947 -1690.0001 14.4011 0.0 0.0 0.0
+0160: point_camera_at_point 2498.4045 -1689.1774 14.2309 SwitchType.JumpCut
+0925: camera_reset_new_scriptables 
+092F: camera_persist_track True
+0930: camera_persist_pos True
+0936: camera_set_vector_move 2498.947 -1690.0001 14.4011 2501.2363 -1678.2303 17.5252 1000 True
+0920: camera_set_vector_track 2498.4045 -1689.1774 14.2309 2500.2378 -1678.1876 17.4907 1000 True
+//0ACD: print_string_now "move camera like in first mission" 2000
+end
+
+if is_key_pressed RESCAM // 9 = restore camera
+then
+wait 0
+0925: camera_reset_new_scriptables
+0373: set_camera_behind_player
+02A3: switch_widescreen False
+01B4: set_player_control $player1 True
+02EB: restore_camera_jumpcut
+//0ACD: print_string_now "given camera back" 2000
+end
+
+if is_key_pressed ENDSCRIPT // - = end script
+then
+wait 0
+0925: camera_reset_new_scriptables
+0373: set_camera_behind_player
+02A3: switch_widescreen False
+01B4: set_player_control $player1 True
+02EB: restore_camera_jumpcut
+0ACD: print_string_now "script end (reload save or new game to restart it)" 3000
+break
+end
+
+end
+terminate_this_custom_script

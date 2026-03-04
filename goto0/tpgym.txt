@@ -1,0 +1,189 @@
+{$CLEO .cs}
+{$NOSOURCE}
+{$USE ini}
+wait 950
+var
+0@ : int
+1@ : int
+2@ : int
+3@ : int
+4@ : int
+5@ : int
+6@ : int
+end
+
+const
+BINCO = 0@
+Z247 = 1@
+DANCE = 2@
+GYM = 3@
+GYMCALL = 4@
+NRG = 5@
+ENDSCRIPT = 6@
+end
+
+
+if does_file_exist "cleo\msztpgym.ini"
+then
+
+if not BINCO = read_int_from_ini_file "cleo\msztpgym.ini" {section} "mszcfg" {key} "binco"
+then BINCO = 0x55
+end
+if not Z247 = read_int_from_ini_file "cleo\msztpgym.ini" {section} "mszcfg" {key} "z247"
+then Z247 = 0x31
+end
+if not DANCE = read_int_from_ini_file "cleo\msztpgym.ini" {section} "mszcfg" {key} "dance"
+then DANCE = 0x30
+end
+if not GYM = read_int_from_ini_file "cleo\msztpgym.ini" {section} "mszcfg" {key} "gym"
+then GYM = 0x54
+end
+if not GYMCALL = read_int_from_ini_file "cleo\msztpgym.ini" {section} "mszcfg" {key} "gymcall"
+then GYMCALL = 0x33
+end
+if not NRG = read_int_from_ini_file "cleo\msztpgym.ini" {section} "mszcfg" {key} "nrg"
+then NRG = 0x32
+end
+if not ENDSCRIPT = read_int_from_ini_file "cleo\msztpgym.ini" {section} "mszcfg" {key} "endscript"
+then ENDSCRIPT = 0xBB
+end
+
+else
+BINCO = 0x55
+Z247 = 0x31
+DANCE = 0x30
+GYM = 0x54
+GYMCALL = 0x33
+NRG = 0x32
+ENDSCRIPT = 0xBB
+0ACC: print_string "tpgym ini doesn't exist~n~Using default keys" 2000
+end
+
+while true
+:start_of_script
+wait 50
+
+if is_key_pressed Z247 // 1 = 24/7
+then
+if is_player_playing $player1
+then
+00A1: set_char_coordinates $scplayer 994.62 -920.24 42.17
+0173: set_char_heading $scplayer 270.0
+gosub @restore_player_control
+end
+wait 500
+end
+
+if is_key_pressed DANCE // 0 = dance club
+then
+if is_player_playing $player1
+then
+00A1: set_char_coordinates $scplayer 1829.3 -1681.43 13.54
+0173: set_char_heading $scplayer 270.0
+gosub @restore_player_control
+end
+wait 500
+end
+
+if is_key_pressed GYM // T = gym 
+then
+if is_player_playing $player1
+then
+00A1: set_char_coordinates $scplayer 2228.8914 -1737.1276 12.3906
+0173: set_char_heading $scplayer 0.0
+gosub @restore_player_control
+end
+wait 500
+end
+
+if is_key_pressed BINCO // U = binco
+then
+if is_player_playing $player1
+then
+00A1: set_char_coordinates $scplayer 2244.42 -1661.0 15.46
+0173: set_char_heading $scplayer 180.0
+gosub @restore_player_control
+end
+wait 500
+end
+
+if is_key_pressed NRG // 2 = nrg
+then
+request_model 522
+while not has_model_loaded 522
+wait 500
+end
+0395: clear_area 2229.47 -1746.21 13.11 10 False
+Car nrg1 = create_car 522 at 2229.47 -1746.21 13.11
+0175: set_car_heading nrg1 0.0
+01C3: mark_car_as_no_longer_needed nrg1
+0249: mark_model_as_no_longer_needed 522
+wait 500
+end
+
+if is_key_pressed GYMCALL // 3 = do the thing
+then
+// this one might be kinda inaccurate, please don't rely on it
+
+if is_player_playing $player1
+then
+016A: do_fade 500 Fade.Out
+while 016B:   get_fading_status 
+0001: wait 0
+end
+01B4: set_player_control $player1 {state} False
+00A0: get_char_coordinates $scplayer {var_x} $player_x {var_y} $player_y {var_z} $player_z
+00A1: set_char_coordinates $scplayer {x} 2228.8914 {y} -1737.1276 {z} 12.3906
+00BE: clear_prints 
+03CB: load_scene {x} 2228.5166 {y} -1734.274 {z} 15.744
+015F: set_fixed_camera_position {x} 2228.0945 {y} -1735.1787 {z} 15.6865 {upVecOffsetX} 0.0 {upVecOffsetY} 0.0 {upVecOffsetZ} 0.0
+0160: point_camera_at_point {x} 2228.5166 {y} -1734.274 {z} 15.744 {switchStyle} SwitchType.JumpCut
+0001: wait {time} 500
+016A: do_fade {time} 1000 {direction} Fade.In
+
+// CJ does some dancing animation for a bit (not sure how much yet)
+// (and also not sure how to make it happen here yet)
+// if you're close to the bike, you can cancel the animation by entering it
+gosub @restore_player_control
+
+// to make sure it is the right angle. assuming we're facing away from BS house
+0173: set_char_heading $scplayer 270.0
+
+03E5: print_help {key} 'GYMHELP'
+0001: wait {time} 5000 // decrease the amount from the added wait above
+03E5: print_help {key} 'DUMBELL'
+0001: wait {time} 5000
+016A: do_fade {time} 500 {direction} Fade.Out
+while 016B:   get_fading_status
+0001: wait {time} 0
+end
+000D: $player_z -= 0.5
+00A1: set_char_coordinates $scplayer {x} $player_x {y} $player_y {z} $player_z
+03CB: load_scene {x} $player_x {y} $player_y {z} $player_z
+02EB: restore_camera_jumpcut 
+01B4: set_player_control $player1 {state} True
+0001: wait {time} 500
+016A: do_fade {time} 1000 {direction} Fade.In
+
+end
+
+wait 500
+end
+
+if is_key_pressed ENDSCRIPT // = = end script
+then
+gosub @restore_player_control
+0ACD: print_string_now "script end (reload save or new game to restart it)" 3000
+break
+end
+
+end
+terminate_this_custom_script
+
+:restore_player_control
+0925: camera_reset_new_scriptables
+0373: set_camera_behind_player
+02A3: switch_widescreen False
+01B4: set_player_control $player1 True
+02EB: restore_camera_jumpcut
+return

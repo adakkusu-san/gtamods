@@ -1,0 +1,63 @@
+{$CLEO .cs}
+wait 1000
+
+const
+OMKEY = 0@
+ENDSCRIPT = 1@
+end
+
+var
+OMKEY : int
+ENDSCRIPT : int
+end
+
+if
+0AAB: does_file_exist "cleo\mszomt.ini"
+then
+if not OMKEY = read_int_from_ini_file "cleo\mszomt.ini" {section} "mszcfg" {key} "omkey"
+then OMKEY = 0x37
+end
+if not ENDSCRIPT = read_int_from_ini_file "cleo\mszomt.ini" {section} "mszcfg" {key} "endscript"
+then ENDSCRIPT = 0xdc
+end
+else
+OMKEY = 0x37
+ENDSCRIPT = 0xdc
+print_string "mszomt ini doesn't exist~n~defaults" 3000
+end
+
+0ADF: add_text_label "MSZOM01" "$ONMISSION=~1~"
+while true
+wait 0
+gosub @textdisplay
+
+if TIMERA > 500
+then
+TIMERA = 0
+if is_key_pressed OMKEY
+then
+if $ONMISSION == 1
+then
+$ONMISSION = 0
+else
+$ONMISSION = 1
+end
+end
+end
+
+if is_key_pressed ENDSCRIPT
+then
+break
+end
+
+end
+
+0AE0: remove_text_label "MSZOM01"
+terminate_this_custom_script
+
+:textdisplay
+03F0: use_text_commands true
+03E0: set_text_draw_before_fade false
+045A: display_text_with_number 40.0 320.0 "MSZOM01" $ONMISSION
+03F0: use_text_commands false
+return

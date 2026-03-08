@@ -1,0 +1,113 @@
+{$CLEO .cs}
+{$USE ini}
+{$NOSOURCE}
+wait 1000
+
+/*
+0 = torso
+2 = legs
+3 = shoes
+13 = chains
+14 = watch
+15 = glasses
+16 = hats
+
+1 = haircut
+4~12 = tattoo
+*/
+
+var
+0@ : int
+end
+
+if
+not does_file_exist "cleo\mszomt.ini"
+then
+goto @savekey
+else
+if
+not 3@ = read_int_from_ini_file "cleo\mszcloth.ini" "0" "txd"
+then
+goto @savekey
+else
+end
+end
+
+:dressup
+0@ = 0
+while 0@ < 17
+
+if 0@ == 1
+then 0@++
+else
+if 0@ == 4
+then 0@ = 13
+end
+end
+
+01E5: print_with_number_now "NUMBER" 0@ 1000 1
+
+0AD3: string_format 5@s format "%d" 0@
+0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "txd" 1@
+0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "dff" 2@
+0784: give_player_clothes $player1 1@ 2@ 0@
+
+0@++
+end
+
+0@ = 1
+while 0@ < 13
+if 0@ == 2
+then 0@ = 4
+end
+01E5: print_with_number_now "NUMBER" 0@ 1000 1
+0AD3: string_format 5@s format "%d" 0@
+0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "txd" 1@
+0784: give_player_clothes $player1 1@ 2@ 0@
+0@++
+end
+
+070D: build_player_model $player1
+
+goto @endofscript
+
+:savekey
+while not is_key_pressed 0x50 // P
+wait 500
+end
+0@ = 0
+while 0@ < 17
+
+if 0@ == 1
+then 0@++
+else
+if 0@ == 4
+then 0@ = 13
+end
+end
+
+01E5: print_with_number_now "NUMBER" 0@ 1000 1
+
+0AD3: string_format 5@s format "%d" 0@
+08F7: get_clothes_item $player1 0@ 1@ 2@
+0AF1: write_int_to_ini_file 1@ "cleo\mszcloth.ini" 5@s "txd"
+0AF1: write_int_to_ini_file 2@ "cleo\mszcloth.ini" 5@s "dff"
+
+0@++
+end
+0@ = 1
+while 0@ < 13
+if 0@ == 2
+then 0@ = 4
+end
+01E5: print_with_number_now "NUMBER" 0@ 1000 1
+0AD3: string_format 5@s format "%d" 0@
+0AF1: write_int_to_ini_file 1@ "cleo\mszcloth.ini" 5@s "txd"
+0784: give_player_clothes $player1 1@ 2@ 0@
+0@++
+end
+
+0ACC: print_string "clothes saved to mszcloth.ini" 5000
+
+:endofscript
+terminate_this_custom_script

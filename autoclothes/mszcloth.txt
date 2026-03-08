@@ -21,7 +21,7 @@ var
 end
 
 if
-not does_file_exist "cleo\mszomt.ini"
+not does_file_exist "cleo\mszcloth.ini"
 then
 goto @savekey
 else
@@ -36,7 +36,7 @@ end
 :dressup
 0@ = 0
 while 0@ < 17
-
+wait 10
 if 0@ == 1
 then 0@++
 else
@@ -46,7 +46,6 @@ end
 end
 
 01E5: print_with_number_now "NUMBER" 0@ 1000 1
-
 0AD3: string_format 5@s format "%d" 0@
 0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "txd" 1@
 0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "dff" 2@
@@ -56,18 +55,15 @@ end
 end
 
 0@ = 1
-while 0@ < 13
-if 0@ == 2
-then 0@ = 4
-end
 01E5: print_with_number_now "NUMBER" 0@ 1000 1
 0AD3: string_format 5@s format "%d" 0@
 0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "txd" 1@
+0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "dff" 2@
 0784: give_player_clothes $player1 1@ 2@ 0@
-0@++
-end
 
 070D: build_player_model $player1
+
+0ACC: print_string "clothes loaded from mszcloth.ini" 2500
 
 goto @endofscript
 
@@ -77,7 +73,7 @@ wait 500
 end
 0@ = 0
 while 0@ < 17
-
+wait 10
 if 0@ == 1
 then 0@++
 else
@@ -87,7 +83,6 @@ end
 end
 
 01E5: print_with_number_now "NUMBER" 0@ 1000 1
-
 0AD3: string_format 5@s format "%d" 0@
 08F7: get_clothes_item $player1 0@ 1@ 2@
 0AF1: write_int_to_ini_file 1@ "cleo\mszcloth.ini" 5@s "txd"
@@ -95,19 +90,15 @@ end
 
 0@++
 end
+
 0@ = 1
-while 0@ < 13
-if 0@ == 2
-then 0@ = 4
-end
 01E5: print_with_number_now "NUMBER" 0@ 1000 1
 0AD3: string_format 5@s format "%d" 0@
+08F7: get_clothes_item $player1 0@ 1@ 2@
 0AF1: write_int_to_ini_file 1@ "cleo\mszcloth.ini" 5@s "txd"
-0784: give_player_clothes $player1 1@ 2@ 0@
-0@++
-end
+0AF1: write_int_to_ini_file 2@ "cleo\mszcloth.ini" 5@s "dff"
 
-0ACC: print_string "clothes saved to mszcloth.ini" 5000
+0ACC: print_string "clothes saved to mszcloth.ini" 2500
 
 :endofscript
 terminate_this_custom_script

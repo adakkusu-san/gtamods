@@ -9,10 +9,11 @@ INI file should be self-explanatory
 [msztime]
 hour = 6
 minute = 30
-freeze = 1
+freeze = 0xba
 ```
 
-if you set to "freeze" the time in the INI file, you can then press `;` to 
-"unfreeze" the time
+press `;` to "unfreeze" the time. you can change the key in the INI file
+
+I'll try to make it so you can easily change the time in-game
 
 I may later add to set the weather too, and make this into a menu instead

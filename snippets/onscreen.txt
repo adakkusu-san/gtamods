@@ -1,0 +1,18 @@
+{$CLEO .cs}
+
+/*
+counter, 0=Number, 1=Bar
+timer, 0=Up, 1=Down
+*/
+
+014E: display_onscreen_timer $var 0
+03C3: display_onscreen_timer_with_string $var 0 'DUMMY'
+
+03C4: display_onscreen_counter_with_string $var 0 'DUMMY'
+04F7: display_nth_onscreen_counter_with_string $var 0 0 'DUMMY'
+
+059C: set_onscreen_counter_flash_when_first_displayed $var True
+0396: freeze_onscreen_timer True
+
+014F: clear_onscreen_timer $var
+0151: clear_onscreen_counter $var

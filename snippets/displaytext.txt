@@ -1,0 +1,58 @@
+{$CLEO .cs}
+
+03F0: use_text_commands 1
+
+033E: display_text X Y 'GXTKEY'
+
+045A: display_text_with_number X Y 'GXTKEY' 0@
+045B: display_text_with_2_numbers X Y 'GXTKEY' 0@ 1@
+07FC: display_text_with_float X Y 'GXTKEY' 0@ 1
+
+0ADF: add_text_label 'GXTKEY' "CUSTOM!!"
+0ADF: add_text_label 'GXTKEY1' "CUSTOM!! ~1~"
+0ADF: add_text_label 'GXTKEY2' "CUSTOM!! ~1~.~1~"
+0AE0: remove_text_label 'GXTKEY'
+0AE0: remove_text_label 'GXTKEY1'
+0AE0: remove_text_label 'GXTKEY2'
+
+033F: set_text_scale 0.48 1.12
+0340: set_text_colour 225 225 225 255 {r, g, b, a}
+0343: set_text_wrapx 182.0
+0348: set_text_proportional 0
+0349: set_text_font 1
+
+0342: set_text_centre 0
+0344: set_text_centre_size 640.0
+
+03E0: set_text_draw_before_fade 1
+03E4: set_text_right_justify 1
+
+060D: set_text_dropshadow 0 0 0 0 0 {dist, r, g, b, a}
+081C: set_text_edge 0 0 0 0 0 {size, r, g, b, a}
+
+0937: draw_window 10.0 10.0 60.0 60.0 'GXTKEY' 0 {x1, y1, x2, y2}
+
+tl = 560.0
+tr = 600.0
+bl = 210.0
+br = 240.0
+w = tr
+w -= tl
+h = br
+h -= bl
+w2 = w
+w2 /= 2.0
+h2 = h
+h2 /= 2.0
+mX = tl
+mX += w2
+mY = bl
+mY += h2
+038E: draw_rect mX mY w h 0 0 0 255
+// use this result instead of all the above
+0AD1: print_formatted_now "mX=%.1f / mY=%.1f / w=%.1f / h=%.1f" 2000 mX mY w h
+// screenshot or change it to output to a file or whatever
+
+03F0: use_text_commands 0
+
+// TODO: create menu

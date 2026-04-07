@@ -10,11 +10,11 @@ floatdint = $827
 origfloat = $3401
 str = $7891
 
-time_start = $2270
-time_end = $2269
-time_diff = $2268
+time_start = $2229
+time_end = $2230
+time_diff = $2231
 
-sc_part = $2267
+sc_part = $2232
 
 fov = $3402
 
@@ -23,47 +23,48 @@ tbone_h = $2380
 toreno_h = $2381
 jizzy_h = $2391
 
-ryder_car = $829
-ryder = $830
-balla = $831
-ryder_status = $834
-ryder_walk = $2266
+ryder_car = $2233
+ryder = $2234
+balla = $2237
+ryder_status = $2238
+ryder_walk = $2239
 
-tbone_car = $828
-tbone = $829
-tbone_status = $833
-tbone_walk = $2265
+tbone_car = $2267
+tbone = $2268
+tbone_status = $2269
+tbone_walk = $2270
 
-toreno_car = $836
-toreno = $837
-toreno_status = $832
-toreno_walk = $835
+toreno_car = $2271
+toreno = $2272
+toreno_status = $2273
+toreno_walk = $2274
 
 min_x = $2382
 min_y = $2383
 min_z = $2384
-offset_x = $2385
-offset_y = $2386
-offset_z = $2387
+off_x = $2385
+off_y = $2386
+off_z = $2387
 max_x = $2388
 max_y = $2389
 max_z = $2390
 
-jizzy_car = $838
-jizzy = $839
-jizzy_status = $840
-jizzy_walk = $841
-jizzy_progress = $8282
+jizzy_car = $2275
+jizzy = $2276
+jizzy_status = $2277
+jizzy_walk = $2278
+jizzy_progress = $2279
 
-end_car = $8283
-pro = $2264
+end_car = $2280
+pro = $2281
 
-savanna = $2263
+savanna = $2282
 
-ryder_finish = $2262
-tbone_finish = $2261
-toreno_finish = $2260
-jizzy_finish = $2259
+reach_dest = $2283
+
+count = $2283
+cnt_timer = $6960
+
 end
 
 var
@@ -74,6 +75,12 @@ ryder_h : float
 tbone_h : float
 toreno_h : float
 jizzy_h : float
+
+time_start : int
+time_end : int
+time_diff : int
+count : int
+cnt_timer : int
 
 off_x : float
 off_y : float
@@ -133,21 +140,7 @@ wait 0
 033E: display_text 20.0 60.0 "MSZDBG"
 */
 
-time_start = get_game_timer
-time_end = 0
-time_diff = 0
-
-sc_part = 0
-
-ryder_h = 0.0
-tbone_h = 0.0
-toreno_h = 0.0
-jizzy_h = 0.0
-
-ryder_finish = 0
-tbone_finish = 0
-toreno_finish = 0
-jizzy_finish = 0
+gosub @varinit
 
 request_model #CAMERA
 request_model #SAVANNA
@@ -210,6 +203,33 @@ end
 end
 return
 
+:varinit
+// after many crashes, I found out that not initializing the variables caused them
+// who would've thought
+ryder_car = -1
+ryder = -1
+balla = -1
+tbone_car = -1
+tbone = -1
+toreno_car = -1
+toreno = -1
+jizzy_car = -1
+jizzy = -1
+end_car = -1
+pro = -1
+savanna = -1
+ryder_h = 0.0
+tbone_h = 0.0
+toreno_h = 0.0
+jizzy_h = 0.0
+time_start = get_game_timer
+time_end = 0
+time_diff = 0
+sc_part = 0
+reach_dest = 0
+cnt_timer = time_start
+return
+
 :text_format
 0343: set_text_wrapx 640.0
 03E4: set_text_right_justify true
@@ -219,6 +239,9 @@ return
 
 :display_text
 03F0: use_text_commands True
+gosub @text_format
+03E4: set_text_right_justify false
+045A: display_text_with_number 40.0 200.0 "NUMBER" count
 gosub @text_format
 0340: set_text_colour 208 95 208 255 // violet
 045A: display_text_with_number 620.0 400.0 "NUMBER" sc_part
@@ -233,21 +256,16 @@ else
 end
 045B: display_text_with_2_numbers 620.0 380.0 str floatint floatdint
 origfloat = 0.0
-if sc_part == 3
-then
+switch sc_part
+case 3
 origfloat = ryder_h
-end
-if sc_part == 6
-then
+case 6
 origfloat = tbone_h
-end
-if sc_part == 9
-then
+case 9
 origfloat = toreno_h
-end
-if sc_part == 12
-then
+case 12
 origfloat = jizzy_h
+default
 end
 gosub @float2int
 gosub @text_format
@@ -266,8 +284,68 @@ end
 03F0: use_text_commands False
 return
 
+:countdown
+switch count
+case 5
+cnt_timer = time_end
+cnt_timer += 999
+0ACB: print_big_string "5" 1100 4
+count --
+case 4
+if cnt_timer < time_end
+then
+cnt_timer = time_end
+cnt_timer += 999
+0ACB: print_big_string "4" 1100 4
+count --
+end
+case 3
+if cnt_timer < time_end
+then
+cnt_timer = time_end
+cnt_timer += 999
+0ACB: print_big_string "3" 1100 4
+count --
+end
+case 2
+if cnt_timer < time_end
+then
+cnt_timer = time_end
+cnt_timer += 999
+0ACB: print_big_string "2" 1100 4
+count --
+end
+case 1
+if cnt_timer < time_end
+then
+cnt_timer = time_end
+cnt_timer += 999
+0ACB: print_big_string "1" 1100 4
+count --
+end
+case 0
+if cnt_timer < time_end
+then
+cnt_timer = time_end
+cnt_timer += 999
+0ACB: print_big_string "GO!" 1100 4
+count = 9
+print_string_now "fade out happened" 1000
+01B4: set_player_control $player1 1
+end
+default
+end
+return
+
 :cutscene_things
 gosub @ryder_car_create
+
+01B4: set_player_control $player1 0
+0373: set_camera_behind_player
+02EB: restore_camera_jumpcut
+print_string_now "waiting for fade out to happen" 5000
+count = 5
+
 while true
 wait 0
 
@@ -288,6 +366,7 @@ if sc_part == 0
 then
 time_end = get_game_timer
 time_diff = time_end - time_start
+gosub @countdown
 if time_diff > 8000
 then
 0395: clear_area -2151.4746 -2442.0647 29.6328 50.0 1
@@ -296,8 +375,8 @@ then
 05EB: start_playback_recorded_car ryder_car 190
 end
 sc_part = 1
+count = 0
 else
-print_string_now "waiting some amount of time" 500
 end
 end
 
@@ -546,7 +625,7 @@ end
 
 if sc_part >= 3
 then
-if ryder_finish == 0
+if not is_global_var_bit_set_const reach_dest 0
 then
 if locate_char_any_means_2d ryder -2160.41 -2461.46 4.0 4.0 False
 then
@@ -557,14 +636,14 @@ else
 01C2: mark_char_as_no_longer_needed ryder
 01C2: mark_char_as_no_longer_needed balla
 01C3: mark_car_as_no_longer_needed ryder_car
-ryder_finish = 1
+08BA: set_global_var_bit_const reach_dest 0
 end
 end
 end
 end
 if sc_part >= 6
 then
-if tbone_finish == 0
+if not is_global_var_bit_set_const reach_dest 1
 then
 if locate_char_any_means_2d tbone -2161.33 -2460.52 4.0 4.0 False
 then
@@ -574,14 +653,14 @@ break
 else
 01C2: mark_char_as_no_longer_needed tbone
 01C3: mark_car_as_no_longer_needed tbone_car
-tbone_finish = 1
+08BA: set_global_var_bit_const reach_dest 1
 end
 end
 end
 end
 if sc_part >= 9
 then
-if toreno_finish == 0
+if not is_global_var_bit_set_const reach_dest 2
 then
 if locate_char_any_means_2d toreno -2162.81 -2459.83 4.0 4.0 False
 then
@@ -591,14 +670,14 @@ break
 else
 01C2: mark_char_as_no_longer_needed toreno
 01C3: mark_char_as_no_longer_needed toreno_car
-toreno_finish = 1
+08BA: set_global_var_bit_const reach_dest 2
 end
 end
 end
 end
 if sc_part >= 12
 then
-if jizzy_finish == 0
+if not is_global_var_bit_set_const reach_dest 3
 then
 if locate_char_any_means_2d jizzy -2163.53 -2458.75 4.0 4.0 False
 then
@@ -609,7 +688,7 @@ else
 01C2: mark_char_as_no_longer_needed jizzy
 01C2: mark_char_as_no_longer_needed pro
 01C3: mark_car_as_no_longer_needed jizzy_car
-jizzy_finish = 1
+08BA: set_global_var_bit_const reach_dest 3
 end
 end
 end

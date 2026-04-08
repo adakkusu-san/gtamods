@@ -30,6 +30,8 @@ remove/comment
 search for :PIMP_20217
 (do the same as above)
 
+// but as mentioned, after you start in bayside you'll have to go to sf anyway
+
 //
 
 // make valet also available in ls and vg
@@ -48,8 +50,7 @@ $10791 = 288.6038
 // search for :VALET_2371
 replace
 ```
-if 
-  is_char_in_area_2d $scplayer -1893.4186 1119.2267 -1617.9149 828.85 False
+if is_char_in_area_2d $scplayer -1893.4186 1119.2267 -1617.9149 828.85 False
 goto_if_false @VALET_2472
 $val_Area = 2
 ```
@@ -73,40 +74,31 @@ end
 
 below
 ```
-if 
-  not is_char_dead $scplayer
+if not is_char_dead $scplayer
 goto_if_false @VALET_3852
 ```
 insert
 ```
-if 
-  $val_Area == 1
+if $val_Area == 1
 goto_if_false @VALET_N3
-if 
-  locate_char_on_foot_3d $scplayer 328.1585 -1512.8881 35.0247 2.0 2.0 2.0 TRUE
+if locate_char_on_foot_3d $scplayer 328.1585 -1512.8881 35.0247 2.0 2.0 2.0 TRUE
 goto_if_false @VALET_N3
-if 
-  is_player_wearing $player1 BodyPart.SpecialCostume "VALET"
+if is_player_wearing $player1 BodyPart.SpecialCostume "VALET"
 goto_if_false @VALET_3836
-if 
-  not is_wanted_level_greater $player1 0
+if not is_wanted_level_greater $player1 0
 goto_if_false @VALET_3813
 print_now 'VAL_A7' 5000 1 // ~s~Valet Parking
 $player_on_valet_mission = 1
 $onmission = 1
 goto @VALET_3829
 :VALET_N3
-if 
-  $val_Area == 3
+if $val_Area == 3
 goto_if_false @VALET_N2
-if 
-  locate_char_on_foot_3d $scplayer 2021.3368 1918.2360 11.3438 2.0 2.0 2.0 TRUE
+if locate_char_on_foot_3d $scplayer 2021.3368 1918.2360 11.3438 2.0 2.0 2.0 TRUE
 goto_if_false @VALET_N2
-if 
-  is_player_wearing $player1 BodyPart.SpecialCostume "VALET"
+if is_player_wearing $player1 BodyPart.SpecialCostume "VALET"
 goto_if_false @VALET_3836
-if 
-  not is_wanted_level_greater $player1 0
+if not is_wanted_level_greater $player1 0
 goto_if_false @VALET_3813
 print_now 'VAL_A7' 5000 1 // ~s~Valet Parking
 $player_on_valet_mission = 1
@@ -127,7 +119,7 @@ with
 if not is_int_var_equal_to_constant $ONMISSION == 2
 goto_if_false @VALET_L_197
 ```
-(or something else that can't happen)
+(or NOPs or something else that can't happen)
 
 replace
 ```
@@ -154,15 +146,84 @@ with
 if not $val_Area == 0
 ```
 
+// now you don't have to wonder what that huge building in LS with underground 
+// parking garage is for. same for the one in LV with the huge (seriously) doors, 
+// and some flickering floor tiles in front of them
+
+// NOTE: the 2D box in LV is a bit wrong and doesn't expand all the way south, 
+// will have to look into it. also, there is a long way to go back to the place 
+// in LV, no wonder it's been disabled
+
+//
+
 // photo opp cutscene
-// TODO
+
+// these are mostly just some camera angles, still thought it'd be interesting
+
+//
 
 // bcou cutscene
-// TODO
+
+search for :BCOUR_371
+change 746@ from 0 to -1
+
+after
+```
+681@ = 0
+```
+insert
+```
+create_car #WAYFARER -2485.6458 7.4586 24.6316 36@
+set_car_heading 36@ 159.0957
+change_car_colour 36@ 55 1
+warp_char_into_car $scplayer 36@
+force_car_lights 36@ 1
+set_char_coordinates $scplayer -2484.2043 49.2125 26.4078
+```
+
+search for :BCOUR_2468
+remove/comment
+```
+// 36@ = store_car_char_is_in $scplayer
+```
+
+search for :BCOUR_3725
+below
+```
+set_player_control $player1 False
+```
+insert
+```
+if not is_char_dead 38@
+then
+task_pick_up_object 38@ 37@ 0.0 -0.2 0.0 PedBoneId.HandR HoldOrientation.Bone "NULL" "NULL" False
+end
+```
+
+search for :BCOUR_4093
+above
+```
+748@ = 20
+```
+insert
+```
+task_pick_up_object 38@ 37@ 0.0 0.15 0.0 PedBoneId.HandR HoldOrientation.Bone "NULL" "NULL" False
+delete_object 37@
+```
+
+// the game loads some models and animation but doesn't seem to do much with them normally
+
+// fun fact, there is always gonna be an object created at {x}-2492.5 {y}0.5 {z}24.7
+// after you start the side-mission, and it won't be removed (unless you despawn it by 
+// going too far from it). There's also one near the place you start the mission at, but 
+// it's there to be already loaded and not pop into existence or whatever 
+// after you throw it the first time
+
+//
 
 // mt bike race cutscene
 // TODO
-unused lvar_float 659@ 660@ 661@
+// need 3 var_float, 1 var_int
 
 // between :label12466 and :label12473
 // will be :cutscenething
@@ -171,6 +232,8 @@ at :label12546, insert gosub below
 ```
 goto_if_false @MTBIKER_13253
 ```
+
+//
 
 // maybe more
 // TODO

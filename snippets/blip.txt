@@ -1,0 +1,38 @@
+{$CLEO .cs}
+
+// 0161: add_blip_for_car_old 1@ {colour} {display} to 0@
+// 0167: add_blip_for_coord_old x y z {colour} {display} to 0@
+0186: add_blip_for_car 1@ to 0@
+0187: add_blip_for_char 1@ to 0@
+0188: add_blip_for_object 0@
+018A: add_blip_for_coord x y z to 0@
+03DC: add_blip_for_pickup 0@
+06C4: add_blip_for_searchlight 1@ to 0@
+0888: add_blip_for_dead_char 1@ to 0@
+
+02A8: add_sprite_blip_for_coord x y z {sprite} to 0@
+02A7: add_sprite_blip_for_contact_point x y z {sprite} to 0@
+
+04CE: add_short_range_sprite_blip_for_coord x y z {sprite} to 0@
+0570: add_short_range_sprite_blip_for_contact_point x y z {sprite} to 0@
+
+0165: change_blip_colour 0@ to 5 {Red=0, Green=1, Blue=2, White=3, Yellow=4, Purple=5, Cyan=6, Threat=7, Destination=8}
+0168: change_blip_scale 0@ size {1 or 2 or 3}
+018B: change_blip_display 0@ to 3 {None=0, Marker=1, Blip=2, Both=3}
+
+07BF: set_blip_always_display_on_zoomed_radar 0@ True
+07E0: set_blip_as_friendly 0@ True
+08DC: set_blip_entry_exit 0@ x y r
+08FB: set_coord_blip_appearance 0@ to 0 {Normal=0, Friend=1, Enemy=2}
+
+0AB6: get_target_blip_coords to x y z
+
+09A6: show_blips_on_all_levels True
+09AC: hide_all_frontend_blips False
+
+075C: does_blip_exist 0@
+
+0164: remove_blip 0@
+
+0E2A: add_cleo_blip 0@ x y {short} r g b a
+0E2B: remove_cleo_blip 0@

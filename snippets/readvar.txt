@@ -1,0 +1,9 @@
+{$CLEO .cs}
+wait 1000
+
+// TODO: mostly like readlvar
+// except it starts from 0xA49980 or something
+// but you don't need to do read_memory, you can just use 
+// global variable notation like $2 for example
+
+terminate_this_custom_script

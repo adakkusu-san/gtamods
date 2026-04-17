@@ -1,0 +1,2 @@
+; this will contain some of the settings I use for some ASI mods
+; note that this may only contain non-defaults

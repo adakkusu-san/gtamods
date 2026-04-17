@@ -1,0 +1,48 @@
+{$CLEO .cs}
+wait 1000
+
+// some missions have progress variables and some other things, figure out 
+// what they are and use
+// 0926: get_number_of_instances_of_streamed_script {id}
+// in a loop until it's at least 1
+// example id, 11 for the first mission
+
+/*
+while true
+wait 250
+0926: n get_number_of_instances_of_streamed_script 11
+while n > 0
+wait 0
+use_text_commands 1
+display_text_with_number 600.0 200.0 'NUMBER' variable
+use_text_commands 0
+if TIMERA > 500
+then
+0926: n get_number_of_instances_of_streamed_script 11
+TIMERA = 0
+TIMERB = 0
+end
+end
+end
+*/
+
+// if it doesn't work, look into where the current script name is located 
+// and compare for a string instead
+
+// don't know where the memory address is atm tho
+
+// or use
+/*
+while true
+wait 0
+if
+0AAA: struct = get_script_struct_named 'intro1'
+then
+use_text_commands 1
+display_text_with_number 600.0 200.0 'NUMBER' variable
+use_text_commands 0
+end
+end
+*/
+
+terminate_this_custom_script

@@ -21,16 +21,15 @@ between 374@ and 293@
 376@ = 75.3359
 ```
 
-search for :PIMP_20010
-remove/comment
+search for :PIMP_20010 and :PIMP_20217
+remove/comment for both
 ```
 //60@(50@,28i) = 1
 ```
 
-search for :PIMP_20217
-(do the same as above)
-
 // but as mentioned, after you start in bayside you'll have to go to sf anyway
+
+// there's also some unused coords that I may look into
 
 //
 
@@ -154,11 +153,20 @@ if not $val_Area == 0
 // will have to look into it. also, there is a long way to go back to the place 
 // in LV, no wonder it's been disabled
 
+// the LS one is a bit cramped and the ramp space for the cars to go up to is 
+// a bit too small, I don't know how to explain it
+
 //
 
 // photo opp cutscene
 
 // these are mostly just some camera angles, still thought it'd be interesting
+
+//
+
+// drive-by mission camera angles
+
+// same as above
 
 //
 
@@ -211,6 +219,8 @@ task_pick_up_object 38@ 37@ 0.0 0.15 0.0 PedBoneId.HandR HoldOrientation.Bone "N
 delete_object 37@
 ```
 
+// also the subtitles are missing I think
+
 // the game loads some models and animation but doesn't seem to do much with them normally
 
 // fun fact, there is always gonna be an object created at {x}-2492.5 {y}0.5 {z}24.7
@@ -218,6 +228,9 @@ delete_object 37@
 // going too far from it). There's also one near the place you start the mission at, but 
 // it's there to be already loaded and not pop into existence or whatever 
 // after you throw it the first time
+
+// in LS and LV it's on the roof, you can see it if you know where it is; in SF 
+// it's _inside_ the building, don't know how to reach it
 
 //
 
@@ -235,5 +248,16 @@ goto_if_false @MTBIKER_13253
 
 //
 
-// maybe more
+// optional weapons
+
+// flowers missing at {x}289.53 {y}-1391.96 {z}13.96 with var $3262
+// bribe missing at {x}-111.0 {y}1132.0 {z}20.0 with var $3388
+// no weapon assigned at vars $3248 $5241 $5242 $5243
+
+//
+
+// there's also (many) unused vars in the first setup "missions", will have 
+// to see how many there are and how to make use of them
+
+// maybe more, that's all I could remember so far
 // TODO

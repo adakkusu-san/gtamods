@@ -1,0 +1,61 @@
+015A: restore_camera
+02EB: restore_camera_jumpcut
+0373: set_camera_behind_player
+03C8: set_camera_in_front_of_player
+0925: camera_reset_new_scriptables
+
+0158: point_camera_at_car
+0159: point_camera_at_char
+0160: point_camera_at_point
+0679: attach_camera_to_vehicle
+067A: attach_camera_to_vehicle_look_at_vehicle
+067B: attach_camera_to_vehicle_look_at_char
+067C: attach_camera_to_char
+067D: attach_camera_to_char_look_at_vehicle
+067E: attach_camera_to_char_look_at_char
+
+0944: set_camera_in_front_of_char
+
+00C2: is_point_on_screen
+
+015F: set_fixed_camera_position
+032A: set_camera_zoom
+041D: set_near_clip
+0460: set_interpolation_parameters
+
+068D: get_active_camera_coordinates
+068E: get_active_camera_point_at
+
+0801: get_camera_fov
+
+0920: camera_set_vector_track
+0936: camera_set_vector_move
+
+092F: camera_persist_track
+0930: camera_persist_pos
+0931: camera_persist_fov
+
+0934: camera_is_vector_track_running
+0933: camera_is_vector_move_running
+
+093D: set_cinema_camera
+
+0A39: get_player_in_car_camera_mode
+09AD: set_player_in_car_camera_mode
+0822: set_first_person_in_car_camera_mode
+
+09EC: allow_fixed_camera_collision
+
+09EF: set_vehicle_camera_tweak
+09F0: reset_vehicle_camera_tweak
+
+0A25: set_camera_position_unfixed
+
+0EBE: locate_camera_distance_to_coordinates
+0EB2: get_offset_from_camera_in_world_coords
+0F14: get_camera_rotation_input_values
+0F15: set_camera_rotation_input_values
+0F0E: get_third_person_camera_target
+0F10: get_active_camera_rotation
+0E64: get_current_camera_mode
+0E60: set_camera_control

@@ -250,6 +250,20 @@ goto_if_false @MTBIKER_13253
 
 // optional weapons
 
+// originally at -2120.0 96.39 39.0
+0215: remove_pickup $3373
+0213: create_pickup #BRIBE PickupType.OnStreetSlow 2120.0 96.39 39.0 to $3373
+
+// originally misplaced at -2094.0 -488.0 36.0
+// TODO: change nearby
+0215: remove_pickup $3109
+032B: create_pickup_with_ammo #rifle PickupType.OnStreetSlow 30 -2094.0 -488.0 36.0 to $3109
+
+originally misplaced at -1871.0 351.0 26.0
+// TODO: change nearby
+0215: remove_pickup $3128
+0213: create_pickup #KNIFECUR PickupType.OnStreetSlow -1871.0 351.0 26.0 to $3128
+
 // flowers missing at {x}289.53 {y}-1391.96 {z}13.96 with var $3262
 // bribe missing at {x}-111.0 {y}1132.0 {z}20.0 with var $3388
 // no weapon assigned at vars $3248 $5241 $5242 $5243

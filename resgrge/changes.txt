@@ -1,0 +1,32 @@
+# IPLs in data/maps/
+
+goto SFe.ipl
+remove the first 3 lines from grge
+
+goto lvE.ipl
+remove the second line from grge
+
+goto lvN.ipl
+remove the first line from grge
+
+
+# binary IPLs extracted from gta3.img
+
+goto SFe.ipl
+remove IDs 10149, 10150, 10154
+
+goto lvE.ipl
+remove IDs 8957
+
+goto lvW.ipl
+remove IDs 7707, 7709
+
+
+# IDEs in data/maps/
+goto lvE.ide
+at ID 8957, change 5th number from 128 to 2176 (add 2048(garage) to 128)
+
+
+# object.dat
+search for `garage doors`
+copy one of the lines and change the name to `pier69gdr` and move it below

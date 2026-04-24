@@ -35,8 +35,13 @@ end
 /*
 while true
 wait 0
-if
+if TIMERA > 250
+then
 0AAA: struct = get_script_struct_named 'intro1'
+TIMERA = 0
+TIMERB = 0
+end
+if not struct == 0
 then
 use_text_commands 1
 display_text_with_number 600.0 200.0 'NUMBER' variable

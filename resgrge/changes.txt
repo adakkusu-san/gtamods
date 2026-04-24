@@ -6,7 +6,7 @@ remove the first 3 lines from grge
 goto lvE.ipl
 remove the second line from grge
 
-goto lvN.ipl
+goto lvW.ipl
 remove the first line from grge
 
 

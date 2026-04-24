@@ -1,0 +1,2612 @@
+DEFINE MISSIONS 1
+DEFINE MISSION 0 AT @SCRASH3          // 555 WE TIP
+DEFINE EXTERNAL_SCRIPTS 1 // Use -1 to not build script.img, or 0 to build script.img with a dummy script
+DEFINE SCRIPT 0 AT @VALET          // VALET
+DEFINE UNKNOWN_EMPTY_SEGMENT 0
+DEFINE UNKNOWN_THREADS_MEMORY 574
+
+var
+    $player1: Player
+    $scplayer: Char
+    $Players_Group: Group
+end
+
+//-------------MAIN---------------
+script_name 'MAIN'
+Game.SetMaxWantedLevel(6)
+set_deatharrest_state 0
+Clock.SetTimeOfDay(8, 0)
+Streaming.RequestCollision(2488.56, -1666.84)
+Streaming.LoadScene(2488.56, -1666.84, 13.38)
+$player1 = Player.Create(0, 2488.56, -1666.84, 13.38)
+$scplayer = $player1.GetChar
+$Players_Group = $player1.GetGroup
+Camera.SetBehindPlayer
+Weather.ForceNow(WeatherType.ExtraSunnyLa)
+wait 0
+
+// set player model
+/*$player1.GiveClothesOutsideShop("PLAYER_FACE", "HEAD", BodyPart.Head)
+$player1.GiveClothesOutsideShop("JEANSDENIM", "JEANS", BodyPart.Legs)
+$player1.GiveClothesOutsideShop("SNEAKERBINCBLK", "SNEAKER", BodyPart.Shoes)
+$player1.GiveClothesOutsideShop("VEST", "VEST", BodyPart.Torso)
+*/
+give_player_clothes_outside_shop 0 "cornrows" "cornrows" BodyPart.Head
+give_player_clothes_outside_shop 0 "tshirtilovels" "tshirt" BodyPart.Torso
+give_player_clothes_outside_shop 0 "worktrcamogry" "worktr" BodyPart.Legs
+give_player_clothes_outside_shop 0 "sneakerbincblk" "sneaker" BodyPart.Shoes
+give_player_clothes_outside_shop 0 "glasses04dark" "glasses04" BodyPart.Glasses
+give_player_clothes_outside_shop 0 "captruck" "captruck" BodyPart.Hat
+
+$player1.BuildModel
+$player1.SetControl(True)
+
+Camera.DoFade(0, Fade.In)
+Streaming.SetAreaVisible(0)
+Stat.SetInt(181, 4)
+Restart.AddHospital(2027.77, -1420.52, 15.99, 137.0, 0)
+Restart.AddPolice(1550.68, -1675.49, 14.51, 90.0, 0)
+declare_mission_flag $ONMISSION
+$mission_trigger_wait_time = 250
+Text.ClearHelp
+
+// put your start_new_script commands here
+// start_new_script @
+start_new_script @VALET_L
+
+$depth_lvl = 0
+
+$valet_unlocked = 1
+$valet_oddjob_opened = 1
+
+$uniform_pickup_LA = create_pickup #CLOTHESP PickupType.Once 365.7 -1558.1 32.9
+$uniform_pickup_SF = create_pickup #CLOTHESP PickupType.Once -1762.5 905.9 24.8
+$uniform_pickup_LV = create_pickup #CLOTHESP PickupType.Once 2076.1 1912.0 13.9
+
+$uniform_pickup_LA_blip = add_blip_for_pickup $uniform_pickup_LA
+$uniform_pickup_SF_blip = add_blip_for_pickup $uniform_pickup_SF
+$uniform_pickup_LV_blip = add_blip_for_pickup $uniform_pickup_LV
+
+change_blip_display $uniform_pickup_LA_blip 2
+change_blip_display $uniform_pickup_SF_blip 2
+change_blip_display $uniform_pickup_LV_blip 2
+
+change_blip_scale $uniform_pickup_LA_blip 2
+change_blip_scale $uniform_pickup_SF_blip 2
+change_blip_scale $uniform_pickup_LV_blip 2
+
+$uniform_pickup_LA2 = create_pickup #CLOTHESP PickupType.Once 0.0 0.0 0.0
+$uniform_pickup_SF2 = create_pickup #CLOTHESP PickupType.Once 0.0 0.0 0.0
+$uniform_pickup_LV2 = create_pickup #CLOTHESP PickupType.Once 0.0 0.0 0.0
+
+do_fade 250 Fade.In
+
+/*
+$kart_ls_spawn = create_car_generator 301.7 -1527.9 24.9 0.0 #KART -1 -1 True 0 0 0 10000
+switch_car_generator $kart_ls_spawn 101
+$kart_ls2_spawn = create_car_generator 311.7 -1527.9 24.9 0.0 #KART -1 -1 True 0 0 0 10000
+switch_car_generator $kart_ls2_spawn 101
+$kart_sf_spawn = create_car_generator -1711.5 995.7 17.9 90.0 #KART -1 -1 True 0 0 0 10000
+switch_car_generator $kart_sf_spawn 101
+$kart_sf2_spawn = create_car_generator -1711.5 1002.7 17.9 90.0 #KART -1 -1 True 0 0 0 10000
+switch_car_generator $kart_sf2_spawn 101
+$kart_lv_spawn = create_car_generator 1928.4 1762.0 12.0 0.0 #KART -1 -1 True 0 0 0 10000
+switch_car_generator $kart_lv_spawn 101
+$kart_lv2_spawn = create_car_generator 1928.4 1784.0 12.0 180.0 #KART -1 -1 True 0 0 0 10000
+switch_car_generator $kart_lv2_spawn 101
+*/
+
+switch_death_penalties False
+switch_arrest_penalties False
+
+while true
+    wait $mission_trigger_wait_time
+//  $hours, $minutes = Clock.GetTimeOfDay()
+gosub @uniform_pickup_check
+end
+
+:uniform_pickup_check
+if has_pickup_been_collected $uniform_pickup_LA
+then
+do_fade 500 Fade.Out
+remove_pickup $uniform_pickup_LA
+remove_pickup $uniform_pickup_LA2
+gosub @uniform_pickup_wear
+$uniform_pickup_LA2 = create_pickup #CLOTHESP PickupType.Once 368.7 -1554.1 32.9
+$uniform_pickup_LA2_blip = add_blip_for_pickup $uniform_pickup_LA2
+change_blip_display $uniform_pickup_LA2_blip 2
+change_blip_scale $uniform_pickup_LA2_blip 2
+do_fade 500 Fade.In
+end
+
+if has_pickup_been_collected $uniform_pickup_LA2
+then
+do_fade 500 Fade.Out
+remove_pickup $uniform_pickup_LA
+remove_pickup $uniform_pickup_LA2
+gosub @uniform_pickup_wear
+$uniform_pickup_LA = create_pickup #CLOTHESP PickupType.Once 365.7 -1558.1 32.9
+$uniform_pickup_LA_blip = add_blip_for_pickup $uniform_pickup_LA
+change_blip_display $uniform_pickup_LA_blip 2
+change_blip_scale $uniform_pickup_LA_blip 2
+do_fade 500 Fade.In
+end
+
+if has_pickup_been_collected $uniform_pickup_SF
+then
+do_fade 500 Fade.Out
+remove_pickup $uniform_pickup_SF
+remove_pickup $uniform_pickup_SF2
+gosub @uniform_pickup_wear
+$uniform_pickup_SF2 = create_pickup #CLOTHESP PickupType.Once -1745.5 905.9 24.8
+$uniform_pickup_SF2_blip = add_blip_for_pickup $uniform_pickup_SF2
+change_blip_display $uniform_pickup_SF2_blip 2
+change_blip_scale $uniform_pickup_SF2_blip 2
+do_fade 500 Fade.In
+end
+
+if has_pickup_been_collected $uniform_pickup_SF2
+then
+do_fade 500 Fade.Out
+remove_pickup $uniform_pickup_SF
+remove_pickup $uniform_pickup_SF2
+gosub @uniform_pickup_wear
+$uniform_pickup_SF = create_pickup #CLOTHESP PickupType.Once -1762.5 905.9 24.8
+$uniform_pickup_SF_blip = add_blip_for_pickup $uniform_pickup_SF
+change_blip_display $uniform_pickup_SF_blip 2
+change_blip_scale $uniform_pickup_SF_blip 2
+do_fade 500 Fade.In
+end
+
+if has_pickup_been_collected $uniform_pickup_LV
+then
+do_fade 500 Fade.Out
+remove_pickup $uniform_pickup_LV
+remove_pickup $uniform_pickup_LV2
+gosub @uniform_pickup_wear
+$uniform_pickup_LV2 = create_pickup #CLOTHESP PickupType.Once 2075.0 1922.6 14.3
+$uniform_pickup_LV2_blip = add_blip_for_pickup $uniform_pickup_LV2
+change_blip_display $uniform_pickup_LV2_blip 2
+change_blip_scale $uniform_pickup_LV2_blip 2
+do_fade 500 Fade.In
+end
+
+if has_pickup_been_collected $uniform_pickup_LV2
+then
+do_fade 500 Fade.Out
+remove_pickup $uniform_pickup_LV
+remove_pickup $uniform_pickup_LV2
+gosub @uniform_pickup_wear
+$uniform_pickup_LV = create_pickup #CLOTHESP PickupType.Once 2076.1 1912.0 13.9
+$uniform_pickup_LV_blip = add_blip_for_pickup $uniform_pickup_LV
+change_blip_display $uniform_pickup_LV_blip 2
+change_blip_scale $uniform_pickup_LV_blip 2
+do_fade 500 Fade.In
+end
+
+return
+
+:uniform_pickup_wear
+while get_fading_status
+wait 250
+end
+if not is_player_wearing $player1 BodyPart.SpecialCostume "VALET"
+then
+give_player_clothes_outside_shop $player1 "VALET" "VALET" BodyPart.SpecialCostume
+else
+give_player_clothes $player1 0 0 BodyPart.SpecialCostume
+end
+build_player_model $player1
+return
+
+// put your scripts here
+:VALET_L
+script_name 'VALET_L'
+
+:VALET_L_11
+wait 0
+
+use_text_commands 1
+set_text_right_justify True
+set_text_proportional True
+display_text_with_number 30.0 290.0 'NUMBER' $depth_lvl
+set_text_right_justify True
+set_text_proportional True
+display_text_with_number 30.0 300.0 'NUMBER' $val_area
+use_text_commands 0
+
+$depth_lvl = 0
+
+if $valet_unlocked == 1
+goto_if_false @VALET_L_197
+
+$depth_lvl++ // 1
+
+if 
+not is_int_var_equal_to_constant $ONMISSION == 2
+goto_if_false @VALET_L_197
+
+$depth_lvl++ // 2
+
+$number_of_instances_of_streamed_script = get_number_of_instances_of_streamed_script 0
+if $number_of_instances_of_streamed_script == 0
+goto_if_false @VALET_L_197
+
+$depth_lvl++ // 3
+
+if is_player_playing $player1
+goto_if_false @VALET_L_197
+
+$depth_lvl++ // 4
+
+//if is_char_in_area_2d $scplayer {leftBottomX} -1893.4186 {leftBottomY} 1119.2267 {rightTopX} -1617.9149 {rightTopY} 828.85 {drawSphere} False
+//if not is_char_in_area_2d $scplayer 0.0 0.0 0.0 0.0 False
+if or
+is_char_in_area_2d $scplayer 215.3643 -1651.7264 440.7311 -1369.3921 False
+is_char_in_area_2d $scplayer -1893.4186 1119.2267 -1617.9149 828.85 False
+is_char_in_area_2d $scplayer 2205.5503 1723.6938 1830.5140 2086.0610 False // y was 1772.4938
+goto_if_false @VALET_L_168
+
+$depth_lvl++ // 5
+
+stream_script 0
+
+if has_streamed_script_loaded 0
+goto_if_false @VALET_L_161
+
+$depth_lvl++ // 6
+
+start_new_streamed_script 0
+
+:VALET_L_161
+goto @VALET_L_197
+
+:VALET_L_168
+if or
+$val_Area == 1
+$val_Area == 2
+$val_Area == 3
+goto_if_false @VALET_L_197
+mark_streamed_script_as_no_longer_needed 0
+$val_Area = 0
+
+:VALET_L_197
+goto @VALET_L_11
+
+
+//-------------Mission 0---------------
+// put your missions here
+:SCRASH3
+// TODO
+return
+
+//-------------External script 0---------------
+// put your external scripts here
+
+:VALET
+script_name 'VALET'
+8@ = 0
+5@ = 1
+$can_script_be_cleaned = 1
+$valet_scene_running = 0
+$valet_can_be_created[0] = 1
+$valet_can_be_created[1] = 1
+$valet_can_be_created[2] = 1
+4@ = 0
+/*
+if 8@ == 99
+goto_if_false @VALET_400
+create_char PedType.CivMale {modelId} #WMYVA {x} $valet_la_x(6@,3f) {y} $valet_la_y(6@,3f) {z} $valet_la_z(6@,3f) {var_handle} $valet(6@,3i)
+$a_thief = create_char PedType.CivMale {modelId} #WMYVA {x} $valet_la_x(6@,3f) {y} $valet_la_y(6@,3f) {z} $valet_la_z(6@,3f)
+$valet_pickup_car = create_car #CHEETAH {x} 0.0 {y} 0.0 {z} 0.0
+$valet_car[1] = create_car #CHEETAH {x} 0.0 {y} 0.0 {z} 0.0
+$drop_off_car = create_car #CHEETAH {x} 0.0 {y} 0.0 {z} 0.0
+$valet_mission_car = create_car #CHEETAH {x} 0.0 {y} 0.0 {z} 0.0
+$sc3_missioncar = create_car #CHEETAH {x} 0.0 {y} 0.0 {z} 0.0
+$mission_drop_off_car = create_car #CHEETAH {x} 0.0 {y} 0.0 {z} 0.0
+$a_pickup_car = create_car #CHEETAH {x} 0.0 {y} 0.0 {z} 0.0
+19@ = add_blip_for_car $valet_pickup_car
+20@ = add_blip_for_coord 21@ {y} 22@ {z} 23@
+7@ = copy_char_decision_maker DecisionMakerCharTemplate.Empty
+20@ = add_blip_for_coord 21@ {y} 22@ {z} 23@
+20@ = add_blip_for_coord 21@ {y} 22@ {z} 23@
+20@ = add_blip_for_coord 21@ {y} 22@ {z} 23@
+20@ = add_blip_for_coord 21@ {y} 22@ {z} 23@
+*/
+
+:VALET_400
+if not is_char_dead $valet[0]
+goto_if_false @VALET_421
+delete_char $valet[0]
+
+:VALET_421
+set_var_int_to_constant $valet_task[0] = 1
+$valet_can_be_created[0] = 1
+if not is_char_dead $valet[1]
+goto_if_false @VALET_456
+delete_char $valet[1]
+
+:VALET_456
+set_var_int_to_constant $valet_task[1] = 1
+$valet_can_be_created[1] = 1
+if not is_char_dead $valet[2]
+goto_if_false @VALET_491
+delete_char $valet[2]
+
+:VALET_491
+set_var_int_to_constant $valet_task[2] = 1
+$valet_can_be_created[2] = 1
+$valet_la_x[0] = 330.4229
+$valet_la_x[1] = 328.9663
+$valet_la_x[2] = 326.4376
+$valet_la_y[0] = -1510.7832
+$valet_la_y[1] = -1512.4666
+$valet_la_y[2] = -1515.4058
+$valet_la_z[0] = 35.0247
+$valet_la_z[1] = 35.0247
+$valet_la_z[2] = 35.0313
+$valet_la_h[0] = 222.0
+$valet_la_h[1] = 222.0
+$valet_la_h[2] = 222.0
+$valet_sf_x[0] = -1761.0292
+$valet_sf_x[1] = -1759.9138
+$valet_sf_x[2] = -1749.7128
+$valet_sf_y[0] = 959.5504
+$valet_sf_y[1] = 960.2669
+$valet_sf_y[2] = 960.1956
+$valet_sf_z[0] = 23.8828
+$valet_sf_z[1] = 23.8828
+$valet_sf_z[2] = 23.8906
+$valet_sf_h[0] = 204.3268
+$valet_sf_h[1] = 199.167
+$valet_sf_h[2] = 142.3291
+$valet_vg_x[0] = 2029.7582
+$valet_vg_x[1] = 2027.6661
+$valet_vg_x[2] = 2026.3937
+$valet_vg_y[0] = 1905.9434
+
+// msz scfix
+$valet_vg_y[1] = 1907.6700
+$valet_vg_y[2] = 1905.8102
+$valet_vg_z[0] = 11.3315
+$valet_vg_z[1] = 11.3349
+$valet_vg_z[2] = 11.3313
+$valet_vg_h[0] = 331.7047
+$valet_vg_h[1] = 297.1161
+$valet_vg_h[2] = 288.6038
+// msz scfix
+
+$valet_drop_off_area_x1[1] = 336.9336
+$valet_drop_off_area_x2[1] = 323.919
+$valet_drop_off_area_y1[1] = -1531.027
+$valet_drop_off_area_y2[1] = -1504.1737
+$valet_drop_off_area_x1[2] = -1768.2949
+$valet_drop_off_area_x2[2] = -1729.0944
+$valet_drop_off_area_y1[2] = 958.9591
+$valet_drop_off_area_y2[2] = 942.184
+$valet_drop_off_area_x1[3] = 2050.8811
+$valet_drop_off_area_x2[3] = 2016.9059
+$valet_drop_off_area_y1[3] = 1958.5413
+$valet_drop_off_area_y2[3] = 1871.0653
+$car_park_area_x1[1] = 336.0477
+$car_park_area_y1[1] = -1452.2249
+$car_park_area_z1[1] = 31.9445
+$car_park_area_x2[1] = 271.6679
+$car_park_area_y2[1] = -1550.2423
+$car_park_area_z2[1] = 23.1681
+$car_park_area_x1[2] = -1760.1785
+$car_park_area_y1[2] = 972.2405
+$car_park_area_z1[2] = 16.1633
+$car_park_area_x2[2] = -1679.6055
+$car_park_area_y2[2] = 1064.2927
+$car_park_area_z2[2] = 24.8629
+$car_park_area_x1[3] = 1968.5016
+$car_park_area_y1[3] = 1755.079
+$car_park_area_z1[3] = 11.4898
+$car_park_area_x2[3] = 1917.8112
+$car_park_area_y2[3] = 1788.1465
+$car_park_area_z2[3] = 17.3118
+$find_drop_off_car_x1[1] = 363.3463
+$find_drop_off_car_y1[1] = -1522.3734
+$find_drop_off_car_x2[1] = 393.1729
+$find_drop_off_car_y2[1] = -1479.321
+$find_drop_off_car_h1[1] = 125.0
+$find_drop_off_car_x3[1] = 324.8593
+$find_drop_off_car_y3[1] = -1591.3274
+$find_drop_off_car_x4[1] = 324.8593
+$find_drop_off_car_y4[1] = -1591.3274
+$find_drop_off_car_h2[1] = 338.0
+$find_drop_off_car_x3[2] = -1743.5244
+$find_drop_off_car_y3[2] = 930.9304
+$find_drop_off_car_x4[2] = -1780.0813
+$find_drop_off_car_y4[2] = 908.4018
+$find_drop_off_car_h2[2] = 270.0
+$find_drop_off_car_x1[2] = -1737.7147
+$find_drop_off_car_y1[2] = 943.7812
+$find_drop_off_car_x2[2] = -1704.2163
+$find_drop_off_car_y2[2] = 911.4586
+$find_drop_off_car_h1[2] = 45.0
+$find_drop_off_car_x1[3] = 2067.5288
+$find_drop_off_car_y1[3] = 1957.2887
+$find_drop_off_car_x2[3] = 2097.2629
+$find_drop_off_car_y2[3] = 1976.0001
+$find_drop_off_car_h1[3] = 120.0
+$find_drop_off_car_x3[3] = 2051.5361
+$find_drop_off_car_y3[3] = 1933.6851
+$find_drop_off_car_x4[3] = 2062.8179
+$find_drop_off_car_y4[3] = 1905.0847
+$find_drop_off_car_h2[3] = 7.0
+$drop_off_point_x[1] = 332.8306
+$drop_off_point_y[1] = -1516.2509
+$drop_off_point_z[1] = 34.8606
+$drop_off_point_x[2] = -1754.5139
+$drop_off_point_y[2] = 953.5991
+$drop_off_point_z[2] = 23.75
+$drop_off_point_x[3] = 2035.7292
+$drop_off_point_y[3] = 1912.09
+$drop_off_point_z[3] = 11.1751
+$valet_exit_x[0] = -1748.3761
+$valet_exit_y[0] = 985.3066
+$valet_exit_z[0] = 17.9009
+$valet_exit_x[1] = 330.7534
+$valet_exit_y[1] = -1474.6079
+$valet_exit_z[1] = 24.9126
+$valet_exit_x[2] = -1738.28
+$valet_exit_y[2] = 985.5498
+$valet_exit_z[2] = 16.6718
+$valet_exit_x[3] = 2061.3367
+$valet_exit_y[3] = 1808.9561
+$valet_exit_z[3] = 9.6719
+$valet_spawn_x[1] = 403.2297
+$valet_spawn_y[1] = -1475.2976
+$valet_spawn_z[1] = 30.0032
+$valet_spawn_h[1] = 128.9467
+$valet_spawn_x2[1] = 341.1339
+$valet_spawn_y2[1] = -1556.116
+$valet_spawn_z2[1] = 31.9903
+$valet_spawn_h2[1] = 328.7578
+$valet_spawn_x[2] = -1717.2042
+$valet_spawn_y[2] = 962.7901
+$valet_spawn_z[2] = 23.7474
+$valet_spawn_h[2] = 179.9692
+$valet_spawn_x2[2] = -1791.2689
+$valet_spawn_y2[2] = 886.3627
+$valet_spawn_z2[2] = 23.75
+$valet_spawn_h2[2] = 359.2426
+$valet_spawn_x[3] = 2073.5627
+$valet_spawn_y[3] = 1879.7365
+$valet_spawn_z[3] = 10.4288
+$valet_spawn_h[3] = 45.5873
+$valet_spawn_x2[3] = 2084.1565
+$valet_spawn_y2[3] = 1965.5731
+$valet_spawn_z2[3] = 9.9974
+$valet_spawn_h2[3] = 117.4401
+remove_decision_maker 7@
+7@ = copy_char_decision_maker DecisionMakerCharTemplate.Empty
+add_char_decision_maker_event_response 7@ {event} Event.Damage {taskId} TaskId.None {respect} 0.0 {hate} 100.0 {like} 100.0 {dislike} 100.0 {inCar} True {onFoot} True
+add_char_decision_maker_event_response 7@ {event} Event.ShotFired {taskId} TaskId.SimpleDuck {respect} 0.0 {hate} 20.0 {like} 20.0 {dislike} 20.0 {inCar} False {onFoot} True
+add_char_decision_maker_event_response 7@ {event} Event.ShotFired {taskId} TaskId.None {respect} 0.0 {hate} 80.0 {like} 80.0 {dislike} 80.0 {inCar} True {onFoot} True
+$valet_scene_running = 1
+
+:VALET_1959
+wait 0
+if is_player_playing $player1
+goto_if_false @VALET_2291
+if $force_valet_cleanup == 1
+goto_if_false @VALET_2004
+gosub @VALET_16854
+
+:VALET_2004
+if $pause_valet_script <> 1
+goto_if_false @VALET_2284
+if not is_char_dead $scplayer
+goto_if_false @VALET_2284
+if 5@ == 1
+goto_if_false @VALET_2095
+if is_player_wearing $player1 {bodyPart} BodyPart.SpecialCostume {modelName} "VALET"
+goto_if_false @VALET_2088
+5@ = 0
+
+:VALET_2088
+goto @VALET_2127
+
+:VALET_2095
+if not is_player_wearing $player1 {bodyPart} BodyPart.SpecialCostume {modelName} "VALET"
+goto_if_false @VALET_2127
+5@ = 1
+
+:VALET_2127
+gosub @VALET_2371
+if $valet_scene_running == 1
+goto_if_false @VALET_2284
+gosub @VALET_3854
+gosub @VALET_7842
+gosub @VALET_13021
+gosub @VALET_16071
+if is_int_lvar_greater_than_int_lvar TIMERA > 8@
+goto_if_false @VALET_2215
+set_lvar_int_to_lvar_int 8@ = TIMERA
+8@ += 2300
+
+:VALET_2215
+if is_int_lvar_greater_than_int_lvar TIMERA > 9@
+goto_if_false @VALET_2249
+set_lvar_int_to_lvar_int 9@ = TIMERA
+9@ += 100
+
+:VALET_2249
+if is_int_lvar_greater_than_int_lvar TIMERA > 10@
+goto_if_false @VALET_2284
+set_lvar_int_to_lvar_int 10@ = TIMERA
+10@ += 900
+
+:VALET_2284
+goto @VALET_2364
+
+:VALET_2291
+if $valet_scene_running == 1
+goto_if_false @VALET_2364
+if $player_on_valet_mission == 1
+goto_if_false @VALET_2357
+$player_on_valet_mission = 0
+$onmission = 0
+print_big 'M_FAIL' {time} 5000 {style} TextStyle.Middle // ~r~MISSION FAILED!
+
+:VALET_2357
+gosub @VALET_16854
+
+:VALET_2364
+goto @VALET_1959
+
+:VALET_2371
+if is_int_lvar_greater_than_int_lvar TIMERA > 16@
+goto_if_false @VALET_3353
+set_lvar_int_to_lvar_int 16@ = TIMERA
+16@ += 1000
+$player_x, $player_y, $player_z = get_char_coordinates $scplayer
+$val_Area = 0
+
+// msz scfix
+if is_char_in_area_2d $scplayer 215.3643 -1651.7264 440.7311 -1369.3921 False
+then
+$val_Area = 1
+end
+if is_char_in_area_2d $scplayer -1893.4186 1119.2267 -1617.9149 828.85 False
+then
+$val_Area = 2
+end
+if is_char_in_area_2d $scplayer 2205.5503 1723.6938 1830.5140 2086.0610 False // y was 1772.4938
+then
+$val_Area = 3
+end
+// msz scfix
+
+:VALET_2472
+if $val_Area == 0
+goto_if_false @VALET_3118
+$area_visible = get_area_visible 
+if $area_visible == 0
+goto_if_false @VALET_2894
+if $frozen_peds == 0
+goto_if_false @VALET_2887
+if $dont_clear_valets == 0
+goto_if_false @VALET_2670
+if $valet_scene_running == 1
+goto_if_false @VALET_2663
+if $force_valet_on_mission <> 1
+goto_if_false @VALET_2663
+if $player_on_valet_mission == 1
+goto_if_false @VALET_2649
+$player_on_valet_mission = 0
+$onmission = 0
+print 'VAL_A9' {time} 4000 {flag} 1 // ~r~You strayed too far.
+print_big 'VAL_A6' {time} 4000 {style} TextStyle.Middle // ~r~You're fired!
+
+:VALET_2649
+gosub @VALET_16854
+$valet_scene_running = 0
+
+:VALET_2663
+goto @VALET_2887
+
+:VALET_2670
+$frozen_peds = 1
+if not is_char_dead $valet[0]
+goto_if_false @VALET_2747
+freeze_char_position $valet[0] {state} True
+if is_char_in_any_car $valet[0]
+goto_if_false @VALET_2747
+$car = get_car_char_is_using $valet[0]
+if not is_car_dead $car
+goto_if_false @VALET_2747
+freeze_car_position $car {state} True
+
+:VALET_2747
+if not is_char_dead $valet[1]
+goto_if_false @VALET_2817
+freeze_char_position $valet[1] {state} True
+if is_char_in_any_car $valet[1]
+goto_if_false @VALET_2817
+$car = get_car_char_is_using $valet[1]
+if not is_car_dead $car
+goto_if_false @VALET_2817
+freeze_car_position $car {state} True
+
+:VALET_2817
+if not is_char_dead $valet[2]
+goto_if_false @VALET_2887
+freeze_char_position $valet[2] {state} True
+if is_char_in_any_car $valet[2]
+goto_if_false @VALET_2887
+$car = get_car_char_is_using $valet[2]
+if not is_car_dead $car
+goto_if_false @VALET_2887
+freeze_car_position $car {state} True
+
+:VALET_2887
+goto @VALET_3111
+
+:VALET_2894
+$frozen_peds = 1
+if not is_char_dead $valet[0]
+goto_if_false @VALET_2971
+freeze_char_position $valet[0] {state} True
+if is_char_in_any_car $valet[0]
+goto_if_false @VALET_2971
+$car = get_car_char_is_using $valet[0]
+if not is_car_dead $car
+goto_if_false @VALET_2971
+freeze_car_position $car {state} True
+
+:VALET_2971
+if not is_char_dead $valet[1]
+goto_if_false @VALET_3041
+freeze_char_position $valet[1] {state} True
+if is_char_in_any_car $valet[1]
+goto_if_false @VALET_3041
+$car = get_car_char_is_using $valet[1]
+if not is_car_dead $car
+goto_if_false @VALET_3041
+freeze_car_position $car {state} True
+
+:VALET_3041
+if not is_char_dead $valet[2]
+goto_if_false @VALET_3111
+freeze_char_position $valet[2] {state} True
+if is_char_in_any_car $valet[2]
+goto_if_false @VALET_3111
+$car = get_car_char_is_using $valet[2]
+if not is_car_dead $car
+goto_if_false @VALET_3111
+freeze_car_position $car {state} True
+
+:VALET_3111
+goto @VALET_3353
+
+:VALET_3118
+if $frozen_peds == 1
+goto_if_false @VALET_3353
+$frozen_peds = 0
+if not is_char_dead $valet[0]
+goto_if_false @VALET_3213
+freeze_char_position $valet[0] {state} False
+if is_char_in_any_car $valet[0]
+goto_if_false @VALET_3213
+$car = get_car_char_is_using $valet[0]
+if not is_car_dead $car
+goto_if_false @VALET_3213
+freeze_car_position $car {state} False
+
+:VALET_3213
+if not is_char_dead $valet[1]
+goto_if_false @VALET_3283
+freeze_char_position $valet[1] {state} False
+if is_char_in_any_car $valet[1]
+goto_if_false @VALET_3283
+$car = get_car_char_is_using $valet[1]
+if not is_car_dead $car
+goto_if_false @VALET_3283
+freeze_car_position $car {state} False
+
+:VALET_3283
+if not is_char_dead $valet[2]
+goto_if_false @VALET_3353
+freeze_char_position $valet[2] {state} False
+if is_char_in_any_car $valet[2]
+goto_if_false @VALET_3353
+$car = get_car_char_is_using $valet[2]
+if not is_car_dead $car
+goto_if_false @VALET_3353
+freeze_car_position $car {state} False
+
+:VALET_3353
+if $play_was_on_valet_oddjob == 1
+goto_if_false @VALET_3597
+if $val_Area == 1
+goto_if_false @VALET_3444
+if not locate_char_any_means_3d $scplayer {x} 328.1585 {y} -1512.8881 {z} 35.0247 {xRadius} 10.0 {yRadius} 10.0 {zRadius} 10.0 {drawSphere} False
+goto_if_false @VALET_3444
+$play_was_on_valet_oddjob = 0
+
+:VALET_3444
+if $val_Area == 2
+goto_if_false @VALET_3517
+if not locate_char_any_means_3d $scplayer {x} -1753.9363 {y} 961.8587 {z} 23.8906 {xRadius} 10.0 {yRadius} 10.0 {zRadius} 10.0 {drawSphere} False
+goto_if_false @VALET_3517
+$play_was_on_valet_oddjob = 0
+
+:VALET_3517
+if $val_Area == 3
+goto_if_false @VALET_3590
+if not locate_char_any_means_3d $scplayer {x} 2021.3368 {y} 1918.236 {z} 11.3438 {xRadius} 10.0 {yRadius} 10.0 {zRadius} 10.0 {drawSphere} True
+goto_if_false @VALET_3590
+$play_was_on_valet_oddjob = 0
+
+:VALET_3590
+goto @VALET_3852
+
+:VALET_3597
+if $onmission <> 1
+goto_if_false @VALET_3852
+if $valet_oddjob_opened == 1
+goto_if_false @VALET_3852
+if $player_on_valet_mission == 0
+goto_if_false @VALET_3852
+if not is_char_dead $scplayer
+goto_if_false @VALET_3852
+
+// msz scfix
+:VALET_N1
+if $val_Area == 1
+goto_if_false @VALET_N2
+if locate_char_on_foot_3d $scplayer 328.1585 -1512.8881 35.0247 2.0 2.0 2.0 TRUE
+goto_if_false @VALET_N2
+if is_player_wearing $player1 {bodyPart} BodyPart.SpecialCostume {modelName} "VALET"
+goto_if_false @VALET_3836
+if not is_wanted_level_greater $player1 {wantedLevel} 0
+goto_if_false @VALET_3813
+print_now 'VAL_A7' {time} 5000 {flag} 1 // ~s~Valet Parking
+$player_on_valet_mission = 1
+$onmission = 1
+goto @VALET_3829
+
+:VALET_N2
+if $val_Area == 2
+goto_if_false @VALET_N3
+if locate_char_on_foot_3d $scplayer -1753.9363 961.8587 23.8906 2.0 2.0 2.0 True
+goto_if_false @VALET_N3
+if is_player_wearing $player1 {bodyPart} BodyPart.SpecialCostume {modelName} "VALET"
+goto_if_false @VALET_3836
+if not is_wanted_level_greater $player1 {wantedLevel} 0
+goto_if_false @VALET_3813
+print_now 'VAL_A7' {time} 5000 {flag} 1 // ~s~Valet Parking
+$player_on_valet_mission = 1
+$onmission = 1
+goto @VALET_3829
+
+:VALET_N3
+if $val_Area == 3
+goto_if_false @VALET_3852
+if locate_char_on_foot_3d $scplayer 2021.3368 1918.2360 11.3438 2.0 2.0 2.0 TRUE
+goto_if_false @VALET_3852
+if is_player_wearing $player1 {bodyPart} BodyPart.SpecialCostume {modelName} "VALET"
+goto_if_false @VALET_3836
+if not is_wanted_level_greater $player1 {wantedLevel} 0
+goto_if_false @VALET_3813
+print_now 'VAL_A7' {time} 5000 {flag} 1 // ~s~Valet Parking
+$player_on_valet_mission = 1
+$onmission = 1
+goto @VALET_3829
+// msz scfix
+
+:VALET_3813
+print_now 'VAL_C1' {time} 1000 {flag} 1 // ~s~You can't work here with a wanted level!
+
+:VALET_3829
+goto @VALET_3852
+
+:VALET_3836
+print_now 'VAL_90' {time} 1000 {flag} 1 // ~S~Get a valet uniform to work as a valet.
+
+:VALET_3852
+return 
+
+:VALET_3854
+if $player_on_valet_mission == 1
+goto_if_false @VALET_7840
+if is_wanted_level_greater $player1 {wantedLevel} 1
+goto_if_false @VALET_3894
+switch_emergency_services True
+
+:VALET_3894
+if not is_player_wearing $player1 {bodyPart} BodyPart.SpecialCostume {modelName} "VALET"
+goto_if_false @VALET_3958
+print_big 'VAL_A6' {time} 4000 {style} TextStyle.Middle // ~r~You're fired!
+print 'VAL_B1' {time} 5000 {flag} 1 // ~r~You no longer have the valet uniform.
+$valet_mission_flag = 8
+
+:VALET_3958
+if $valet_mission_car <> 0
+goto_if_false @VALET_4102
+if not does_vehicle_exist $valet_mission_car
+goto_if_false @VALET_4047
+if $valet_time_bonus > 0
+goto_if_false @VALET_4033
+print_big 'VAL_A6' {time} 4000 {style} TextStyle.Middle // ~r~You're fired!
+$valet_mission_flag = 8
+
+:VALET_4033
+$valet_mission_car = 0
+goto @VALET_4102
+
+:VALET_4047
+if is_car_dead $valet_mission_car
+goto_if_false @VALET_4102
+print_big 'VAL_A6' {time} 4000 {style} TextStyle.Middle // ~r~You're fired!
+print 'VAL_B6' {time} 5000 {flag} 1 // ~r~The customer's car was destroyed.
+$valet_mission_flag = 8
+
+:VALET_4102
+if $tell_player_to_kill_valet == 0
+goto_if_false @VALET_4152
+if not is_car_dead $mission_drop_off_car
+goto_if_false @VALET_4152
+$a_Car = get_car_blocking_car $mission_drop_off_car
+set_var_int_to_var_int $steal_this_car = $a_Car
+
+:VALET_4152
+if $valet_mission_flag == 0
+goto_if_false @VALET_4575
+if has_model_loaded #WMYVA
+goto_if_false @VALET_4570
+if is_char_dead $valet[0]
+goto_if_false @VALET_4263
+$valet[0] = create_char PedType.CivMale {modelId} #WMYVA {x} -1783.8038 {y} 968.6431 {z} 23.7343
+set_char_decision_maker $valet[0] {handleOrTemplate} 7@
+set_char_only_damaged_by_player $valet[0] {state} True
+set_char_suffers_critical_hits $valet[0] {state} False
+$valet_task[0] = 2
+0@ = 2
+
+:VALET_4263
+if is_char_dead $valet[1]
+goto_if_false @VALET_4340
+$valet[1] = create_char PedType.CivMale {modelId} #WMYVA {x} -1782.6503 {y} 965.0251 {z} 23.8906
+set_char_decision_maker $valet[1] {handleOrTemplate} 7@
+set_char_only_damaged_by_player $valet[1] {state} True
+set_char_suffers_critical_hits $valet[1] {state} False
+$valet_task[1] = 2
+1@ = 2
+
+:VALET_4340
+if is_char_dead $valet[2]
+goto_if_false @VALET_4417
+$valet[2] = create_char PedType.CivMale {modelId} #WMYVA {x} -1783.7314 {y} 965.4009 {z} 23.8961
+set_char_decision_maker $valet[2] {handleOrTemplate} 7@
+set_char_only_damaged_by_player $valet[2] {state} True
+set_char_suffers_critical_hits $valet[2] {state} False
+$valet_task[2] = 2
+2@ = 2
+
+:VALET_4417
+set_ped_density_multiplier 0.3
+switch_emergency_services False
+$valet_mission_car = 0
+load_mission_text 'VALET1'
+clear_prints 
+print_big 'VAL_A7' {time} 3000 {style} TextStyle.Middle // ~s~Valet Parking
+$total_cars_parked = 0
+set_lvar_int_to_lvar_int 17@ = TIMERA
+17@ += 4000
+$valet_mission_flag = 1
+if not is_char_dead $valet[0]
+goto_if_false @VALET_4517
+set_char_cant_be_dragged_out $valet[0] {state} True
+
+:VALET_4517
+if not is_char_dead $valet[1]
+goto_if_false @VALET_4540
+set_char_cant_be_dragged_out $valet[1] {state} True
+
+:VALET_4540
+if not is_char_dead $valet[2]
+goto_if_false @VALET_4563
+set_char_cant_be_dragged_out $valet[2] {state} True
+
+:VALET_4563
+goto @VALET_4575
+
+:VALET_4570
+request_model #WMYVA
+
+:VALET_4575
+if $valet_mission_flag == 1
+goto_if_false @VALET_4642
+if is_int_lvar_greater_than_int_lvar TIMERA > 17@
+goto_if_false @VALET_4642
+$valet_cars_to_park = 3
+$valet_countdown = 2
+18@ = 1
+clear_prints 
+$valet_mission_flag = 2
+
+:VALET_4642
+if $valet_mission_flag == 2
+goto_if_false @VALET_4947
+if is_int_lvar_greater_than_int_lvar TIMERA > 17@
+goto_if_false @VALET_4947
+clear_prints 
+print_with_number_big 'VAL_60' {num} 18@ {duration} 4000 {style} TextStyle.Middle // ~s~Valet Mission Level ~1~
+print_with_2_numbers_now 'VAL_76' {num1} $valet_cars_to_park {num2} $valet_countdown {duration} 4000 {style} TextStyle.Middle // ~s~Park ~1~ cars in ~1~ minutes.
+$valet_countdown *= 60000
+clear_onscreen_counter $valet_countdown
+clear_onscreen_counter $valet_cars_to_park
+display_onscreen_timer_with_string $valet_countdown {direction} TimerDirection.Down {text} 'VAL_A8' // ~s~Time left
+display_nth_onscreen_counter_with_string $valet_cars_to_park {display} CounterDisplay.Number {slot} 1 {text} 'VAL_A3' // Cars to park
+set_lvar_int_to_lvar_int 17@ = TIMERA
+17@ += 5000
+$valet_mission_flag = 4
+if $valet_task[0] == 6
+goto_if_false @VALET_4831
+$valet_task[0] = 1
+$valet_mission_dead = 0
+
+:VALET_4831
+if $valet_task[1] == 6
+goto_if_false @VALET_4863
+$valet_task[1] = 1
+$1898 = 0
+
+:VALET_4863
+if $valet_task[2] == 6
+goto_if_false @VALET_4895
+$valet_task[2] = 1
+$1899 = 0
+
+:VALET_4895
+if $drop_off_car <> 0
+goto_if_false @VALET_4921
+set_var_int_to_var_int $mission_drop_off_car = $drop_off_car
+
+:VALET_4921
+if $valet_pickup_car <> 0
+goto_if_false @VALET_4947
+set_var_int_to_var_int $mission_drop_off_car = $valet_pickup_car
+
+:VALET_4947
+if $valet_mission_flag == 3
+goto_if_false @VALET_4991
+if is_int_lvar_greater_than_int_lvar TIMERA > 17@
+goto_if_false @VALET_4991
+$valet_mission_flag = 4
+
+:VALET_4991
+if and
+  is_char_dead $valet[0]
+  $valet_mission_dead == 0
+  $valet_task[0] == 6
+goto_if_false @VALET_5077
+$valet_mission_dead = 1
+$valet_countdown -= 20000
+if 0 > $valet_countdown
+goto_if_false @VALET_5061
+$valet_countdown = 0
+
+:VALET_5061
+print 'VAL_A19' {time} 4000 {flag} 1 // ~s~You killed a valet.~n~-20 second penalty.
+
+:VALET_5077
+if and
+  is_char_dead $valet[1]
+  $1898 == 0
+  $valet_task[1] == 6
+goto_if_false @VALET_5163
+$1898 = 1
+$valet_countdown -= 20000
+if 0 > $valet_countdown
+goto_if_false @VALET_5147
+$valet_countdown = 0
+
+:VALET_5147
+print 'VAL_A19' {time} 4000 {flag} 1 // ~s~You killed a valet.~n~-20 second penalty.
+
+:VALET_5163
+if and
+  is_char_dead $valet[2]
+  $1899 == 0
+  $valet_task[2] == 6
+goto_if_false @VALET_5249
+$1899 = 1
+$valet_countdown -= 20000
+if 0 > $valet_countdown
+goto_if_false @VALET_5233
+$valet_countdown = 0
+
+:VALET_5233
+print 'VAL_A19' {time} 4000 {flag} 1 // ~s~You killed a valet.~n~-20 second penalty.
+
+:VALET_5249
+if $valet_mission_flag > 3
+goto_if_false @VALET_5326
+if $valet_countdown == 0
+goto_if_false @VALET_5326
+clear_prints 
+print 'VAL_47' {time} 4000 {flag} 1 // ~r~You ran out of time!
+print_big 'VAL_A6' {time} 4000 {style} TextStyle.Middle // ~r~You're fired!
+$valet_mission_flag = 8
+
+:VALET_5326
+if $valet_mission_flag == 4
+goto_if_false @VALET_5476
+if $valet_pickup_car <> 0
+goto_if_false @VALET_5476
+if not is_car_dead $valet_pickup_car
+goto_if_false @VALET_5476
+if is_int_var_equal_to_int_var $valet_pickup_car == $mission_drop_off_car
+goto_if_false @VALET_5476
+$a_ped = get_driver_of_car $valet_pickup_car
+if $a_ped == -1
+goto_if_false @VALET_5476
+$valet_mission_flag = 20
+print 'VAL_84' {time} 4000 {flag} 1 // ~s~There's a car waiting to be serviced.
+19@ = add_blip_for_car $valet_pickup_car
+set_blip_as_friendly 19@ {state} True
+set_var_int_to_var_int $valet_mission_car = $valet_pickup_car
+$valet_mission_flag = 5
+
+:VALET_5476
+if $valet_mission_flag == 5
+goto_if_false @VALET_5875
+if not is_car_dead $valet_mission_car
+goto_if_false @VALET_5849
+$a_ped = get_driver_of_car $valet_mission_car
+if $a_ped <> -1
+goto_if_false @VALET_5842
+if is_int_var_equal_to_int_var $a_ped == $scplayer
+goto_if_false @VALET_5765
+clear_prints 
+print 'VAL_25' {time} 4000 {flag} 1 // ~s~Take this car to the marked parking space.
+remove_blip 19@
+$valet_time_bonus = 60
+set_car_health $valet_mission_car {health} 1000
+clear_onscreen_counter $valet_time_bonus
+display_nth_onscreen_counter_with_string $valet_time_bonus {display} CounterDisplay.Number {slot} 2 {text} 'VAL_A17' // Damage Bonus
+21@, 22@, 23@ = get_parking_node_in_area $car_park_area_x1($val_Area,4f) {leftBottomY} $car_park_area_y1($val_Area,4f) {leftBottomZ} $car_park_area_z1($val_Area,4f) {rightTopX} $car_park_area_x2($val_Area,4f) {rightTopY} $car_park_area_y2($val_Area,4f) {rightTopZ} $car_park_area_z2($val_Area,4f)
+if 21@ <> 0.0
+goto_if_false @VALET_5758
+clear_area 21@ {y} 22@ {z} 23@ {radius} 5.0 {clearParticles} False
+set_var_float_to_lvar_float $parking_x = 21@
+set_var_float_to_lvar_float $parking_y = 22@
+set_var_float_to_lvar_float $parking_z = 23@
+remove_blip 20@
+20@ = add_blip_for_coord 21@ {y} 22@ {z} 23@
+$valet_mission_flag = 6
+
+:VALET_5758
+goto @VALET_5842
+
+:VALET_5765
+if or
+  is_int_var_equal_to_int_var $a_ped == $valet[0]
+  is_int_var_equal_to_int_var $a_ped == $valet[1]
+  is_int_var_equal_to_int_var $a_ped == $valet[2]
+goto_if_false @VALET_5842
+remove_blip 19@
+print 'VAL_79' {time} 4000 {flag} 1 // ~s~Another valet picked up the waiting car.
+$valet_mission_flag = 4
+$valet_mission_car = 0
+$mission_drop_off_car = 0
+
+:VALET_5842
+goto @VALET_5875
+
+:VALET_5849
+remove_blip 19@
+$valet_mission_flag = 4
+$valet_mission_car = 0
+$mission_drop_off_car = 0
+
+:VALET_5875
+if $valet_mission_flag == 6
+goto_if_false @VALET_7430
+if not is_char_dead $scplayer
+goto_if_false @VALET_7430
+if not is_car_dead $valet_mission_car
+goto_if_false @VALET_7407
+$valet_time_bonus = get_car_health $valet_mission_car
+$a_int = 17
+sub_int_lvar_from_int_var $a_int -= 18@
+$a_int *= 20
+$valet_time_bonus += -1000
+abs_var_int $valet_time_bonus
+cset_lvar_float_to_var_int 13@ =# $valet_time_bonus
+cset_lvar_float_to_var_int 27@ =# $a_int
+set_lvar_float_to_lvar_float 28@ = 13@
+div_float_lvar_by_float_lvar 28@ /= 27@
+if 28@ > 1.0
+goto_if_false @VALET_6031
+28@ = 1.0
+
+:VALET_6031
+28@ -= 1.0
+28@ = abs_lvar_float 
+28@ *= 45.0
+cset_var_int_to_lvar_float $valet_time_bonus =# 28@
+if $valet_time_bonus > 45
+goto_if_false @VALET_6089
+$valet_time_bonus = 45
+
+:VALET_6089
+if 0 > $valet_time_bonus
+goto_if_false @VALET_6114
+$valet_time_bonus = 0
+
+:VALET_6114
+$a_ped = get_driver_of_car $valet_mission_car
+if not is_int_var_equal_to_int_var $a_ped == $scplayer
+goto_if_false @VALET_6173
+remove_blip 20@
+19@ = add_blip_for_car $valet_mission_car
+set_blip_as_friendly 19@ {state} True
+clear_onscreen_counter $valet_time_bonus
+$valet_mission_flag = 7
+
+:VALET_6173
+if and
+  $a_ped <> -1
+  not is_int_var_equal_to_int_var $a_ped == $scplayer
+  not is_int_var_equal_to_int_var $a_ped == $valet[0]
+  not is_int_var_equal_to_int_var $a_ped == $valet[1]
+  not is_int_var_equal_to_int_var $a_ped == $valet[2]
+goto_if_false @VALET_6263
+$valet_mission_car = 0
+remove_blip 19@
+clear_onscreen_counter $valet_time_bonus
+$valet_mission_flag = 4
+print 'VAL_A4' {time} 4000 {flag} 1 // ~s~Your car's been stolen! Get back to the service area.
+
+:VALET_6263
+if is_char_in_any_car $scplayer
+goto_if_false @VALET_6314
+if not is_char_in_car $scplayer {vehicle} $valet_mission_car
+goto_if_false @VALET_6314
+print_now 'VAL_A18' {time} 1000 {flag} 1 // ~s~This car doesn't need servicing.
+
+:VALET_6314
+if locate_stopped_car_3d $valet_mission_car {x} 21@ {y} 22@ {z} 23@ {xRadius} 4.0 {yRadius} 4.0 {zRadius} 4.0 {drawSphere} True
+goto_if_false @VALET_7400
+remove_blip 20@
+set_car_engine_broken $valet_mission_car {state} True
+mark_car_as_no_longer_needed $valet_mission_car
+clear_onscreen_counter $valet_time_bonus
+set_lvar_int_to_var_int 6@ = $valet_countdown
+$x, $y, $z, 24@ = get_closest_car_node_with_heading 21@ {y} 22@ {z} 23@
+$x, $y, $z = get_car_coordinates $valet_mission_car
+26@ = get_distance_between_coords_2d $x {fromY} $y {toX} 21@ {toZ} 22@
+25@ = get_car_heading $valet_mission_car
+24@ = abs_lvar_float 
+if 24@ > 180.0
+goto_if_false @VALET_6484
+24@ -= 180.0
+
+:VALET_6484
+25@ = abs_lvar_float 
+if 25@ > 180.0
+goto_if_false @VALET_6520
+25@ -= 180.0
+
+:VALET_6520
+set_lvar_float_to_lvar_float 27@ = 24@
+sub_float_lvar_from_float_lvar 27@ -= 25@
+27@ = abs_lvar_float 
+cset_lvar_float_to_lvar_int 13@ =# 18@
+13@ *= 2.0
+29@ = 45.0
+sub_float_lvar_from_float_lvar 29@ -= 13@
+set_lvar_float_to_lvar_float 28@ = 27@
+div_float_lvar_by_float_lvar 28@ /= 29@
+13@ = 1.0
+sub_float_lvar_from_float_lvar 13@ -= 28@
+if 0.0 > 13@
+goto_if_false @VALET_6642
+13@ = 0.0
+
+:VALET_6642
+13@ *= 10.0
+cset_var_int_to_lvar_float $angle_bonus =# 13@
+cset_var_int_to_lvar_float $parking_bonus =# 13@
+cset_lvar_float_to_lvar_int 13@ =# 18@
+13@ -= 20.0
+13@ = abs_lvar_float 
+13@ /= 6.0
+set_lvar_float_to_lvar_float 27@ = 26@
+div_float_lvar_by_float_lvar 27@ /= 13@
+28@ = 1.0
+sub_float_lvar_from_float_lvar 28@ -= 27@
+if 0.0 > 28@
+goto_if_false @VALET_6766
+28@ = 0.0
+
+:VALET_6766
+28@ *= 5.0
+cset_var_int_to_lvar_float $a_int =# 28@
+set_var_int_to_var_int $distance_bonus = $a_int
+add_int_var_to_int_var $parking_bonus += $a_int
+if and
+  $parking_bonus <> 1
+  $valet_time_bonus <> 1
+goto_if_false @VALET_6847
+print_with_2_numbers_now 'VAL_A10' {num1} $parking_bonus {num2} $valet_time_bonus {duration} 2500 {style} TextStyle.Middle // ~s~Parking Bonus +~1~ seconds~n~Damage Bonus +~1~ seconds
+
+:VALET_6847
+if and
+  $parking_bonus == 1
+  $valet_time_bonus <> 1
+goto_if_false @VALET_6894
+print_with_2_numbers_now 'VAL_A12' {num1} $parking_bonus {num2} $valet_time_bonus {duration} 2500 {style} TextStyle.Middle // ~s~Parking Bonus +~1~ second~n~Damage Bonus +~1~ seconds
+
+:VALET_6894
+if and
+  $parking_bonus <> 1
+  $valet_time_bonus == 1
+goto_if_false @VALET_6941
+print_with_2_numbers_now 'VAL_A11' {num1} $parking_bonus {num2} $valet_time_bonus {duration} 2500 {style} TextStyle.Middle // ~s~Parking Bonus +~1~ seconds~n~Damage Bonus +~1~ second
+
+:VALET_6941
+if and
+  $parking_bonus == 0
+  $valet_time_bonus == 0
+goto_if_false @VALET_6988
+print_with_2_numbers_now 'VAL_A13' {num1} $parking_bonus {num2} $valet_time_bonus {duration} 2500 {style} TextStyle.Middle // ~s~Parking Bonus +~1~ second~n~Damage Bonus +~1~ second
+
+:VALET_6988
+set_var_int_to_var_int $a_int = $parking_bonus
+add_int_var_to_int_var $a_int += $valet_time_bonus
+if $a_int <> 1
+goto_if_false @VALET_7048
+print_with_number 'VAL_A14' {num} $a_int {duration} 2500 {flag} 1 // ~s~Total Bonus +~1~ seconds
+goto @VALET_7067
+
+:VALET_7048
+print_with_number 'VAL_A15' {num} $a_int {duration} 2500 {flag} 1 // ~s~Total Bonus +~1~ second
+
+:VALET_7067
+print 'VAL_A16' {time} 3000 {flag} 1 // ~s~Get back to the car port.
+$valet_time_bonus *= 1000
+$parking_bonus *= 1000
+add_int_var_to_int_var $valet_countdown += $valet_time_bonus
+add_int_var_to_int_var $valet_countdown += $parking_bonus
+$valet_time_bonus = 0
+$valet_mission_car = 0
+$valet_cars_to_park -= 1
+$total_cars_parked += 1
+$a_int = get_int_stat StatId.ValetCarsParked
+if is_int_var_greater_than_int_var $total_cars_parked > $a_int
+goto_if_false @VALET_7178
+set_int_stat StatId.ValetCarsParked {value} $total_cars_parked
+
+:VALET_7178
+if $valet_cars_to_park == 0
+goto_if_false @VALET_7393
+clear_prints 
+clear_onscreen_timer $valet_countdown
+clear_onscreen_counter $valet_cars_to_park
+18@ += 1
+$valet_mission_flag = 2
+set_var_int_to_lvar_int $valet_cars_to_park = 18@
+$valet_cars_to_park += 2
+$valet_countdown = 2
+if 6 > 18@
+goto_if_false @VALET_7361
+set_var_int_to_lvar_int $a_int = 18@
+$a_int -= 1
+print_with_number_big 'VAL_62' {num} $a_int {duration} 3000 {style} TextStyle.Middle // ~s~Valet Mission Level ~1~ Passed.
+set_var_int_to_lvar_int $a_int = 18@
+$a_int *= 100
+$a_int -= 100
+print_with_number 'VAL_65' {num} $a_int {duration} 4000 {flag} 1 // ~s~You received $~1~ tip.
+add_score $player1 {money} $a_int
+set_lvar_int_to_lvar_int 17@ = TIMERA
+17@ += 5000
+
+:VALET_7361
+if 18@ == 6
+goto_if_false @VALET_7386
+gosub @VALET_16442
+
+:VALET_7386
+goto @VALET_7400
+
+:VALET_7393
+$valet_mission_flag = 4
+
+:VALET_7400
+goto @VALET_7430
+
+:VALET_7407
+print_big 'VAL_A6' {time} 4000 {style} TextStyle.Middle // ~r~You're fired!
+$valet_mission_flag = 8
+
+:VALET_7430
+if $valet_mission_flag == 7
+goto_if_false @VALET_7675
+if not is_car_dead $valet_mission_car
+goto_if_false @VALET_7649
+$a_ped = get_driver_of_car $valet_mission_car
+if $a_ped <> -1
+goto_if_false @VALET_7642
+if is_int_var_equal_to_int_var $a_ped == $scplayer
+goto_if_false @VALET_7565
+remove_blip 19@
+20@ = add_blip_for_coord 21@ {y} 22@ {z} 23@
+clear_onscreen_counter $valet_time_bonus
+display_nth_onscreen_counter_with_string $valet_time_bonus {display} CounterDisplay.Number {slot} 2 {text} 'VAL_A17' // Damage Bonus
+$valet_mission_flag = 6
+goto @VALET_7642
+
+:VALET_7565
+if or
+  is_int_var_equal_to_int_var $a_ped == $valet[0]
+  is_int_var_equal_to_int_var $a_ped == $valet[1]
+  is_int_var_equal_to_int_var $a_ped == $valet[2]
+goto_if_false @VALET_7642
+remove_blip 19@
+print 'VAL_79' {time} 4000 {flag} 1 // ~s~Another valet picked up the waiting car.
+$valet_mission_flag = 4
+$valet_mission_car = 0
+$mission_drop_off_car = 0
+
+:VALET_7642
+goto @VALET_7675
+
+:VALET_7649
+remove_blip 19@
+$valet_mission_flag = 4
+$valet_mission_car = 0
+$mission_drop_off_car = 0
+
+:VALET_7675
+if $valet_mission_flag == 8
+goto_if_false @VALET_7840
+remove_blip 19@
+remove_blip 20@
+clear_onscreen_counter $valet_time_bonus
+clear_onscreen_timer $valet_countdown
+clear_onscreen_counter $valet_cars_to_park
+set_ped_density_multiplier 1.0
+switch_emergency_services True
+$player_on_valet_mission = 0
+$onmission = 0
+$valet_mission_flag = 0
+$valet_mission_car = 0
+$play_was_on_valet_oddjob = 1
+set_wanted_multiplier 1.0
+if not is_char_dead $valet[0]
+goto_if_false @VALET_7794
+set_char_cant_be_dragged_out $valet[0] {state} False
+
+:VALET_7794
+if not is_char_dead $valet[1]
+goto_if_false @VALET_7817
+set_char_cant_be_dragged_out $valet[1] {state} False
+
+:VALET_7817
+if not is_char_dead $valet[2]
+goto_if_false @VALET_7840
+set_char_cant_be_dragged_out $valet[2] {state} False
+
+:VALET_7840
+return 
+
+:VALET_7842
+6@ = 0
+
+:VALET_7849
+if 3 > 6@
+goto_if_false @VALET_13019
+if not is_char_dead $valet(6@,3i)
+goto_if_false @VALET_7985
+if is_char_stuck_under_car $valet(6@,3i)
+goto_if_false @VALET_7985
+3@ = get_script_task_status $valet(6@,3i) {taskId} 2089
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_7985
+clear_char_tasks_immediately $valet(6@,3i)
+task_die_named_anim $valet(6@,3i) {animationName} "KO_SKID_FRONT" {animationFile} "PED" {blendSpeed} 1000.0 {time} 0
+
+:VALET_7985
+if and
+  $valet_task(6@,3i) <> 4
+  $valet_task(6@,3i) <> 5
+goto_if_false @VALET_8395
+if and
+  not is_char_dead $valet(6@,3i)
+  not is_char_dead $scplayer
+goto_if_false @VALET_8395
+if is_char_responding_to_event $valet(6@,3i) {event} Event.Damage
+goto_if_false @VALET_8344
+if or
+  locate_char_any_means_char_3d $scplayer {target} $valet(6@,3i) {xRadius} 5.0 {yRadius} 5.0 {zRadius} 5.0 {drawSphere} False
+  has_char_been_damaged_by_char $valet(6@,3i) {handle} $scplayer
+goto_if_false @VALET_8328
+$valet_task(6@,3i) = 5
+$this_a += 1
+clear_char_tasks $valet(6@,3i)
+if not is_char_dead $valet[0]
+goto_if_false @VALET_8203
+if locate_char_any_means_char_3d $scplayer {target} $valet[0] {xRadius} 15.0 {yRadius} 15.0 {zRadius} 15.0 {drawSphere} False
+goto_if_false @VALET_8203
+$valet_task[0] = 5
+
+:VALET_8203
+if not is_char_dead $valet[1]
+goto_if_false @VALET_8262
+if locate_char_any_means_char_3d $scplayer {target} $valet[1] {xRadius} 15.0 {yRadius} 15.0 {zRadius} 15.0 {drawSphere} False
+goto_if_false @VALET_8262
+$valet_task[1] = 5
+
+:VALET_8262
+if not is_char_dead $valet[2]
+goto_if_false @VALET_8321
+if locate_char_any_means_char_3d $scplayer {target} $valet[2] {xRadius} 15.0 {yRadius} 15.0 {zRadius} 15.0 {drawSphere} False
+goto_if_false @VALET_8321
+$valet_task[2] = 5
+
+:VALET_8321
+goto @VALET_8344
+
+:VALET_8328
+set_var_int_to_lvar_int $valet_task(6@,3i) = 0@(6@,3i)
+
+:VALET_8344
+if $valet_task(6@,3i) <> 9
+goto_if_false @VALET_8395
+if is_int_var_equal_to_constant $valet_event == 7
+goto_if_false @VALET_8395
+$valet_task(6@,3i) = 9
+
+:VALET_8395
+if $valet_task(6@,3i) <> 1
+goto_if_false @VALET_8704
+if does_char_exist $valet(6@,3i)
+goto_if_false @VALET_8704
+if is_char_dead $valet(6@,3i)
+goto_if_false @VALET_8704
+$x, $y, $z = get_dead_char_coordinates $valet(6@,3i)
+if $valet_task(6@,3i) <> 6
+goto_if_false @VALET_8684
+if not is_char_dead $scplayer
+goto_if_false @VALET_8576
+if locate_char_any_means_3d $scplayer {x} $x {y} $y {z} $z {xRadius} 15.0 {yRadius} 15.0 {zRadius} 15.0 {drawSphere} False
+goto_if_false @VALET_8576
+$valet_task[0] = 5
+$valet_task[1] = 5
+$valet_task[2] = 5
+
+:VALET_8576
+if $player_on_valet_mission == 1
+goto_if_false @VALET_8684
+if or
+  is_float_var_greater_than_float_var $car_park_area_x1($val_Area,4f) > $x
+  is_float_var_greater_than_float_var $car_park_area_y1($val_Area,4f) > $y
+  is_float_var_greater_than_float_var $car_park_area_z1($val_Area,4f) > $z
+  is_float_var_greater_than_float_var $x > $car_park_area_x2($val_Area,4f)
+  is_float_var_greater_than_float_var $y > $car_park_area_y2($val_Area,4f)
+  is_float_var_greater_than_float_var $z > $car_park_area_z2($val_Area,4f)
+goto_if_false @VALET_8684
+alter_wanted_level_no_drop $player1 {wantedLevel} 1
+
+:VALET_8684
+$valet_task(6@,3i) = 6
+mark_char_as_no_longer_needed $valet(6@,3i)
+
+:VALET_8704
+switch_start $valet_task(6@,3i) {numCases} 11 {hasDefaultCase} 0 {defaultLabel} @VALET_13005 {caseNum1} 1 {caseLabel1} @VALET_8836 {caseNum2} 2 {caseLabel2} @VALET_9149 {caseNum3} 3 {caseLabel3} @VALET_9763 {caseNum4} 4 {caseLabel4} @VALET_10506 {caseNum5} 5 {caseLabel5} @VALET_10614 {caseNum6} 6 {caseLabel6} @VALET_12998 {caseNum7} 7 {caseLabel7} @VALET_11111
+switch_continued 8 {caseLabel1} @VALET_12285 {caseNum2} 9 {caseLabel2} @VALET_12607 {caseNum3} 10 {caseLabel3} @VALET_10325 {caseNum4} 11 {caseLabel4} @VALET_12792 {caseNum5} -1 {caseLabel5} @VALET_13005 {caseNum6} -1 {caseLabel6} @VALET_13005 {caseNum7} -1 {caseLabel7} @VALET_13005 {caseNum8} -1 {caseLabel8} @VALET_13005 {caseNum9} -1 {caseLabel9} @VALET_13005
+
+:VALET_8836
+if $valet_can_be_created(6@,3i) == 1
+goto_if_false @VALET_9142
+request_model #WMYVA
+if has_model_loaded #WMYVA
+goto_if_false @VALET_9142
+if $val_Area == 1
+goto_if_false @VALET_8948
+create_char PedType.Mission1 {modelId} #WMYVA {x} $valet_la_x(6@,3f) {y} $valet_la_y(6@,3f) {z} $valet_la_z(6@,3f) {var_handle} $valet(6@,3i)
+set_char_heading $valet(6@,3i) {heading} $valet_la_h(6@,3f)
+
+:VALET_8948
+if $val_Area == 2
+goto_if_false @VALET_9017
+create_char PedType.Mission1 {modelId} #WMYVA {x} $valet_sf_x(6@,3f) {y} $valet_sf_y(6@,3f) {z} $valet_sf_z(6@,3f) {var_handle} $valet(6@,3i)
+set_char_heading $valet(6@,3i) {heading} $valet_sf_h(6@,3f)
+
+:VALET_9017
+if $val_Area == 3
+goto_if_false @VALET_9086
+create_char PedType.Mission1 {modelId} #WMYVA {x} $valet_vg_x(6@,3f) {y} $valet_vg_y(6@,3f) {z} $valet_vg_z(6@,3f) {var_handle} $valet(6@,3i)
+set_char_heading $valet(6@,3i) {heading} $valet_vg_h(6@,3f)
+
+:VALET_9086
+set_char_decision_maker $valet(6@,3i) {handleOrTemplate} 7@
+set_char_only_damaged_by_player $valet(6@,3i) {state} True
+set_char_suffers_critical_hits $valet(6@,3i) {state} False
+$valet_task(6@,3i) = 2
+0@(6@,3i) = 2
+
+:VALET_9142
+goto @VALET_13005
+
+:VALET_9149
+if is_int_lvar_greater_than_int_lvar TIMERA > 8@
+goto_if_false @VALET_9756
+if not is_char_dead $valet(6@,3i)
+goto_if_false @VALET_9756
+if $val_Area == 1
+goto_if_false @VALET_9342
+if not locate_char_any_means_3d $valet(6@,3i) {x} $valet_la_x(6@,3f) {y} $valet_la_y(6@,3f) {z} $valet_la_z(6@,3f) {xRadius} 2.0 {yRadius} 2.0 {zRadius} 2.0 {drawSphere} False
+goto_if_false @VALET_9342
+11@ = open_sequence_task 
+task_follow_path_nodes_to_coord -1 {x} $valet_la_x(6@,3f) {y} $valet_la_y(6@,3f) {z} $valet_la_z(6@,3f) {speed} MoveState.Run {time} -2
+task_achieve_heading -1 {heading} $valet_la_h(6@,3f)
+close_sequence_task 11@
+perform_sequence_task $valet(6@,3i) {sequence} 11@
+clear_sequence_task 11@
+$valet_task(6@,3i) = 3
+
+:VALET_9342
+if $val_Area == 2
+goto_if_false @VALET_9602
+if not locate_char_any_means_3d $valet(6@,3i) {x} $valet_sf_x(6@,3f) {y} $valet_sf_y(6@,3f) {z} $valet_sf_z(6@,3f) {xRadius} 2.0 {yRadius} 2.0 {zRadius} 2.0 {drawSphere} False
+goto_if_false @VALET_9503
+11@ = open_sequence_task 
+task_follow_path_nodes_to_coord -1 {x} $valet_sf_x(6@,3f) {y} $valet_sf_y(6@,3f) {z} $valet_sf_z(6@,3f) {speed} MoveState.Run {time} -2
+task_achieve_heading -1 {heading} $valet_sf_h(6@,3f)
+close_sequence_task 11@
+perform_sequence_task $valet(6@,3i) {sequence} 11@
+clear_sequence_task 11@
+$valet_task(6@,3i) = 3
+goto @VALET_9602
+
+:VALET_9503
+3@ = get_script_task_status $valet(6@,3i) {taskId} 1492
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_9602
+$val_h = get_char_heading $valet(6@,3i)
+sub_float_var_from_float_var $val_h -= $valet_sf_h(6@,3f)
+abs_var_float $val_h
+if 10.0 <= $val_h
+goto_if_false @VALET_9602
+task_achieve_heading $valet(6@,3i) {heading} $valet_sf_h(6@,3f)
+
+:VALET_9602
+if $val_Area == 3
+goto_if_false @VALET_9756
+if not locate_char_any_means_3d $valet(6@,3i) {x} $valet_vg_x(6@,3f) {y} $valet_vg_y(6@,3f) {z} $valet_vg_z(6@,3f) {xRadius} 2.0 {yRadius} 2.0 {zRadius} 2.0 {drawSphere} False
+goto_if_false @VALET_9756
+11@ = open_sequence_task 
+task_follow_path_nodes_to_coord -1 {x} $valet_vg_x(6@,3f) {y} $valet_vg_y(6@,3f) {z} $valet_vg_z(6@,3f) {speed} MoveState.Run {time} -2
+task_achieve_heading -1 {heading} $valet_vg_h(6@,3f)
+close_sequence_task 11@
+perform_sequence_task $valet(6@,3i) {sequence} 11@
+clear_sequence_task 11@
+$valet_task(6@,3i) = 3
+
+:VALET_9756
+goto @VALET_13005
+
+:VALET_9763
+if is_int_lvar_greater_than_int_lvar TIMERA > 9@
+goto_if_false @VALET_10318
+if not is_char_dead $valet(6@,3i)
+goto_if_false @VALET_10318
+3@ = get_script_task_status $valet(6@,3i) {taskId} 1560
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_10318
+if $val_Area == 1
+goto_if_false @VALET_9996
+if not locate_char_any_means_3d $valet(6@,3i) {x} $valet_la_x(6@,3f) {y} $valet_la_y(6@,3f) {z} $valet_la_z(6@,3f) {xRadius} 3.0 {yRadius} 3.0 {zRadius} 3.0 {drawSphere} False
+goto_if_false @VALET_9985
+11@ = open_sequence_task 
+task_follow_path_nodes_to_coord -1 {x} $valet_la_x(6@,3f) {y} $valet_la_y(6@,3f) {z} $valet_la_z(6@,3f) {speed} MoveState.Run {time} -2
+task_achieve_heading -1 {heading} $valet_la_h(6@,3f)
+close_sequence_task 11@
+perform_sequence_task $valet(6@,3i) {sequence} 11@
+clear_sequence_task 11@
+goto @VALET_9996
+
+:VALET_9985
+$valet_task(6@,3i) = 2
+
+:VALET_9996
+if $val_Area == 2
+goto_if_false @VALET_10157
+if not locate_char_any_means_3d $valet(6@,3i) {x} $valet_sf_x(6@,3f) {y} $valet_sf_y(6@,3f) {z} $valet_sf_z(6@,3f) {xRadius} 3.0 {yRadius} 3.0 {zRadius} 3.0 {drawSphere} False
+goto_if_false @VALET_10146
+11@ = open_sequence_task 
+task_follow_path_nodes_to_coord -1 {x} $valet_sf_x(6@,3f) {y} $valet_sf_y(6@,3f) {z} $valet_sf_z(6@,3f) {speed} MoveState.Run {time} -2
+task_achieve_heading -1 {heading} $valet_sf_h(6@,3f)
+close_sequence_task 11@
+perform_sequence_task $valet(6@,3i) {sequence} 11@
+clear_sequence_task 11@
+goto @VALET_10157
+
+:VALET_10146
+$valet_task(6@,3i) = 2
+
+:VALET_10157
+if $val_Area == 3
+goto_if_false @VALET_10318
+if not locate_char_any_means_3d $valet(6@,3i) {x} $valet_vg_x(6@,3f) {y} $valet_vg_y(6@,3f) {z} $valet_vg_z(6@,3f) {xRadius} 3.0 {yRadius} 3.0 {zRadius} 3.0 {drawSphere} False
+goto_if_false @VALET_10307
+11@ = open_sequence_task 
+task_follow_path_nodes_to_coord -1 {x} $valet_vg_x(6@,3f) {y} $valet_vg_y(6@,3f) {z} $valet_vg_z(6@,3f) {speed} MoveState.Run {time} -2
+task_achieve_heading -1 {heading} $valet_vg_h(6@,3f)
+close_sequence_task 11@
+perform_sequence_task $valet(6@,3i) {sequence} 11@
+clear_sequence_task 11@
+goto @VALET_10318
+
+:VALET_10307
+$valet_task(6@,3i) = 2
+
+:VALET_10318
+goto @VALET_13005
+
+:VALET_10325
+if not is_char_dead $valet(6@,3i)
+goto_if_false @VALET_10499
+3@ = get_script_task_status $valet(6@,3i) {taskId} 1560
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_10499
+if not locate_char_any_means_3d $valet(6@,3i) {x} $valet_exit_x($val_Area,4f) {y} $valet_exit_y($val_Area,4f) {z} $valet_exit_z($val_Area,4f) {xRadius} 3.0 {yRadius} 3.0 {zRadius} 3.0 {drawSphere} False
+goto_if_false @VALET_10477
+task_follow_path_nodes_to_coord $valet(6@,3i) {x} $valet_exit_x($val_Area,4f) {y} $valet_exit_y($val_Area,4f) {z} $valet_exit_z($val_Area,4f) {speed} MoveState.Run {time} -2
+goto @VALET_10499
+
+:VALET_10477
+0@(6@,3i) = 3
+$valet_task(6@,3i) = 3
+
+:VALET_10499
+goto @VALET_13005
+
+:VALET_10506
+if not is_char_dead $valet(6@,3i)
+goto_if_false @VALET_10607
+if not is_char_responding_to_event $valet(6@,3i) {event} Event.Damage
+goto_if_false @VALET_10591
+task_play_anim_non_interruptable $valet(6@,3i) {animationName} "FUCKU" {animationFile} "PED" {blendSpeed} 4.0 {loop} False {lockX} False {lockY} False {keepLastFrame} False {time} -2
+4@ += 1
+
+:VALET_10591
+set_var_int_to_lvar_int $valet_task(6@,3i) = 0@(6@,3i)
+
+:VALET_10607
+goto @VALET_13005
+
+:VALET_10614
+if not is_char_dead $valet(6@,3i)
+goto_if_false @VALET_11104
+3@ = get_script_task_status $valet(6@,3i) {taskId} 1506
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_10679
+task_kill_char_on_foot $valet(6@,3i) {target} $scplayer
+
+:VALET_10679
+if is_int_lvar_greater_than_int_lvar TIMERA > 9@
+goto_if_false @VALET_11104
+if not is_char_dead $scplayer
+goto_if_false @VALET_11104
+if $val_Area == 1
+goto_if_false @VALET_10844
+if or
+  not locate_char_any_means_char_3d $valet(6@,3i) {target} $scplayer {xRadius} 15.0 {yRadius} 15.0 {zRadius} 15.0 {drawSphere} False
+  not locate_char_any_means_3d $valet(6@,3i) {x} $valet_la_x(6@,3f) {y} $valet_la_y(6@,3f) {z} $valet_la_z(6@,3f) {xRadius} 10.0 {yRadius} 10.0 {zRadius} 10.0 {drawSphere} False
+goto_if_false @VALET_10844
+clear_char_tasks $valet(6@,3i)
+set_var_int_to_lvar_int $valet_task(6@,3i) = 0@(6@,3i)
+
+:VALET_10844
+if $val_Area == 2
+goto_if_false @VALET_10974
+if or
+  not locate_char_any_means_char_3d $valet(6@,3i) {target} $scplayer {xRadius} 15.0 {yRadius} 15.0 {zRadius} 15.0 {drawSphere} False
+  not locate_char_any_means_3d $valet(6@,3i) {x} $valet_sf_x(6@,3f) {y} $valet_sf_y(6@,3f) {z} $valet_sf_z(6@,3f) {xRadius} 10.0 {yRadius} 10.0 {zRadius} 10.0 {drawSphere} False
+goto_if_false @VALET_10974
+clear_char_tasks $valet(6@,3i)
+set_var_int_to_lvar_int $valet_task(6@,3i) = 0@(6@,3i)
+
+:VALET_10974
+if $val_Area == 3
+goto_if_false @VALET_11104
+if or
+  not locate_char_any_means_char_3d $valet(6@,3i) {target} $scplayer {xRadius} 15.0 {yRadius} 15.0 {zRadius} 15.0 {drawSphere} False
+  not locate_char_any_means_3d $valet(6@,3i) {x} $valet_vg_x(6@,3f) {y} $valet_vg_y(6@,3f) {z} $valet_vg_z(6@,3f) {xRadius} 10.0 {yRadius} 10.0 {zRadius} 10.0 {drawSphere} False
+goto_if_false @VALET_11104
+clear_char_tasks $valet(6@,3i)
+set_var_int_to_lvar_int $valet_task(6@,3i) = 0@(6@,3i)
+
+:VALET_11104
+goto @VALET_13005
+
+:VALET_11111
+if not is_char_dead $valet(6@,3i)
+goto_if_false @VALET_12278
+if $val_Area == 1
+goto_if_false @VALET_11240
+if not locate_char_any_means_3d $valet(6@,3i) {x} $valet_la_x(6@,3f) {y} $valet_la_y(6@,3f) {z} $valet_la_z(6@,3f) {xRadius} 23.0 {yRadius} 23.0 {zRadius} 8.0 {drawSphere} False
+goto_if_false @VALET_11240
+$valet_task(6@,3i) = 2
+0@(6@,3i) = 2
+$valet_car(6@,3i) = 0
+
+:VALET_11240
+if $val_Area == 2
+goto_if_false @VALET_11349
+if not locate_char_any_means_3d $valet(6@,3i) {x} $valet_sf_x(6@,3f) {y} $valet_sf_y(6@,3f) {z} $valet_sf_z(6@,3f) {xRadius} 23.0 {yRadius} 23.0 {zRadius} 8.0 {drawSphere} False
+goto_if_false @VALET_11349
+$valet_task(6@,3i) = 2
+0@(6@,3i) = 2
+$valet_car(6@,3i) = 0
+
+:VALET_11349
+if $val_Area == 3
+goto_if_false @VALET_11458
+if not locate_char_any_means_3d $valet(6@,3i) {x} $valet_vg_x(6@,3f) {y} $valet_vg_y(6@,3f) {z} $valet_vg_z(6@,3f) {xRadius} 23.0 {yRadius} 23.0 {zRadius} 8.0 {drawSphere} False
+goto_if_false @VALET_11458
+$valet_task(6@,3i) = 2
+0@(6@,3i) = 2
+$valet_car(6@,3i) = 0
+
+:VALET_11458
+if $valet_task(6@,3i) <> 2
+goto_if_false @VALET_12278
+3@ = get_script_task_status $valet(6@,3i) {taskId} 1560
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_12033
+if not is_car_dead $valet_car(6@,3i)
+goto_if_false @VALET_11993
+if is_char_in_car $valet(6@,3i) {vehicle} $valet_car(6@,3i)
+goto_if_false @VALET_11828
+$x, $y, $z = get_parking_node_in_area $car_park_area_x1($val_Area,4f) {leftBottomY} $car_park_area_y1($val_Area,4f) {leftBottomZ} $car_park_area_z1($val_Area,4f) {rightTopX} $car_park_area_x2($val_Area,4f) {rightTopY} $car_park_area_y2($val_Area,4f) {rightTopZ} $car_park_area_z2($val_Area,4f)
+if $x <> 0.0
+goto_if_false @VALET_11821
+if is_int_var_equal_to_int_var $valet_car(6@,3i) == $valet_pickup_car
+goto_if_false @VALET_11664
+$valet_pickup_car = 0
+
+:VALET_11664
+set_var_float_to_var_float $parking_x = $x
+set_var_float_to_var_float $parking_y = $y
+set_var_float_to_var_float $parking_z = $z
+if is_vehicle_attached $valet_car(6@,3i)
+goto_if_false @VALET_11734
+detach_car $valet_car(6@,3i) {x} 0.0 {y} 0.0 {z} 0.0 {collisionDetection} False
+
+:VALET_11734
+task_car_drive_to_coord $valet(6@,3i) {vehicle} $valet_car(6@,3i) {x} $x {y} $y {z} $z {speed} 15.0 {driveStyle} DriveMode.Accurate {modelId} #NULL {drivingStyle} DrivingMode.StopForCars
+if $player_on_valet_mission == 1
+goto_if_false @VALET_11799
+set_char_cant_be_dragged_out $valet(6@,3i) {state} True
+
+:VALET_11799
+$valet_task(6@,3i) = 8
+0@(6@,3i) = 7
+
+:VALET_11821
+goto @VALET_11986
+
+:VALET_11828
+if not is_car_dead $valet_car(6@,3i)
+goto_if_false @VALET_11953
+if locate_char_any_means_car_3d $valet(6@,3i) {vehicle} $valet_car(6@,3i) {xRadius} 20.0 {yRadius} 20.0 {zRadius} 20.0 {drawSphere} False
+goto_if_false @VALET_11946
+11@ = open_sequence_task 
+task_pause -1 {time} 3000
+task_enter_car_as_driver -1 {vehicle} $valet_car(6@,3i) {time} -2
+close_sequence_task 11@
+$this_b += 1
+perform_sequence_task $valet(6@,3i) {sequence} 11@
+clear_sequence_task 11@
+
+:VALET_11946
+goto @VALET_11986
+
+:VALET_11953
+$valet_task(6@,3i) = 2
+0@(6@,3i) = 2
+$valet_car(6@,3i) = 0
+
+:VALET_11986
+goto @VALET_12026
+
+:VALET_11993
+$valet_task(6@,3i) = 2
+0@(6@,3i) = 2
+$valet_car(6@,3i) = 0
+
+:VALET_12026
+goto @VALET_12278
+
+:VALET_12033
+if and
+  not is_car_dead $valet_car(6@,3i)
+  not is_char_dead $scplayer
+goto_if_false @VALET_12278
+$a_Car = get_car_char_is_using $scplayer
+if is_int_var_equal_to_int_var $a_Car == $valet_car(6@,3i)
+goto_if_false @VALET_12174
+if is_player_wearing $player1 {bodyPart} BodyPart.SpecialCostume {modelName} "VALET"
+goto_if_false @VALET_12174
+if and
+  not is_char_getting_in_to_a_car $valet(6@,3i)
+  not is_char_in_any_car $valet(6@,3i)
+goto_if_false @VALET_12174
+clear_char_tasks $valet(6@,3i)
+$valet_task(6@,3i) = 2
+$valet_car(6@,3i) = 0
+
+:VALET_12174
+if not is_car_dead $valet_car(6@,3i)
+goto_if_false @VALET_12271
+if not locate_char_any_means_car_3d $valet(6@,3i) {vehicle} $valet_car(6@,3i) {xRadius} 20.0 {yRadius} 20.0 {zRadius} 20.0 {drawSphere} False
+goto_if_false @VALET_12271
+$valet_task(6@,3i) = 2
+0@(6@,3i) = 2
+$valet_car(6@,3i) = 0
+
+:VALET_12271
+goto @VALET_12278
+
+:VALET_12278
+goto @VALET_13005
+
+:VALET_12285
+if not is_char_dead $valet(6@,3i)
+goto_if_false @VALET_12600
+3@ = get_script_task_status $valet(6@,3i) {taskId} 1489
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_12460
+if is_char_in_area_3d $valet(6@,3i) {leftBottomX} $car_park_area_x1($val_Area,4f) {leftBottomY} $car_park_area_y1($val_Area,4f) {leftBottomZ} $car_park_area_z1($val_Area,4f) {rightTopX} $car_park_area_x2($val_Area,4f) {rightTopY} $car_park_area_y2($val_Area,4f) {rightTopZ} $car_park_area_z2($val_Area,4f) {drawSphere} False
+goto_if_false @VALET_12431
+$valet_task(6@,3i) = 3
+0@(6@,3i) = 3
+goto @VALET_12453
+
+:VALET_12431
+$valet_task(6@,3i) = 3
+0@(6@,3i) = 3
+
+:VALET_12453
+goto @VALET_12600
+
+:VALET_12460
+if or
+  $onmission == 0
+  $player_on_valet_mission == 1
+  $force_valet_on_mission > 0
+goto_if_false @VALET_12600
+if not is_car_dead $valet_car(6@,3i)
+goto_if_false @VALET_12600
+$a_Car = get_car_blocking_car $valet_car(6@,3i)
+if not is_car_dead $a_Car
+goto_if_false @VALET_12600
+$a_ped = get_driver_of_car $a_Car
+if or
+  is_int_var_equal_to_int_var $a_ped == $scplayer
+  $a_ped == -1
+goto_if_false @VALET_12600
+if $a_Car <> -1
+goto_if_false @VALET_12600
+set_var_int_to_var_int $steal_this_car = $a_Car
+
+:VALET_12600
+goto @VALET_13005
+
+:VALET_12607
+if and
+  not is_char_dead $valet(6@,3i)
+  not is_car_dead $valet_car(6@,3i)
+goto_if_false @VALET_12785
+if not is_char_in_car $valet(6@,3i) {vehicle} $valet_car(6@,3i)
+goto_if_false @VALET_12785
+$a_char = get_driver_of_car $valet_car(6@,3i)
+if $a_char <> -1
+goto_if_false @VALET_12785
+$a_Car = get_car_char_is_using $scplayer
+if is_int_var_equal_to_int_var $a_Car == $valet_car(6@,3i)
+goto_if_false @VALET_12774
+if is_player_wearing $player1 {bodyPart} BodyPart.SpecialCostume {modelName} "VALET"
+goto_if_false @VALET_12756
+goto @VALET_12767
+
+:VALET_12756
+$valet_task(6@,3i) = 2
+
+:VALET_12767
+goto @VALET_12785
+
+:VALET_12774
+$valet_task(6@,3i) = 2
+
+:VALET_12785
+goto @VALET_13005
+
+:VALET_12792
+if not is_char_dead $valet(6@,3i)
+goto_if_false @VALET_12991
+3@ = get_script_task_status $valet(6@,3i) {taskId} 1655
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_12991
+if 6@ == 0
+goto_if_false @VALET_12991
+if not is_char_dead $valet[1]
+goto_if_false @VALET_12991
+if not is_char_dead $valet[0]
+goto_if_false @VALET_12991
+3@ = get_script_task_status $valet[1] {taskId} 1655
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_12991
+3@ = get_script_task_status $valet[0] {taskId} 1655
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_12991
+task_chat_with_char $valet[0] {other} $valet[1] {leadSpeaker} True {_p4} 1
+task_chat_with_char $valet[1] {other} $valet[0] {leadSpeaker} False {_p4} 1
+0@ = 11
+1@ = 11
+
+:VALET_12991
+goto @VALET_13005
+
+:VALET_12998
+goto @VALET_13005
+
+:VALET_13005
+6@ += 1
+goto @VALET_7849
+
+:VALET_13019
+return 
+
+:VALET_13021
+if or
+  $freeze_creating_drop_off_cars == 0
+  $force_a_one_off_car > 0
+goto_if_false @VALET_13235
+if $create_drop_off_car_now == 0
+goto_if_false @VALET_13235
+if $drop_off_car == 0
+goto_if_false @VALET_13235
+if not is_area_occupied $valet_drop_off_area_x1($val_Area,4f) {leftBottomY} $valet_drop_off_area_y1($val_Area,4f) {leftBottomZ} 0.0 {rightTopX} $valet_drop_off_area_x2($val_Area,4f) {rightTopY} $valet_drop_off_area_y2($val_Area,4f) {rightTopZ} 80.0 {solid} False {car} True {char} False {object} False {particle} False
+goto_if_false @VALET_13164
+$force_a_one_off_car -= 1
+$create_drop_off_car_now = 1
+15@ = 0
+
+:VALET_13164
+if $create_drop_off_car_now == 0
+goto_if_false @VALET_13235
+if and
+  $valet_mission_car == 0
+  $valet_pickup_car == 0
+  $drop_off_car == 0
+goto_if_false @VALET_13235
+$force_a_one_off_car -= 1
+$create_drop_off_car_now = 1
+15@ = 0
+
+:VALET_13235
+if $drop_off_car <> 0
+goto_if_false @VALET_13392
+if is_car_dead $drop_off_car
+goto_if_false @VALET_13283
+$debug_this = 1
+$drop_off_car = 0
+
+:VALET_13283
+if not is_car_dead $drop_off_car
+goto_if_false @VALET_13392
+$a_ped = get_driver_of_car $drop_off_car
+if not is_char_dead $a_ped
+goto_if_false @VALET_13347
+if not is_char_sitting_in_car $a_ped {vehicle} $drop_off_car
+goto_if_false @VALET_13347
+mark_car_as_no_longer_needed $drop_off_car
+
+:VALET_13347
+if or
+  $a_ped == -1
+  is_int_var_equal_to_int_var $a_ped == $scplayer
+goto_if_false @VALET_13392
+mark_car_as_no_longer_needed $drop_off_car
+$debug_this = 2
+$drop_off_car = 0
+
+:VALET_13392
+if $valet_pickup_car <> 0
+goto_if_false @VALET_13507
+if is_car_dead $valet_pickup_car
+goto_if_false @VALET_13433
+$valet_pickup_car = 0
+
+:VALET_13433
+if not is_car_dead $valet_pickup_car
+goto_if_false @VALET_13507
+$a_ped = get_driver_of_car $valet_pickup_car
+if is_int_var_equal_to_int_var $a_ped == $scplayer
+goto_if_false @VALET_13507
+if not is_int_var_equal_to_int_var $valet_pickup_car == $sc3_missioncar
+goto_if_false @VALET_13500
+mark_car_as_no_longer_needed $valet_pickup_car
+
+:VALET_13500
+$valet_pickup_car = 0
+
+:VALET_13507
+if is_int_lvar_greater_than_int_lvar TIMERA > 9@
+goto_if_false @VALET_14641
+if or
+  $valet_task[0] == 2
+  $valet_task[1] == 2
+  $valet_task[2] == 2
+  $player_on_valet_mission == 1
+  $onmission == 1
+goto_if_false @VALET_14641
+if and
+  $valet_task[0] <> 7
+  $valet_task[1] <> 7
+  $valet_task[2] <> 7
+goto_if_false @VALET_14641
+$a_pickup_car = get_random_car_of_type_in_area_no_save $valet_drop_off_area_x1($val_Area,4f) {leftBottomY} $valet_drop_off_area_y1($val_Area,4f) {rightTopX} $valet_drop_off_area_x2($val_Area,4f) {rightTopY} $valet_drop_off_area_y2($val_Area,4f) {modelId} -1
+if not is_car_dead $sc3_missioncar
+goto_if_false @VALET_13709
+if is_car_in_area_2d $sc3_missioncar {leftBottomX} $valet_drop_off_area_x1($val_Area,4f) {leftBottomY} $valet_drop_off_area_y1($val_Area,4f) {rightTopX} $valet_drop_off_area_x2($val_Area,4f) {rightTopY} $valet_drop_off_area_y2($val_Area,4f) {drawSphere} False
+goto_if_false @VALET_13709
+set_var_int_to_var_int $a_pickup_car = $sc3_missioncar
+
+:VALET_13709
+if $a_pickup_car == -1
+goto_if_false @VALET_13797
+if not is_car_dead $drop_off_car
+goto_if_false @VALET_13797
+if is_car_in_area_2d $drop_off_car {leftBottomX} $valet_drop_off_area_x1($val_Area,4f) {leftBottomY} $valet_drop_off_area_y1($val_Area,4f) {rightTopX} $valet_drop_off_area_x2($val_Area,4f) {rightTopY} $valet_drop_off_area_y2($val_Area,4f) {drawSphere} False
+goto_if_false @VALET_13797
+set_var_int_to_var_int $a_pickup_car = $drop_off_car
+
+:VALET_13797
+if $a_pickup_car == -1
+goto_if_false @VALET_13885
+if not is_car_dead $mission_drop_off_car
+goto_if_false @VALET_13885
+if is_car_in_area_2d $mission_drop_off_car {leftBottomX} $valet_drop_off_area_x1($val_Area,4f) {leftBottomY} $valet_drop_off_area_y1($val_Area,4f) {rightTopX} $valet_drop_off_area_x2($val_Area,4f) {rightTopY} $valet_drop_off_area_y2($val_Area,4f) {drawSphere} False
+goto_if_false @VALET_13885
+set_var_int_to_var_int $a_pickup_car = $mission_drop_off_car
+
+:VALET_13885
+$blah = 0
+if $a_pickup_car <> -1
+goto_if_false @VALET_14022
+set_var_int_to_var_int $blahb = $a_pickup_car
+if not is_car_dead $a_pickup_car
+goto_if_false @VALET_14022
+$a_ped = get_driver_of_car $a_pickup_car
+if $a_ped == -1
+goto_if_false @VALET_14022
+/*
+12@ = get_vehicle_class $a_pickup_car
+if and
+  not is_int_lvar_equal_to_constant 12@ == 0
+  not is_int_lvar_equal_to_constant 12@ == 1
+  not is_int_lvar_equal_to_constant 12@ == 2
+  not is_int_lvar_equal_to_constant 12@ == 3
+goto_if_false @VALET_14022
+*/
+set_var_int_to_var_int $steal_this_car = $a_pickup_car
+$a_pickup_car = -1
+
+:VALET_14022
+if $a_pickup_car <> -1
+goto_if_false @VALET_14087
+if not is_car_dead $a_pickup_car
+goto_if_false @VALET_14087
+/*
+if is_emergency_services_vehicle $a_pickup_car
+goto_if_false @VALET_14087
+set_var_int_to_var_int $steal_this_car = $a_pickup_car
+$a_pickup_car = -1
+*/
+
+:VALET_14087
+if $a_pickup_car <> -1
+goto_if_false @VALET_14641
+if not is_car_dead $a_pickup_car
+goto_if_false @VALET_14267
+$a_ped = get_driver_of_car $a_pickup_car
+if $a_ped <> -1
+goto_if_false @VALET_14267
+if not is_char_dead $a_ped
+goto_if_false @VALET_14267
+if not is_char_sitting_in_car $a_ped {vehicle} $a_pickup_car
+goto_if_false @VALET_14197
+set_var_int_to_var_int $valet_pickup_car = $a_pickup_car
+set_car_straight_line_distance $valet_pickup_car {distance} 1
+
+:VALET_14197
+3@ = get_script_task_status $a_ped {taskId} 1560
+if is_int_lvar_equal_to_constant 3@ == 1
+goto_if_false @VALET_14267
+3@ = get_sequence_progress $a_ped
+if 3@ == 1
+goto_if_false @VALET_14267
+set_var_int_to_var_int $valet_pickup_car = $a_pickup_car
+set_car_straight_line_distance $valet_pickup_car {distance} 1
+
+:VALET_14267
+if $a_ped == -1
+goto_if_false @VALET_14300
+set_var_int_to_var_int $valet_pickup_car = $a_pickup_car
+set_car_straight_line_distance $valet_pickup_car {distance} 1
+
+:VALET_14300
+$a_Car = get_car_char_is_using $scplayer
+if is_int_var_equal_to_int_var $a_Car == $valet_pickup_car
+goto_if_false @VALET_14334
+$valet_pickup_car = 0
+
+:VALET_14334
+if is_int_var_equal_to_int_var $valet_pickup_car == $a_pickup_car
+goto_if_false @VALET_14634
+if not is_car_dead $a_pickup_car
+goto_if_false @VALET_14521
+30@ = get_maximum_number_of_passengers $a_pickup_car
+6@ = 0
+
+:VALET_14384
+if is_int_lvar_greater_than_int_lvar 30@ > 6@
+goto_if_false @VALET_14521
+if not is_car_passenger_seat_free $a_pickup_car {seat} 6@
+goto_if_false @VALET_14507
+$a_char = get_char_in_car_passenger_seat $a_pickup_car {seat} 6@
+if not is_char_dead $a_char
+goto_if_false @VALET_14507
+if is_char_sitting_in_car $a_char {vehicle} $a_pickup_car
+goto_if_false @VALET_14507
+3@ = get_script_task_status $a_char {taskId} 1502
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_14507
+mark_char_as_no_longer_needed $a_char
+task_wander_standard $a_char
+
+:VALET_14507
+6@ += 1
+goto @VALET_14384
+
+:VALET_14521
+if $valet_task[0] == 2
+goto_if_false @VALET_14561
+$valet_task[0] = 7
+set_var_int_to_var_int $valet_car[0] = $valet_pickup_car
+goto @VALET_14634
+
+:VALET_14561
+if $valet_task[1] == 2
+goto_if_false @VALET_14601
+$valet_task[1] = 7
+set_var_int_to_var_int $valet_car[1] = $valet_pickup_car
+goto @VALET_14634
+
+:VALET_14601
+if $valet_task[2] == 2
+goto_if_false @VALET_14634
+$valet_task[2] = 7
+set_var_int_to_var_int $valet_car[2] = $valet_pickup_car
+
+:VALET_14634
+$a_pickup_car = 0
+
+:VALET_14641
+if $create_drop_off_car_now == 1
+goto_if_false @VALET_16069
+if is_int_lvar_greater_than_int_lvar TIMERA > 10@
+goto_if_false @VALET_16069
+$debug_this = 3
+$drop_off_car = 0
+$a_Car = get_random_car_of_type_in_area_no_save $find_drop_off_car_x1($val_Area,4f) {leftBottomY} $find_drop_off_car_y1($val_Area,4f) {rightTopX} $find_drop_off_car_x2($val_Area,4f) {rightTopY} $find_drop_off_car_y2($val_Area,4f) {modelId} -1
+if $a_Car <> -1
+goto_if_false @VALET_14983
+if not is_car_dead $a_Car
+goto_if_false @VALET_14983
+24@ = get_car_heading $a_Car
+set_lvar_float_to_lvar_float 13@ = 24@
+sub_float_var_from_float_lvar 13@ -= $find_drop_off_car_h1($val_Area,4f)
+13@ = abs_lvar_float 
+if 45.0 > 13@
+goto_if_false @VALET_14983
+/*
+12@ = get_vehicle_class $a_Car
+if or
+  is_int_lvar_equal_to_constant 12@ == 0
+  is_int_lvar_equal_to_constant 12@ == 1
+  is_int_lvar_equal_to_constant 12@ == 2
+  is_int_lvar_equal_to_constant 12@ == 3
+goto_if_false @VALET_14983
+12@ = get_car_model $a_Car
+if or
+  not is_int_lvar_equal_to_constant 12@ == 596
+  not is_int_lvar_equal_to_constant 12@ == 420
+goto_if_false @VALET_14983
+*/
+$a_driver = get_driver_of_car $a_Car
+if $a_driver <> -1
+goto_if_false @VALET_14983
+if not is_char_dead $a_driver
+goto_if_false @VALET_14983
+3@ = get_script_task_status $a_driver {taskId} 1490
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_14983
+set_var_int_to_var_int $drop_off_car = $a_Car
+set_car_can_go_against_traffic $drop_off_car {state} False
+
+:VALET_14983
+if $drop_off_car == 0
+goto_if_false @VALET_15292
+$a_Car = get_random_car_of_type_in_area_no_save $find_drop_off_car_x3($val_Area,4f) {leftBottomY} $find_drop_off_car_y3($val_Area,4f) {rightTopX} $find_drop_off_car_x4($val_Area,4f) {rightTopY} $find_drop_off_car_y4($val_Area,4f) {modelId} -1
+if $a_Car <> -1
+goto_if_false @VALET_15292
+if not is_car_dead $a_Car
+goto_if_false @VALET_15292
+24@ = get_car_heading $a_Car
+set_lvar_float_to_lvar_float 13@ = 24@
+sub_float_var_from_float_lvar 13@ -= $find_drop_off_car_h2($val_Area,4f)
+13@ = abs_lvar_float 
+if 45.0 > 13@
+goto_if_false @VALET_15292
+/*
+12@ = get_vehicle_class $a_Car
+if or
+  is_int_lvar_equal_to_constant 12@ == 0
+  is_int_lvar_equal_to_constant 12@ == 1
+  is_int_lvar_equal_to_constant 12@ == 2
+  is_int_lvar_equal_to_constant 12@ == 3
+goto_if_false @VALET_15292
+12@ = get_car_model $a_Car
+if or
+  not is_int_lvar_equal_to_constant 12@ == 596
+  not is_int_lvar_equal_to_constant 12@ == 420
+goto_if_false @VALET_15292
+*/
+$a_driver = get_driver_of_car $a_Car
+if $a_driver <> -1
+goto_if_false @VALET_15292
+if not is_char_dead $a_driver
+goto_if_false @VALET_15292
+3@ = get_script_task_status $a_driver {taskId} 1490
+if is_int_lvar_equal_to_constant 3@ == 7
+goto_if_false @VALET_15292
+set_var_int_to_var_int $drop_off_car = $a_Car
+set_car_can_go_against_traffic $drop_off_car {state} False
+
+:VALET_15292
+if or
+  $player_on_valet_mission == 1
+  $force_valet_on_mission > 0
+goto_if_false @VALET_15771
+if $drop_off_car == 0
+goto_if_false @VALET_15771
+15@ += 1
+if 15@ == 6
+goto_if_false @VALET_15462
+6@ = generate_random_int_in_range 0 {max} 3
+if 6@ == 0
+goto_if_false @VALET_15400
+request_model #PREVION
+set_lvar_int_to_constant 14@ = 436
+
+:VALET_15400
+if 6@ == 1
+goto_if_false @VALET_15431
+request_model #FELTZER
+set_lvar_int_to_constant 14@ = 533
+
+:VALET_15431
+if 6@ == 2
+goto_if_false @VALET_15462
+request_model #ELEGANT
+set_lvar_int_to_constant 14@ = 507
+
+:VALET_15462
+if 15@ >= 6
+goto_if_false @VALET_15771
+if 14@ <> 0
+goto_if_false @VALET_15771
+if has_model_loaded 14@
+goto_if_false @VALET_15771
+if not is_point_on_screen $valet_spawn_x($val_Area,4f) {y} $valet_spawn_y($val_Area,4f) {z} $valet_spawn_z($val_Area,4f) {radius} 5.0
+goto_if_false @VALET_15646
+clear_area $valet_spawn_x($val_Area,4f) {y} $valet_spawn_y($val_Area,4f) {z} $valet_spawn_z($val_Area,4f) {radius} 5.0 {clearParticles} False
+$drop_off_car = create_car 14@ {x} $valet_spawn_x($val_Area,4f) {y} $valet_spawn_y($val_Area,4f) {z} $valet_spawn_z($val_Area,4f)
+set_car_heading $drop_off_car {heading} $valet_spawn_h($val_Area,4f)
+$a_driver = create_random_char_as_driver $drop_off_car
+set_car_can_go_against_traffic $drop_off_car {state} False
+goto @VALET_15771
+
+:VALET_15646
+if not is_point_on_screen $valet_spawn_x2($val_Area,4f) {y} $valet_spawn_y2($val_Area,4f) {z} $valet_spawn_z2($val_Area,4f) {radius} 5.0
+goto_if_false @VALET_15771
+clear_area $valet_spawn_x2($val_Area,4f) {y} $valet_spawn_y2($val_Area,4f) {z} $valet_spawn_z2($val_Area,4f) {radius} 5.0 {clearParticles} False
+$drop_off_car = create_car 14@ {x} $valet_spawn_x2($val_Area,4f) {y} $valet_spawn_y2($val_Area,4f) {z} $valet_spawn_z2($val_Area,4f)
+set_car_heading $drop_off_car {heading} $valet_spawn_h2($val_Area,4f)
+$a_driver = create_random_char_as_driver $drop_off_car
+set_car_can_go_against_traffic $drop_off_car {state} False
+
+:VALET_15771
+if $drop_off_car <> 0
+goto_if_false @VALET_16069
+$create_drop_off_car_now = 0
+if and
+  not is_char_dead $a_driver
+  not is_car_dead $drop_off_car
+goto_if_false @VALET_16039
+if $sc3_missioncar_alive == 1
+goto_if_false @VALET_15844
+change_car_colour $drop_off_car {color1} 3 {color2} 3
+
+:VALET_15844
+mark_char_as_no_longer_needed $a_driver
+11@ = open_sequence_task 
+if $onmission == 0
+goto_if_false @VALET_15911
+task_car_drive_to_coord -1 {vehicle} $drop_off_car {x} $drop_off_point_x($val_Area,4f) {y} $drop_off_point_y($val_Area,4f) {z} $drop_off_point_z($val_Area,4f) {speed} 17.0 {driveStyle} DriveMode.Normal {modelId} #NULL {drivingStyle} DrivingMode.StopForCars
+
+:VALET_15911
+if $onmission == 1
+goto_if_false @VALET_15968
+task_car_drive_to_coord -1 {vehicle} $drop_off_car {x} $drop_off_point_x($val_Area,4f) {y} $drop_off_point_y($val_Area,4f) {z} $drop_off_point_z($val_Area,4f) {speed} 17.0 {driveStyle} DriveMode.Normal {modelId} #NULL {drivingStyle} DrivingMode.AvoidCars
+
+:VALET_15968
+task_wander_standard -1
+close_sequence_task 11@
+if not is_char_dead $a_driver
+goto_if_false @VALET_16000
+set_char_cant_be_dragged_out $a_driver {state} True
+
+:VALET_16000
+if $player_on_valet_mission == 1
+goto_if_false @VALET_16026
+set_var_int_to_var_int $mission_drop_off_car = $drop_off_car
+
+:VALET_16026
+perform_sequence_task $a_driver {sequence} 11@
+clear_sequence_task 11@
+
+:VALET_16039
+if 14@ <> 0
+goto_if_false @VALET_16069
+mark_model_as_no_longer_needed 14@
+14@ = 0
+
+:VALET_16069
+return 
+
+:VALET_16071
+if or
+  $player_on_valet_mission == 1
+  $playing_scrash1 == 1
+goto_if_false @VALET_16440
+if and
+  $steal_this_car <> -1
+  not is_int_var_equal_to_int_var $steal_this_car == $sc3_missioncar
+  not is_int_var_equal_to_int_var $steal_this_car == $valet_mission_car
+goto_if_false @VALET_16440
+if not is_int_var_equal_to_int_var $last_steal_Car == $steal_this_car
+goto_if_false @VALET_16440
+if not is_car_dead $steal_this_car
+goto_if_false @VALET_16440
+$x, $y, $z = get_car_coordinates $steal_this_car
+if or
+  -1760.1785 > $x
+  972.2405 > $y
+  16.1633 > $z
+  $x > -1679.6055
+  $y > 1064.2927
+  $z > 24.8629
+goto_if_false @VALET_16440
+if not is_char_in_car $scplayer {vehicle} $steal_this_car
+goto_if_false @VALET_16440
+if not is_car_on_screen $steal_this_car
+goto_if_false @VALET_16297
+delete_car $steal_this_car
+goto @VALET_16440
+
+:VALET_16297
+$a_char = get_driver_of_car $steal_this_car
+if $a_char == -1
+goto_if_false @VALET_16440
+if not locate_char_any_means_car_3d $scplayer {vehicle} $steal_this_car {xRadius} 8.0 {yRadius} 8.0 {zRadius} 8.0 {drawSphere} False
+goto_if_false @VALET_16440
+$a_char = create_random_char 0.0 {y} 0.0 {z} 0.0
+mark_char_as_no_longer_needed $a_char
+mark_car_as_no_longer_needed $steal_this_car
+if and
+  not is_char_dead $a_char
+  not is_car_dead $steal_this_car
+goto_if_false @VALET_16440
+warp_char_into_car $a_char {vehicle} $steal_this_car
+task_car_drive_wander $a_char {vehicle} $steal_this_car {speed} 20.0 {drivingMode} DrivingMode.AvoidCars
+$steal_this_car = 0
+
+:VALET_16440
+return 
+
+:VALET_16442
+if $valet_mission_completed == 0
+goto_if_false @VALET_16829
+player_made_progress 1
+play_mission_passed_tune 1
+$valet_mission_completed = 1
+do_fade 500 {direction} Fade.Out
+
+:VALET_16482
+if get_fading_status 
+goto_if_false @VALET_16506
+wait 0
+goto @VALET_16482
+
+:VALET_16506
+clear_prints 
+if is_player_playing $player1
+goto_if_false @VALET_16791
+set_player_control $player1 {state} False
+switch_widescreen True
+$valet_cash_pickup = create_protection_pickup -1757.6682 {y} 961.7819 {z} 24.3828 {revenueLimit} 2000 {revenueRate} 2000
+load_scene -1757.6682 {y} 961.7819 {z} 24.3828
+set_fixed_camera_position -1761.832 {y} 910.2675 {z} 30.7224 {upVecOffsetX} 0.0 {upVecOffsetY} 0.0 {upVecOffsetZ} 0.0
+point_camera_at_point -1761.6892 {y} 911.2571 {z} 30.7291 {switchStyle} SwitchType.JumpCut
+do_fade 500 {direction} Fade.In
+
+:VALET_16636
+if get_fading_status 
+goto_if_false @VALET_16660
+wait 0
+goto @VALET_16636
+
+:VALET_16660
+play_mission_passed_tune 2
+print_big 'ASS_ACQ' {time} 5000 {style} TextStyle.WhiteMiddleSmaller // Asset acquired!
+wait 5000
+set_fixed_camera_position -1748.3796 {y} 951.821 {z} 27.5455 {upVecOffsetX} 0.0 {upVecOffsetY} 0.0 {upVecOffsetZ} 0.0
+point_camera_at_point -1748.9379 {y} 952.5872 {z} 27.2272 {switchStyle} SwitchType.JumpCut
+print_with_number_now 'ASS_LUV' {num} 2000 {duration} 6000 {flag} 1 // This property will now generate revenue up to a maximum of $~1~. Make sure you collect it regularly!
+wait 6000
+do_fade 500 {direction} Fade.Out
+
+:VALET_16767
+if get_fading_status 
+goto_if_false @VALET_16791
+wait 0
+goto @VALET_16767
+
+:VALET_16791
+if is_player_playing $player1
+goto_if_false @VALET_16829
+set_camera_behind_player 
+restore_camera_jumpcut 
+switch_widescreen False
+set_player_control $player1 {state} True
+do_fade 500 {direction} Fade.In
+
+:VALET_16829
+print_big 'VAL_A33' {time} 5000 {style} TextStyle.Middle // ~S~Valet Parking Complete
+$valet_mission_flag = 8
+return 
+
+:VALET_16854
+mark_model_as_no_longer_needed #WMYVA
+mark_char_as_no_longer_needed $valet[0]
+mark_char_as_no_longer_needed $valet[1]
+mark_char_as_no_longer_needed $valet[2]
+clear_onscreen_counter $valet_time_bonus
+clear_onscreen_timer $valet_countdown
+clear_onscreen_counter $valet_cars_to_park
+remove_decision_maker 7@
+if not is_char_dead $valet[0]
+goto_if_false @VALET_16915
+delete_char $valet[0]
+
+:VALET_16915
+if not is_char_dead $valet[1]
+goto_if_false @VALET_16936
+delete_char $valet[1]
+
+:VALET_16936
+if not is_char_dead $valet[2]
+goto_if_false @VALET_16957
+delete_char $valet[2]
+
+:VALET_16957
+if $player_on_valet_mission == 1
+goto_if_false @VALET_16986
+set_ped_density_multiplier 1.0
+switch_emergency_services True
+
+:VALET_16986
+$valet_task[0] = 1
+$valet_task[1] = 1
+$valet_task[2] = 1
+4@ = 0
+$dont_clear_valets = 0
+if not is_car_dead $valet_mission_car
+goto_if_false @VALET_17077
+if not is_char_dead $scplayer
+goto_if_false @VALET_17077
+if not is_char_in_car $scplayer {vehicle} $valet_mission_car
+goto_if_false @VALET_17077
+delete_car $valet_mission_car
+
+:VALET_17077
+if not is_car_dead $valet_car[0]
+goto_if_false @VALET_17133
+if not is_char_dead $scplayer
+goto_if_false @VALET_17133
+if not is_char_in_car $scplayer {vehicle} $valet_car[0]
+goto_if_false @VALET_17133
+delete_car $valet_car[0]
+
+:VALET_17133
+if not is_car_dead $valet_car[1]
+goto_if_false @VALET_17189
+if not is_char_dead $scplayer
+goto_if_false @VALET_17189
+if not is_char_in_car $scplayer {vehicle} $valet_car[1]
+goto_if_false @VALET_17189
+delete_car $valet_car[1]
+
+:VALET_17189
+if not is_car_dead $valet_car[2]
+goto_if_false @VALET_17245
+if not is_char_dead $scplayer
+goto_if_false @VALET_17245
+if not is_char_in_car $scplayer {vehicle} $valet_car[2]
+goto_if_false @VALET_17245
+delete_car $valet_car[2]
+
+:VALET_17245
+if not is_car_dead $valet_pickup_car
+goto_if_false @VALET_17301
+if not is_char_dead $scplayer
+goto_if_false @VALET_17301
+if not is_char_in_car $scplayer {vehicle} $valet_pickup_car
+goto_if_false @VALET_17301
+delete_car $valet_pickup_car
+
+:VALET_17301
+if not is_car_dead $drop_off_car
+goto_if_false @VALET_17357
+if not is_char_dead $scplayer
+goto_if_false @VALET_17357
+if not is_char_in_car $scplayer {vehicle} $drop_off_car
+goto_if_false @VALET_17357
+delete_car $drop_off_car
+
+:VALET_17357
+$valet_mission_dead = 0
+$1898 = 0
+$1899 = 0
+$valet_mission_car = 0
+$valet_car[0] = 0
+$valet_car[1] = 0
+$valet_car[2] = 0
+$valet_pickup_car = 0
+$debug_this = 4
+$drop_off_car = 0
+$valet_mission_flag = 0
+$pause_valet_script = 0
+$force_valet_cleanup = 0
+$valet_scene_running = 0
+remove_blip 20@
+remove_blip 19@
+terminate_this_script 
+return 
+terminate_this_script 
+

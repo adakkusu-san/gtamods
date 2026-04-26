@@ -1,0 +1,104 @@
+{$CLEO .cs}
+{$NOSOURCE}
+{$USE ini}
+{$USE CLEO+}
+wait 1000
+
+const
+enable = 0@
+reset = 1@
+hour = 2@
+min = 3@
+wthr = 4@
+exit = 5@
+hours = 6@
+mins = 7@
+wthrs = 8@
+end
+
+var
+enable : int
+reset : int
+hour : int
+min : int
+wthr : int
+exit : int
+hours : int
+mins : int
+wthrs : int
+end
+
+:start_of_script
+if does_file_exist "cleo\msztime.ini"
+then
+if not enable = read_int_from_ini_file "cleo\msztime.ini" "mszcfg" "enable"
+then
+goto @end_of_script
+else
+if not enable == 1
+then
+goto @end_of_script
+end
+end
+
+if not reset = read_int_from_ini_file "cleo\msztime.ini" "mszcfg" "reset"
+then
+reset = 0x55
+end
+
+if not exit = read_int_from_ini_file "cleo\msztime.ini" "mszcfg" "exit"
+then
+exit = 0x49
+end
+
+if not hour = read_int_from_ini_file "cleo\msztime.ini" "time" "hour"
+then
+hour = -1
+end
+
+if not min = read_int_from_ini_file "cleo\msztime.ini" "time" "min"
+then
+min = -1
+end
+
+if not wthr = read_int_from_ini_file "cleo\msztime.ini" "weather" "type"
+then
+wthr = -1
+end
+else
+goto @end_of_script
+end
+
+while true
+wait 750
+if is_key_pressed reset
+then
+break
+end
+if is_key_pressed exit
+then
+goto @end_of_script
+end
+00BF: get_time_of_day hours mins
+if min > -1
+then
+if hour > -1
+then
+00C0: set_time_of_day hour min
+end
+else
+00C0: set_time_of_day hour mins
+end
+if wthr > -1
+then
+01B6: force_weather wthr
+else
+0D59: wthrs = get_current_weather
+01B6: force_weather wthrs
+end
+end
+goto @start_of_script
+:end_of_script
+0915: set_weather_to_appropriate_type_now
+01B7: release_weather
+terminate_this_custom_script

@@ -1,3 +1,7 @@
+I remade it so it just shows the local variables on screen during the mission
+
+(below applies to the old script)
+
 photo opp without frozen in-place
 
 _please DO NOT save while you have this script!_ I used global variables because 

@@ -1,135 +1,120 @@
 {$CLEO .cs}
 {$NOSOURCE}
-wait 1000
-
-const
-floatint = $824
-intfloat = $825
-floatdec = $826
-floatdint = $827
-origfloat = $3401
-str = $7891
-
-time_start = $2229
-time_end = $2230
-time_diff = $2231
-
-sc_part = $2232
-
-fov = $3402
-
-ryder_h = $2379
-tbone_h = $2380
-toreno_h = $2381
-jizzy_h = $2391
-
-ryder_car = $2233
-ryder = $2234
-balla = $2237
-ryder_status = $2238
-ryder_walk = $2239
-
-tbone_car = $2267
-tbone = $2268
-tbone_status = $2269
-tbone_walk = $2270
-
-toreno_car = $2271
-toreno = $2272
-toreno_status = $2273
-toreno_walk = $2274
-
-min_x = $2382
-min_y = $2383
-min_z = $2384
-off_x = $2385
-off_y = $2386
-off_z = $2387
-max_x = $2388
-max_y = $2389
-max_z = $2390
-
-jizzy_car = $2275
-jizzy = $2276
-jizzy_status = $2277
-jizzy_walk = $2278
-jizzy_progress = $2279
-
-end_car = $2280
-pro = $2281
-
-savanna = $2282
-
-reach_dest = $2283
-
-count = $2283
-cnt_timer = $6960
-
-end
+wait 2000
+03A4: script_name 'PHOTOP'
 
 var
-origfloat : float
-str : string
-fov : float
-ryder_h : float
-tbone_h : float
-toreno_h : float
-jizzy_h : float
-
-time_start : int
-time_end : int
-time_diff : int
-count : int
-cnt_timer : int
-
-off_x : float
-off_y : float
-off_z : float
-min_x : float
-min_y : float
-min_z : float
-max_x : float
-max_y : float
-max_z : float
+4@ : float
+9@ : float
+10@ : float
 end
 
-const ideal_fov = 20.0
-const lower_heading = 120.0
-const upper_heading = 240.0
+const
+floatint = 0@
+intfloat = 1@
+floatdec = 2@
+floatdint = 3@
+origfloat = 4@
+str = 5@s
+uct = 7@
+stage = 8@
+part = 9@
+fov = 10@
+tochar = 11@
+currentchar = 12@
+ideal_fov = 20.0
+lower_heading = 120.0
+upper_heading = 240.0
+end
 
 0ADF: add_text_label "MSZP_A" "~1~.~1~"
 0ADF: add_text_label "MSZP_0" "~1~.0~1~"
 0ADF: add_text_label "MSZP_N" "-~1~.~1~"
 0ADF: add_text_label "MSZPN0" "-~1~.0~1~"
-//0ADF: add_text_label "MSZDBG" "CUSTOM!!"
 
 :start_of_script
-while not is_key_pressed 0xbc // ,
-wait 500
-
-if is_key_pressed 0xbf // /
+while true
+wait 250
+7@ = get_script_struct_named 'SYN1'
+if not 7@ == 0
 then
-goto @end_of_script
+break
 end
-
 end
-while not is_player_playing $scplayer
-wait 0
-end
-set_area_visible 0
-
-01EB: set_car_density_multiplier 0.0
-03DE: set_ped_density_multiplier 0.0
-
-//00A1: set_char_coordinates $scplayer -2172.9 -2426.4 30.6
-00A1: set_char_coordinates $scplayer -2199.7195 -2308.075 29.6181
-0173: set_char_heading $scplayer 322.8928
-0925: camera_reset_new_scriptables
-0373: set_camera_behind_player
-02EB: restore_camera_jumpcut
 
 while true
 wait 0
+
+0AB1: cleo_call @lvar num 1 arg 34 store stage
+0AB1: cleo_call @lvar num 1 arg 35 store part
+fov = get_camera_fov
+
+gosub @display_text
+
+if part <= 6
+then
+draw_sphere -2210.9 -2477.7 30.0 2.0
+end
+if part <= 10
+then
+draw_sphere -2178.5 -2448.8 30.0 4.0
+end
+if part > 12
+then
+goto @end_of_script
+end
+end
+
+:display_text
+03F0: use_text_commands True
+gosub @textset
+0340: set_text_colour 208 95 208 255 // violet
+045A: display_text_with_number 490.0 20.0 "NUMBER" stage
+gosub @textset
+0340: set_text_colour 39 215 215 255 // cyan
+045A: display_text_with_number 490.0 40.0 "NUMBER" part
+origfloat = fov
+gosub @float2int
+gosub @textset
+if fov < ideal_fov
+then
+0340: set_text_colour 135 215 135 255 // green
+else
+0340: set_text_colour 239 111 111 255 // red
+end
+045B: display_text_with_2_numbers 490.0 60.0 str floatint floatdint
+origfloat = 0.0
+switch part
+case 3
+currentchar = 391 // ryder
+gosub @getheading
+case 6
+currentchar = 406 // tbone
+gosub @getheading
+case 9
+currentchar = 436 // toreno
+gosub @getheading
+case 12
+currentchar = 420 // jizzy
+gosub @getheading
+default
+end
+if not origfloat == 0.0
+then
+gosub @float2int
+gosub @textset
+if or
+origfloat > upper_heading
+origfloat < lower_heading
+then
+0340: set_text_colour 135 215 135 255 // green
+else
+0340: set_text_colour 239 111 111 255 // red
+end
+045B: display_text_with_2_numbers 490.0 80.0 str floatint floatdint
+end
+03F0: use_text_commands False
+return
 
 /*
 0340: set_text_colour 239 111 111 255 // red
@@ -137,40 +122,28 @@ wait 0
 0340: set_text_colour 199 199 7 255 // yellow
 0340: set_text_colour 39 215 215 255 // cyan
 0340: set_text_colour 208 95 208 255 // violet
-033E: display_text 20.0 60.0 "MSZDBG"
 */
 
-gosub @varinit
-
-request_model #CAMERA
-request_model #SAVANNA
-load_all_models_now
-while true
-wait 0
-if and
-has_model_loaded #CAMERA
-has_model_loaded #SAVANNA
+:getheading
+0AB1: cleo_call @lvar num 1 arg currentchar store tochar // ryder
+if not is_char_dead tochar
 then
-break
+get_char_heading tochar origfloat
 end
-end
+return
 
-0555: remove_weapon_from_char $scplayer WeaponType.Camera
-01B2: give_weapon_to_char $scplayer WeaponType.Camera 30000
+:lvar
+0@ *= 4
+0@ += 0xA48960
+1@ = read_memory 0@ size 4 vp 0
+0AB2: cleo_return num 1 param 1@
 
-00A5: create_car #SAVANNA -2163.4 -2404.1 29.6 savanna
-0175: set_car_heading savanna 225.0
-0229: change_car_colour savanna 3 3
-
-gosub @cutscene_things
-
-wait 2000
-gosub @cleanup
-break
-end
-
-print_string_now "let's do it again" 2000
-goto @start_of_script
+:textset
+0343: set_text_wrapx 640.0
+03E4: set_text_right_justify true
+03E0: set_text_draw_before_fade false
+0348: set_text_proportional false
+return
 
 :float2int
 // original from: https://gtamods.com/wiki/Display_float_in_text
@@ -203,644 +176,9 @@ end
 end
 return
 
-:varinit
-// after many crashes, I found out that not initializing the variables caused them
-// who would've thought
-ryder_car = -1
-ryder = -1
-balla = -1
-tbone_car = -1
-tbone = -1
-toreno_car = -1
-toreno = -1
-jizzy_car = -1
-jizzy = -1
-end_car = -1
-pro = -1
-savanna = -1
-ryder_h = 0.0
-tbone_h = 0.0
-toreno_h = 0.0
-jizzy_h = 0.0
-time_start = get_game_timer
-time_end = 0
-time_diff = 0
-sc_part = 0
-reach_dest = 0
-cnt_timer = time_start
-return
-
-:text_format
-0343: set_text_wrapx 640.0
-03E4: set_text_right_justify true
-03E0: set_text_draw_before_fade false
-0348: set_text_proportional false
-return
-
-:display_text
-03F0: use_text_commands True
-gosub @text_format
-03E4: set_text_right_justify false
-045A: display_text_with_number 40.0 200.0 "NUMBER" count
-gosub @text_format
-0340: set_text_colour 208 95 208 255 // violet
-045A: display_text_with_number 620.0 400.0 "NUMBER" sc_part
-origfloat = fov
-gosub @float2int
-gosub @text_format
-if fov < ideal_fov
-then
-0340: set_text_colour 135 215 135 255 // green
-else
-0340: set_text_colour 239 111 111 255 // red
-end
-045B: display_text_with_2_numbers 620.0 380.0 str floatint floatdint
-origfloat = 0.0
-switch sc_part
-case 3
-origfloat = ryder_h
-case 6
-origfloat = tbone_h
-case 9
-origfloat = toreno_h
-case 12
-origfloat = jizzy_h
-default
-end
-gosub @float2int
-gosub @text_format
-if or
-origfloat > upper_heading
-origfloat < lower_heading
-then
-0340: set_text_colour 135 215 135 255 // green
-else
-0340: set_text_colour 239 111 111 255 // red
-end
-if not origfloat == 0.0
-then
-045B: display_text_with_2_numbers 620.0 360.0 str floatint floatdint
-end
-03F0: use_text_commands False
-return
-
-:countdown
-switch count
-case 5
-cnt_timer = time_end
-cnt_timer += 999
-0ACB: print_big_string "5" 1100 4
-count --
-case 4
-if cnt_timer < time_end
-then
-cnt_timer = time_end
-cnt_timer += 999
-0ACB: print_big_string "4" 1100 4
-count --
-end
-case 3
-if cnt_timer < time_end
-then
-cnt_timer = time_end
-cnt_timer += 999
-0ACB: print_big_string "3" 1100 4
-count --
-end
-case 2
-if cnt_timer < time_end
-then
-cnt_timer = time_end
-cnt_timer += 999
-0ACB: print_big_string "2" 1100 4
-count --
-end
-case 1
-if cnt_timer < time_end
-then
-cnt_timer = time_end
-cnt_timer += 999
-0ACB: print_big_string "1" 1100 4
-count --
-end
-case 0
-if cnt_timer < time_end
-then
-cnt_timer = time_end
-cnt_timer += 999
-0ACB: print_big_string "GO!" 1100 4
-count = 9
-print_string_now "fade out happened" 1000
-01B4: set_player_control $player1 1
-end
-default
-end
-return
-
-:cutscene_things
-gosub @ryder_car_create
-
-01B4: set_player_control $player1 0
-0373: set_camera_behind_player
-02EB: restore_camera_jumpcut
-print_string_now "waiting for fade out to happen" 5000
-count = 5
-
-while true
-wait 0
-
-if is_key_pressed 0xbe // .
-then
-print_string_now "reset" 1000
-break
-end
-
-if is_key_pressed 0xbf // /
-then
-goto @end_of_script
-end
-
-fov = get_camera_fov
-
-if sc_part == 0
-then
-time_end = get_game_timer
-time_diff = time_end - time_start
-gosub @countdown
-if time_diff > 8000
-then
-0395: clear_area -2151.4746 -2442.0647 29.6328 50.0 1
-if not is_playback_going_on_for_car ryder_car
-then
-05EB: start_playback_recorded_car ryder_car 190
-end
-sc_part = 1
-count = 0
-else
-end
-end
-
-if sc_part == 1
-then
-if not is_playback_going_on_for_car ryder_car
-then
-0615: open_sequence_task ryder_walk
-05CD: task_leave_car -1 ryder_car
-05D3: task_go_straight_to_coord -1 -2151.4746 -2442.0647 29.6328 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2157.3882 -2441.6162 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2162.4712 -2444.5745 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2167.3086 -2451.8782 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2166.5168 -2456.9656 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2160.4199 -2461.468 29.6328 MoveState.Walk -2
-0616: close_sequence_task ryder_walk
-0618: perform_sequence_task ryder ryder_walk
-sc_part = 2
-end
-end
-
-if sc_part == 2
-then
-print_string_now "take a photo" 5000
-sc_part = 3
-end
-
-if sc_part == 3
-then
-062E: get_script_task_status ryder_walk 1560 ryder_status
-if ryder_status == 7
-then
-// todo
-end
-get_char_heading ryder ryder_h
-if has_char_been_photographed ryder
-then
-if fov < ideal_fov
-then
-if or
-ryder_h > upper_heading
-ryder_h < lower_heading
-then
-gosub @tbone_car_create
-sc_part = 4
-print_string_now "gg you done 1!~n~onto the next" 2000
-end
-else
-print_string_now "more zoom!" 3000
-end
-end
-end
-
-if sc_part == 4
-then
-if not is_playback_going_on_for_car tbone_car
-then
-0615: open_sequence_task tbone_walk
-05CD: task_leave_car -1 tbone_car
-05D3: task_go_straight_to_coord -1 -2156.6895 -2441.7119 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2161.1423 -2444.1865 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2165.8298 -2449.4763 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2167.1379 -2454.5098 29.6328 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2164.0945 -2458.8633 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2161.3364 -2460.5225 29.6328 MoveState.Walk -2
-0616: close_sequence_task tbone_walk
-0618: perform_sequence_task tbone tbone_walk
-sc_part = 5
-end
-end
-
-if sc_part == 5
-then
-print_string_now "take a photo" 5000
-sc_part = 6
-end
-
-if sc_part == 6
-then
-062E: get_script_task_status tbone_walk 1560 tbone_status
-if tbone_status == 7
-then
-// todo
-end
-get_char_heading tbone tbone_h
-if has_char_been_photographed tbone
-then
-if fov < ideal_fov
-then
-if or
-tbone_h > upper_heading
-tbone_h < lower_heading
-then
-gosub @toreno_car_create
-sc_part = 7
-print_string_now "gg you done 2!~n~onto the next" 2000
-end
-else
-print_string_now "more zoom!" 3000
-end
-end
-end
-
-if sc_part == 7
-then
-if is_playback_going_on_for_car toreno_car
-then
-get_offset_from_car_in_world_coords toreno_car 0.0 4.0 0.0 off_x off_y off_z
-min_x = off_x
-min_x -= 1.0
-min_y = off_y
-min_y -= 1.0
-min_z = off_z
-min_z -= 1.0
-max_x = off_x
-max_x += 1.0
-max_y = off_y
-max_y += 1.0
-max_z = off_z
-max_z += 1.0
-if is_area_occupied min_x min_y min_z max_x max_y max_z FALSE FALSE TRUE FALSE FALSE
-then
-stop_playback_recorded_car toreno_car
-end
-end
-if not is_playback_going_on_for_car toreno_car
-then
-0615: open_sequence_task toreno_walk
-05CD: task_leave_car -1 toreno_car
-05D3: task_go_straight_to_coord -1 -2176.855 -2453.5398 29.4688 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2172.5171 -2453.8345 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2169.3833 -2456.0796 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2162.8123 -2459.8394 29.6328 MoveState.Walk -2
-0616: close_sequence_task toreno_walk
-0618: perform_sequence_task toreno toreno_walk
-sc_part = 8
-end
-end
-
-if sc_part == 8
-then
-print_string_now "take a photo" 5000
-sc_part = 9
-end
-
-if sc_part == 9
-then
-062E: get_script_task_status toreno_walk 1560 toreno_status
-if toreno_status == 7
-then
-// todo
-end
-get_char_heading toreno toreno_h
-if has_char_been_photographed toreno
-then
-if fov < ideal_fov
-then
-if or
-toreno_h > upper_heading
-toreno_h < lower_heading
-then
-gosub @jizzy_car_create
-sc_part = 10
-print_string_now "gg you done 3!~n~onto the next" 2000
-end
-else
-print_string_now "more zoom!" 3000
-end
-end
-end
-
-if sc_part == 10
-then
-if not is_playback_going_on_for_car jizzy_car
-then
-0615: open_sequence_task jizzy_walk
-05CD: task_leave_car -1 jizzy_car
-05D3: task_go_straight_to_coord -1 -2173.3906 -2445.9854 29.4688 MoveState.Walk -2
-05BA: task_stand_still -1 1500
-05D3: task_go_straight_to_coord -1 -2170.468 -2449.1865 29.4688 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2167.9741 -2454.9741 29.625 MoveState.Walk -2
-05D3: task_go_straight_to_coord -1 -2163.5393 -2458.7529 29.625 MoveState.Walk -2
-0616: close_sequence_task jizzy_walk
-0618: perform_sequence_task jizzy jizzy_walk
-sc_part = 11
-end
-end
-
-if sc_part == 11
-then
-print_string_now "take a photo" 5000
-sc_part = 12
-end
-
-if sc_part == 12
-then
-062E: get_script_task_status jizzy_walk 1560 jizzy_status
-if jizzy_status == 7
-then
-// todo
-end
-if not jizzy_status == 7
-then
-get_sequence_progress jizzy jizzy_progress
-if jizzy_progress = 1
-then
-start_playback_recorded_car jizzy_car 194
-end
-end
-get_char_heading jizzy jizzy_h
-if has_char_been_photographed jizzy
-then
-if fov < ideal_fov
-then
-if or
-jizzy_h > upper_heading
-jizzy_h < lower_heading
-then
-sc_part = 13
-end
-else
-print_string_now "more zoom!" 3000
-end
-end
-end
-
-if sc_part == 13
-then
-print_string_now "gg you done it!~n~all of them" 2000
-wait 2000
-break
-end
-
-gosub @display_text
-if sc_part <= 6
-then
-draw_sphere -2210.9 -2477.7 30.0 2.0
-end
-if sc_part <= 10
-then
-draw_sphere -2178.5 -2448.8 30.0 4.0
-end
-
-// "softlock" prevention, or at least an attempt at it
-// you can just reset if you didn't take the photo lol
-
-if sc_part >= 3
-then
-if not is_global_var_bit_set_const reach_dest 0
-then
-if locate_char_any_means_2d ryder -2160.41 -2461.46 4.0 4.0 False
-then
-if sc_part == 3
-then
-break
-else
-01C2: mark_char_as_no_longer_needed ryder
-01C2: mark_char_as_no_longer_needed balla
-01C3: mark_car_as_no_longer_needed ryder_car
-08BA: set_global_var_bit_const reach_dest 0
-end
-end
-end
-end
-if sc_part >= 6
-then
-if not is_global_var_bit_set_const reach_dest 1
-then
-if locate_char_any_means_2d tbone -2161.33 -2460.52 4.0 4.0 False
-then
-if sc_part == 6
-then
-break
-else
-01C2: mark_char_as_no_longer_needed tbone
-01C3: mark_car_as_no_longer_needed tbone_car
-08BA: set_global_var_bit_const reach_dest 1
-end
-end
-end
-end
-if sc_part >= 9
-then
-if not is_global_var_bit_set_const reach_dest 2
-then
-if locate_char_any_means_2d toreno -2162.81 -2459.83 4.0 4.0 False
-then
-if sc_part == 9
-then
-break
-else
-01C2: mark_char_as_no_longer_needed toreno
-01C3: mark_char_as_no_longer_needed toreno_car
-08BA: set_global_var_bit_const reach_dest 2
-end
-end
-end
-end
-if sc_part >= 12
-then
-if not is_global_var_bit_set_const reach_dest 3
-then
-if locate_char_any_means_2d jizzy -2163.53 -2458.75 4.0 4.0 False
-then
-if sc_part == 12
-then
-break
-else
-01C2: mark_char_as_no_longer_needed jizzy
-01C2: mark_char_as_no_longer_needed pro
-01C3: mark_car_as_no_longer_needed jizzy_car
-08BA: set_global_var_bit_const reach_dest 3
-end
-end
-end
-end
-
-end
-return
-
-:ryder_car_create
-0247: request_model 600
-07C0: request_car_recording 190
-023C: load_special_character 2 'RYDER2'
-0247: request_model 102
-038B: load_all_models_now
-while true
-wait 0
-if and
-has_model_loaded 600
-has_model_loaded 102
-has_special_character_loaded 2
-has_car_recording_been_loaded 190
-then
-break
-end
-end
-0674: custom_plate_for_next_car #PICADOR "_SHERM__"
-0395: clear_area -2120.3997 -2448.4578 29.4688 5.0 True
-00A5: create_car 600 -2120.3997 -2448.4578 29.4688 ryder_car
-0229: change_car_colour ryder_car 84 84
-02AC: set_car_proofs ryder_car True True True True True
-0175: set_car_heading ryder_car 137.4828
-0129: create_char_inside_car ryder_car PedType.CivMale 291 ryder
-01C8: create_char_as_passenger ryder_car PedType.CivMale 102 SeatId.BikeRear balla
-return
-
-:tbone_car_create
-0247: request_model 477
-07C0: request_car_recording 191
-023C: load_special_character 3 'TBONE'
-038B: load_all_models_now
-while true
-wait 0
-if and
-has_model_loaded 477
-has_special_character_loaded 3
-has_car_recording_been_loaded 191
-then
-break
-end
-end
-0395: clear_area -2141.4009 -2481.5747 29.4688 5.0 True
-00A5: create_car 477 -2141.4009 -2481.5747 29.4688 tbone_car
-0229: change_car_colour tbone_car 84 84
-02AC: set_car_proofs tbone_car True True True True True
-0175: set_car_heading tbone_car 317.093
-0129: create_char_inside_car tbone_car PedType.CivMale 292 tbone
-05EB: start_playback_recorded_car tbone_car 191
-06FD: set_playback_speed tbone_car 0.6
-return
-
-:toreno_car_create
-0247: request_model 421
-07C0: request_car_recording 192
-023C: load_special_character 4 'TORINO'
-038B: load_all_models_now
-while true
-wait 0
-if and
-has_model_loaded 421
-has_special_character_loaded 4
-has_car_recording_been_loaded 192
-then
-break
-end
-end
-0674: custom_plate_for_next_car 421 "_OMEGA__"
-0395: clear_area -2214.2754 -2475.1125 29.4688 5.0 True
-00A5: create_car 421 -2214.2754 -2475.1125 29.4688 toreno_car
-0229: change_car_colour toreno_car 84 84
-02AC: set_car_proofs toreno_car True True True True True
-0175: set_car_heading toreno_car 232.2762
-0129: create_char_inside_car toreno_car PedType.CivMale 293 toreno
-05EB: start_playback_recorded_car toreno_car 192
-return
-
-:jizzy_car_create
-0247: request_model 575
-0247: request_model 478
-07C0: request_car_recording 193
-07C0: request_car_recording 194
-023C: load_special_character 5 'JIZZY'
-0247: request_model 237
-038B: load_all_models_now
-while true
-wait 0
-if and
-has_model_loaded 575
-has_model_loaded 237
-has_model_loaded 478
-has_special_character_loaded 5
-has_car_recording_been_loaded 193
-has_car_recording_been_loaded 194
-then
-break
-end
-end
-0395: clear_area -2141.4009 -2481.5747 29.4688 5.0 True
-0674: custom_plate_for_next_car 575 "HO_2_HO_"
-00A5: create_car 575 -2141.4009 -2481.5747 29.4688 jizzy_car
-00A5: create_car 478 -2235.7273 -2572.8728 30.9296 end_car
-02AC: set_car_proofs jizzy_car True True True True True
-0175: set_car_heading end_car 44.9335
-0229: change_car_colour jizzy_car 123 5
-0175: set_car_heading jizzy_car 317.093
-0129: create_char_inside_car jizzy_car PedType.CivFemale 237 pro
-01C8: create_char_as_passenger jizzy_car PedType.CivMale 294 SeatId.BikeRear jizzy
-05EB: start_playback_recorded_car jizzy_car 193
-return
-
-:cleanup
-01EB: set_car_density_multiplier 1.0
-03DE: set_ped_density_multiplier 1.0
-0296: unload_special_character 1
-0296: unload_special_character 2
-0296: unload_special_character 3
-0296: unload_special_character 4
-0296: unload_special_character 5
-009B: delete_char ryder
-009B: delete_char tbone
-009B: delete_char toreno
-009B: delete_char jizzy
-009B: delete_char balla
-009B: delete_char pro
-00A6: delete_car ryder_car
-00A6: delete_car tbone_car
-00A6: delete_car toreno_car
-00A6: delete_car jizzy_car
-00A6: delete_car savanna
-0249: mark_model_as_no_longer_needed 600
-0249: mark_model_as_no_longer_needed 477
-0249: mark_model_as_no_longer_needed 421
-0249: mark_model_as_no_longer_needed 575
-0249: mark_model_as_no_longer_needed 237
-0249: mark_model_as_no_longer_needed 367
-0249: mark_model_as_no_longer_needed 330
-0249: mark_model_as_no_longer_needed 567
-0249: mark_model_as_no_longer_needed 510
-0249: mark_model_as_no_longer_needed 102
-0249: mark_model_as_no_longer_needed 478
-return
-
 :end_of_script
-print_string_now "end" 2000
-wait 2000
-terminate_this_custom_script
+0AE0: remove_text_label "MSZP_A"
+0AE0: remove_text_label "MSZP_0"
+0AE0: remove_text_label "MSZP_N"
+0AE0: remove_text_label "MSZPN0"
+0A93: terminate_this_custom_script

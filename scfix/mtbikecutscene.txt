@@ -1,0 +1,82 @@
+// mt bike race cutscene
+
+// TODO
+
+// originally the code doesn't work properly, chars will be floating in midair
+
+// needs some map objects I think
+
+// following is my interpretation, I may turn it into a cleo script that 
+you can try better
+
+:mtbikelabel
+
+0@ = 0
+
+1@ = 
+
+if player_position == 1
+then
+1@ = -2404.1289
+2@ = -2206.4763
+3@ = 33.4909
+end
+
+if player_position == 2
+then
+1@ = -2404.1821
+2@ = -2205.1987
+3@ = 33.4909
+end
+
+if player_position == 3
+then
+1@ = -2403.8489
+2@ = -2208.4829
+3@ = 33.4909
+end
+
+if player_position > 3
+then
+1@ = -2404.3813 
+2@ = -2212.2981 
+3@ = 32.3042 
+end
+
+if is_char_in_any_char scplayer
+then
+warp_char_from_car_to_coord scplayer 1@ 2@ 3@
+else
+set_char_coordinates scplayer 1@ 2@ 3@
+end
+
+set_char_heading scplayer 270.0 
+
+TIMERA = 0
+TIMERB = 0
+set_player_control player1 False
+switch_widescreen True
+
+while not 0@ == 10
+wait 0
+if 0@ == 0
+then
+set_fixed_camera_position -2399.4277 -2207.4241 32.9310 0.0 0.0 0.0
+point_camera_at_point -2401.7283 -2207.2827 33.8958 7
+0@ = 1
+end
+if TIMERA > 5000
+then
+0@ = 10
+end
+end
+
+if not is_char_dead scplayer
+then
+set_player_control player1 False
+switch_widescreen True
+restore_camera_jumpcut
+set_camera_behind_player
+end
+
+return

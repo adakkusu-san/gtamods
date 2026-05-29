@@ -1,0 +1,45 @@
+// photo opp cutscene
+
+// these are mostly just some camera points, but I still thought it'd be interesting
+
+//first set (pilot)
+set_fixed_camera_position -2413.0 -580.0 133.0 0.0 0.0 0.0
+set_fixed_camera_position -2410.0 -582.0 133.0 0.0 0.0 0.0
+set_fixed_camera_position -2406.0 -584.0 133.0 0.0 0.0 0.0
+
+//second set (heli)
+set_fixed_camera_position -2408.4370 -585.0820 133.2022 0.0 0.0 0.0
+point_camera_at_point -2408.3367 -584.0877 133.1662 7
+
+set_fixed_camera_position -60.0461 -433.1644 1.4904 0.0 0.0 0.0
+point_camera_at_point -59.0698 -432.9484 1.5005 7
+
+set_fixed_camera_position -58.7976 -433.3285 3.0796 0.0 0.0 0.0
+point_camera_at_point -57.8850 -432.9940 2.8444 7
+
+set_fixed_camera_position -46.1629 -427.8859 1.5902 0.0 0.0 0.0
+point_camera_at_point -45.8006 -428.8180 1.3937 7
+
+set_fixed_camera_position -2407.1704 -583.5895 133.3550 0.0 0.0 0.0
+point_camera_at_point -2407.7656 -582.7864 133.3749 7
+
+set_fixed_camera_position -2407.1704 -583.5895 133.3550 0.0 0.0 0.0
+point_camera_at_point -2407.9668 -584.1938 133.3749 7
+
+set_fixed_camera_position -2172.5522 -2427.4873 30.5334 0.0 0.0 0.0
+point_camera_at_point -2171.9856 -2428.3042 30.6400 7
+
+set_fixed_camera_position -2139.5693 -2452.2385 31.2226 0.0 0.0 0.0
+point_camera_at_point -2140.2920 -2451.5486 31.1829 7
+
+set_fixed_camera_position -2175.6719 -2437.2302 30.7446 0.0 0.0 0.0
+point_camera_at_point -2174.6836 -2437.1333 30.8619 7
+
+set_fixed_camera_position -2170.4121 -2429.4302 31.7580 0.0 0.0 0.0
+point_camera_at_point -2170.4998 -2430.4231 31.8365 7
+
+set_fixed_camera_position -2246.8511 -2571.0310 32.7468 0.0 0.0 0.0 // used
+point_camera_at_point -2246.1604 -2570.3110 32.6781 7
+
+set_fixed_camera_position -2241.5188 -2568.2810 32.2372 0.0 0.0 0.0 // used
+point_camera_at_point -2242.2859 -2567.6418 32.2906 7 // used

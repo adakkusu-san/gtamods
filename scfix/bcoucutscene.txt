@@ -1,0 +1,62 @@
+// bcou cutscene
+
+search for :BCOUR_371
+change 746@ from 0 to -1
+
+after
+```
+681@ = 0
+```
+insert
+```
+create_car #WAYFARER -2485.6458 7.4586 24.6316 36@
+set_car_heading 36@ 159.0957
+change_car_colour 36@ 55 1
+warp_char_into_car $scplayer 36@
+force_car_lights 36@ 1
+set_char_coordinates $scplayer -2484.2043 49.2125 26.4078
+```
+
+search for :BCOUR_2468
+remove/comment
+```
+// 36@ = store_car_char_is_in $scplayer
+```
+
+search for :BCOUR_3725
+below
+```
+set_player_control $player1 False
+```
+insert
+```
+if not is_char_dead 38@
+then
+task_pick_up_object 38@ 37@ 0.0 -0.2 0.0 PedBoneId.HandR HoldOrientation.Bone "NULL" "NULL" False
+end
+```
+
+search for :BCOUR_4093
+above
+```
+748@ = 20
+```
+insert
+```
+task_pick_up_object 38@ 37@ 0.0 0.15 0.0 PedBoneId.HandR HoldOrientation.Bone 'NULL' 'NULL' False
+delete_object 37@
+```
+
+// also the subtitles are missing I think
+
+// the game loads some models and animation but doesn't seem to do much with them normally
+
+// fun fact, there is always gonna be an object created at {x}-2492.5 {y}0.5 {z}24.7
+// after you start the side-mission, and it won't be removed (unless you despawn it by 
+// going too far from it). There's also one near the place you start the mission at, but 
+// it's there to be already loaded and not pop into existence or whatever 
+// after you throw it the first time
+
+// in LS and LV it's on the roof, you can see it if you know where it is; in SF 
+// it's _inside_ the building, don't know how to reach it
+

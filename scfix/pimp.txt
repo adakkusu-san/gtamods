@@ -1,0 +1,26 @@
+// enable Bayside to be selected in the side-mission
+// it's part of sf, so if you start it here, you'll have to go to the middle or sf
+
+search for :PIMP_138
+between 374@ and 293@
+
+```
+291@ = -2248.7585 
+319@ = 2285.5298 
+347@ = 3.8125 
+375@ = 162.2104
+292@ = -2436.1055 
+320@ = 2228.9583 
+348@ = 3.9921
+376@ = 75.3359
+```
+
+search for :PIMP_20010 and :PIMP_20217
+remove/comment for both
+```
+//60@(50@,28i) = 1
+```
+
+// but as mentioned, after you start in bayside you'll have to go to sf anyway
+
+// there's also some unused coords that I may look into

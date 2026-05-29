@@ -1,0 +1,20 @@
+// drive-by mission camera angles and locations
+
+//used for if locate_car_3d
+original set to 2227.72 -1315.79 24.04 / changed to 2079.42 -1364.08 23.04
+
+//used for clear_area and create_char
+original set to 2099.8 -1288.37 24.35 / changed to 2101.58 -1291.78 24.02
+original set to 2184.97 -1230.92 24.02 / changed to 2162.97 -1261.92 23.02
+original set to 2157.77 -1345.03 24.04 / changed to 1986.54 -1233.03 20.07
+
+// camera angles
+2500.026 -1661.180 17.763
+2194.35 -1380.42 24.34 // var replaced by camera offset, set_fixed_camera_position
+2082.42 -1362.58 26.81
+2078.99 -1366.22 25.09 // var replaced by camera offset, point_camera_at_point
+2152.0 -1339.0 30.0
+2502.16 -1661.95 15.76
+2509.18 -1662.81 14.07
+2510.63 -1665.81 13.83
+2511.89 -1668.39 14.26

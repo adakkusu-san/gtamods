@@ -1,0 +1,126 @@
+// make valet also available in ls and vg
+
+// note: not tested much with original script
+
+// search for :VALET_491
+// insert after 1905.9434
+$10784 = 1907.6700
+$10785 = 1905.8102
+$10786 = 11.3315
+$10787 = 11.3349
+$10788 = 11.3313
+$10789 = 331.7047
+$10790 = 297.1161
+$10791 = 288.6038
+
+// search for :VALET_2371
+replace
+```
+if is_char_in_area_2d $scplayer -1893.4186 1119.2267 -1617.9149 828.85 False
+goto_if_false @VALET_2472
+$val_Area = 2
+```
+with
+```
+if is_char_in_area_2d $scplayer 215.3643 -1651.7264 440.7311 -1369.3921 False
+then
+$val_Area = 1
+end
+if is_char_in_area_2d $scplayer -1893.4186 1119.2267 -1617.9149 828.85 False
+then
+$val_Area = 2
+end
+if is_char_in_area_2d $scplayer 2205.5503 1772.4938 1830.5140 2086.0610 False
+then
+$val_Area = 3
+end
+```
+
+// search for :VALET_3597
+
+below
+```
+if not is_char_dead $scplayer
+goto_if_false @VALET_3852
+```
+insert
+```
+if $val_Area == 1
+goto_if_false @VALET_N3
+if locate_char_on_foot_3d $scplayer 328.1585 -1512.8881 35.0247 2.0 2.0 2.0 TRUE
+goto_if_false @VALET_N3
+if is_player_wearing $player1 BodyPart.SpecialCostume "VALET"
+goto_if_false @VALET_3836
+if not is_wanted_level_greater $player1 0
+goto_if_false @VALET_3813
+print_now 'VAL_A7' 5000 1 // ~s~Valet Parking
+$player_on_valet_mission = 1
+$onmission = 1
+goto @VALET_3829
+:VALET_N3
+if $val_Area == 3
+goto_if_false @VALET_N2
+if locate_char_on_foot_3d $scplayer 2021.3368 1918.2360 11.3438 2.0 2.0 2.0 TRUE
+goto_if_false @VALET_N2
+if is_player_wearing $player1 BodyPart.SpecialCostume "VALET"
+goto_if_false @VALET_3836
+if not is_wanted_level_greater $player1 0
+goto_if_false @VALET_3813
+print_now 'VAL_A7' 5000 1 // ~s~Valet Parking
+$player_on_valet_mission = 1
+$onmission = 1
+goto @VALET_3829
+:VALET_N2
+```
+
+// search for :VALET_L_11
+
+replace
+```
+if is_int_var_equal_to_constant $im_players_city == 2
+goto_if_false @VALET_L_197
+```
+with
+```
+if not is_int_var_equal_to_constant $ONMISSION == 2
+goto_if_false @VALET_L_197
+```
+(or NOPs or something else that can't happen)
+
+replace
+```
+if is_char_in_area_2d $scplayer -1893.4186 1119.2267 -1617.9149 828.85 False
+goto_if_false @VALET_L_168
+```
+with
+```
+if not is_char_in_area_2d $scplayer 0.0 0.0 0.0 0.0 False
+goto_if_false @VALET_L_168
+```
+(or something else, I wanted to check for all 3 locations, but that's too many bytes)
+(you could NOP the photol script and change the `if not` to a gosub there, but 
+I don't know yet how to make it compile to the same number of bytes)
+
+variable right below it will get overwritten anyway, but if you want, just set it to 0
+
+// search for :VALET_L_168
+
+replace
+```
+if $val_Area == 2
+```
+with
+```
+if not $val_Area == 0
+```
+
+// now you don't have to wonder what that huge building in LS with underground 
+// parking garage is for. same for the one in LV with the huge (seriously) doors, 
+// and some flickering floor tiles in front of them
+
+// NOTE: the 2D box in LV is a bit wrong and doesn't expand all the way south, 
+// will have to look into it. also, there is a long way to go back to the place 
+// in LV, no wonder it's been disabled
+
+// the LS one is a bit cramped and the ramp space for the cars to go up to is 
+// a bit too small, I don't know how to explain it

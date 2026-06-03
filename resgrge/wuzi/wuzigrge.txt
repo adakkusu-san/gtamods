@@ -1,0 +1,9 @@
+{$CLEO .cs}
+{$NOSOURCE}
+wait 1000
+
+0299: activate_garage 'fdorsfe'
+02FA: change_garage_type 'fdorsfe' 5
+093A: set_garage_respray_free 'fdorsfe' True
+
+terminate_this_custom_script

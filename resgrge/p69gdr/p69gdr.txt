@@ -1,0 +1,20 @@
+{$CLEO .cs}
+{$NOSOURCE}
+{$INCLUDE grgx.txt}
+wait 1000
+
+// p69gdr = big garage from pier69
+// to make the door work, open object.dat in notepad
+// search for 'garage doors', duplicate one of them
+// and change the name to 'pier69gdr'
+
+if 02FA: grgx_command 'p69gdr' DOES_GARAGE_EXISTS
+then
+else
+0219: create_garage xyz1 -1794.15 1429.69 4.37321 xy2 -1787.18 1429.69 xyz3 -1794.15 1441.37 14.3732 type GRGX_RESPRAY_GARAGE name 'p69gdr'
+end
+03BB: set_garage 'p69gdr' door_to_rotate
+02FA: grgx_command 'p69gdr' SET_GARAGE_DONT_SAVE
+093A: set_garage_respray_free 'p69gdr' True
+
+terminate_this_custom_script

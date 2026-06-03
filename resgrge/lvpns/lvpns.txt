@@ -1,0 +1,11 @@
+{$CLEO .cs}
+{$NOSOURCE}
+wait 1000
+
+// to make the garage door work, open vegasE.ide in notepad
+// at ID 8957, change 128 to 2176 (128+2048)
+
+0164: remove_blip $2638 // this is a duplicate clothes icon in SF
+04CE: add_short_range_sprite_blip_for_coord 2393.6 1483.6 10.8 63 store $2638
+
+terminate_this_custom_script

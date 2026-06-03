@@ -1,1 +1,4 @@
-IPL data\maps\resgrge.ipl
+IPL data\maps\lvpns.ipl
+IPL data\maps\lvbmbd.ipl
+IPL data\maps\sfbmbd.ipl
+IPL data\maps\p69gdr.ipl

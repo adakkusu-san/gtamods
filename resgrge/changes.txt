@@ -1,25 +1,25 @@
 # IPLs in data/maps/
 
-goto SFe.ipl
-remove the first 3 lines from grge
+goto lvW.ipl
+at first line from grge, change first number 1 to 5 (optional, this will make camera go inside)
 
 goto lvE.ipl
-remove the second line from grge
-
-goto lvW.ipl
-remove the first line from grge
+at second line from grge, change first number 5 to 1 (optional, this will make camera stay outside)
 
 
 # binary IPLs extracted from gta3.img
 
 goto SFe.ipl
-remove IDs 10149, 10150, 10154
+remove IDs 10149(bmbdr02), 10154(p69gdr)
+re-placed with sfbmbd.ipl and p69gdr.ipl
 
 goto lvE.ipl
-remove IDs 8957
+remove IDs 8957(lvpns)
+re-placed with lvpns.ipl
 
 goto lvW.ipl
-remove IDs 7707, 7709
+remove IDs 7709(lvbmbdr1), 7707(lvbmbdr2)
+re-placed with lvbmbd.ipl
 
 
 # IDEs in data/maps/

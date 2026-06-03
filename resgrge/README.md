@@ -1,5 +1,17 @@
 restore some (unused?) garages
 
+split into parts
+
+* wuzigrge = active(cs)
+* lvpns = blip(cs) / ide(vegasE)
+* lvbmbdr = ipl(place) / model(rotate)
+* sfbmbdr = grgx(re-create) / ipl(sfe) / model(rotate)
+* p69gdr = grgx(re-create) / ipl(sfe) / model(rotate) / object.dat(define)
+
+`binary.zip` should have some text that will say what the files are for
+
+not sure if below still applies, maybe it does
+
 note: needs grgx
 
 some `dff`s are facing the wrong way, and such the camera when going in 

@@ -1,0 +1,17 @@
+{$CLEO .cs}
+{$NOSOURCE}
+{$INCLUDE grgx.txt}
+wait 1000
+
+// sweetdr = sweet's garage
+// there's space behind the garage door but it's not defined anywhere
+
+if 02FA: grgx_command 'sweetdr' DOES_GARAGE_EXISTS
+then
+else
+0219: create_garage xyz1 2520.59 -1671.88 13.97 xy2 2520.83 -1675.67 xyz3 2528.62 -1672.09 17.27 type GRGX_SCRIPT_GARAGE name 'sweetdr'
+end
+03BB: set_garage 'sweetdr' door_to_rotate
+02FA: grgx_command 'sweetdr' SET_GARAGE_DONT_SAVE
+
+terminate_this_custom_script

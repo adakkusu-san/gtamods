@@ -1,7 +1,6 @@
 {$CLEO .cs}
 {$NOSOURCE}
 {$USE ini}
-{$USE CLEO+}
 wait 1000
 
 const

@@ -1,0 +1,111 @@
+{$CLEO .cs}
+script_name 'msntutL'
+wait 1000
+
+while true
+wait 0
+if is_player_playing $scplayer
+then
+if $ONMISSION == 0
+then
+if locate_char_any_means_3d $scplayer 338.6 -1808.2 20.5 1.2 1.2 2.0 True
+then
+print_big_string "mission tutorial" 1000 2
+$ONMISSION = 1
+0A94: start_custom_mission "msntut"
+end // locate_char
+end // $ONMISSION == 0
+end // is_player_playing
+end // while
+
+//
+
+{$CLEO .cm}
+script_name 'msntutM'
+wait 250
+gosub @tutM
+if has_deatharrest_been_executed
+then
+gosub @tutF
+end
+gosub @tutC
+terminate_this_script
+
+:tutM
+request_model #zr350
+
+while true
+wait 250
+if has_model_loaded #zr350
+then
+break
+end
+end
+
+clear_area 335.4 -1827.4 20.0 True
+0@ = create_car #zr350 335.4 -1827.4 20.0
+change_car_colour 0@ 22 1
+set_car_coordinates 0@ -1813.1 941.2 24.6
+set_car_heading 0@ 270.0
+mark_model_as_no_longer_needed #zr350
+mark_car_as_no_longer_needed 0@
+
+while true
+wait 0
+
+if locate_char_any_means_3d $scplayer 297.7 -1787.8 20.0 4.0 4.0 4.0 True
+then
+do_fade 500 Fade.Out
+while get_fading_status
+wait 250
+end
+switch_widescreen True
+set_player_control $player1 False
+// set_fixed_camera_position
+// point_camera_at_point
+do_fade 500 Fade.In
+while get_fading_status
+wait 250
+end
+print_string_now "camera point example" 5000
+wait 5000
+do_fade 500 Fade.Out
+while get_fading_status
+wait 250
+end
+switch_widescreen False
+set_player_control $player1 True
+restore_camera_jumpcut
+set_camera_behind_player
+camera_reset_new_scriptables
+do_fade 500 Fade.In
+while get_fading_status
+wait 250
+end
+
+break
+end
+
+end
+
+clear_prints
+wait 500
+print_string_now "IT WORKED!!" 1000
+restore_camera_jumpcut
+set_camera_behind_player
+camera_reset_new_scriptables
+
+mark_car_as_no_longer_needed 0@
+
+:tutP
+print_big 'M_PASS' 5000 1
+return
+
+:tutF
+print_big 'M_FAIL' 5000 1
+return
+
+:tutC
+$ONMISSION = 0
+mission_has_finished
+return

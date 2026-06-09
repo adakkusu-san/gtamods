@@ -1,0 +1,191 @@
+{$CLEO .cs}
+wait 2000
+
+const
+menumake = 0@
+menuitem = 1@
+h_r = 2@
+h_g = 3@
+h_b = 4@
+h_a = 5@
+end
+
+var
+menumake : int
+menuitem : int
+h_r : int
+h_g : int
+h_b : int
+h_a : int
+end
+
+add_text_label 'MSZDBG1' "You have selected"
+add_text_label 'MSZDBG2' "item number = ~1~"
+
+add_text_label 'MSZITMF' "Fancy Text"
+add_text_label 'MSZITMH' "Header"
+add_text_label 'MSZITM0' "( 0)"
+add_text_label 'MSZITM1' "( 1)"
+add_text_label 'MSZITM2' "( 2)"
+add_text_label 'MSZITM3' "( 3)"
+add_text_label 'MSZITM4' "( 4)"
+add_text_label 'MSZITM5' "( 5)"
+add_text_label 'MSZITM6' "( 6)"
+add_text_label 'MSZITM7' "( 7)"
+add_text_label 'MSZITM8' "( 8)"
+add_text_label 'MSZITM9' "( 9)"
+add_text_label 'MSZIT10' "(10)"
+add_text_label 'MSZIT11' "(11)"
+
+:start_of_script
+
+while true
+wait 0
+gosub @showtext
+if is_key_pressed 0x30 // 0
+then
+while is_key_pressed 0x30
+wait 0
+end
+break
+end
+end
+
+menumake = create_menu {header} 'MSZITMF' {XY} 30.0 140.0 {width} 200.0 {cols} 1 {interact} True {background} True {align} 1
+// 0 = center / 1 = left / 2 = right
+
+set_menu_column menumake {column} 0 {title} 'MSZITMH' {rows} 'MSZITM0' 'MSZITM1' 'MSZITM2' 'MSZITM3' 'MSZITM4' 'MSZITM5' 'MSZITM6' 'MSZITM7' 'MSZITM8' 'MSZITM9' 'MSZIT10' 'MSZIT11'
+// 12 rows total, any row not needed, set it to 'DUMMY'
+
+// set_menu_column_orientation menumake {column} 1 {align} 1
+
+// activate_menu_item menumake {row} 0 {canSelect} False
+if menuitem > -1
+then
+set_active_menu_item menumake {row} menuitem
+end
+// highlight_menu_item {row} 0 {set} True
+
+// set_menu_column_width menumake {column} 0 {width} 200
+
+// set_menu_item_with_number menumake {column} 0 {row} 0 {gxt} 'MSZNUM1 {number} menuitem
+// set_menu_item_with_2_numbers menumake {column} 0 {row} 0 {gxt} 'MSZNUM2' {numbers} menumake menuitem
+
+print_help_forever 'WARDH3'
+
+set_player_control $player1 False
+set_everyone_ignore_player $player1 True
+
+while true
+gosub @showtext
+wait 0
+if is_button_pressed 0 Button.Cross // Select Item
+then
+menuitem = get_menu_item_selected menumake
+break
+end
+if is_button_pressed 0 Button.Triangle // Exit Menu
+then
+menuitem = get_menu_item_accepted menumake
+break
+end
+end
+
+TIMERA = 0
+TIMERB = 0
+
+delete_menu menumake
+clear_help
+set_player_control $player1 True
+set_everyone_ignore_player $player1 False
+
+switch_start menuitem count 12 default True go @c_def incase 0 go @c_0 incase 1 go @c_1 incase 2 go @c_2 incase 3 go @c_3 incase 4 go @c_4 incase 5 go @c_5 incase 6 go @c_6
+switch_continued incase 7 go @c_7 incase 8 go @c_8 incase 9 go @c_9 incase 10 go @c10 incase 11 go @c11 skip -1 @c_def -1 @c_def -1 @c_def -1 @c_def
+
+:c_0
+add_text_label 'MSZDBG0' "This is first option"
+get_hud_colour 0 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c_1
+add_text_label 'MSZDBG0' "This is second option"
+get_hud_colour 1 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c_2
+add_text_label 'MSZDBG0' "This is third option"
+get_hud_colour 6 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c_3
+add_text_label 'MSZDBG0' "This is four option"
+get_hud_colour 7 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c_4
+add_text_label 'MSZDBG0' "This is five option"
+get_hud_colour 13 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c_5
+add_text_label 'MSZDBG0' "This is six option"
+get_hud_colour 14 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c_6
+add_text_label 'MSZDBG0' "This is seven option"
+get_hud_colour 0 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c_7
+add_text_label 'MSZDBG0' "This is eight option"
+get_hud_colour 1 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c_8
+add_text_label 'MSZDBG0' "This is nine option"
+get_hud_colour 6 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c_9
+add_text_label 'MSZDBG0' "This is ten option"
+get_hud_colour 7 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c10
+add_text_label 'MSZDBG0' "This is eleven option"
+get_hud_colour 13 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c11
+add_text_label 'MSZDBG0' "This is twelve option"
+get_hud_colour 14 store_to h_r h_g h_b h_a
+goto @c_end
+
+:c_def
+add_text_label 'MSZDBG0' "on menu exit"
+get_hud_colour 8 store_to h_r h_g h_b h_a
+goto @c_end
+
+:showtext
+if TIMERA < 3000
+then
+use_text_commands True
+set_text_colour h_r h_g h_b h_a
+gosub @settext
+display_text 610.0 260.0 'MSZDBG0'
+gosub @settext
+display_text 610.0 270.0 'MSZDBG1'
+gosub @settext
+display_text_with_number 610.0 280.0 'MSZDBG2' menuitem
+use_text_commands False
+end
+return
+
+:settext
+set_text_right_justify True
+set_text_wrapx 640.0
+return
+
+:c_end
+goto @start_of_script

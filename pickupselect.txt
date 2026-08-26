@@ -1,0 +1,446 @@
+{$CLEO .cs}
+{$NOSOURCE}
+{$USE INI,CLEO+}
+script_name "MSZPIKA"
+wait 2000
+
+const
+index = 0@
+pickarray = 2@
+
+pickX = 3@
+pickY = 4@
+pickZ = 5@
+
+bliptoadd = 6@
+pickhandle = 7@
+
+pickpoint = 9@
+
+readmem = 10@
+writemem = 11@
+pickXo = 12@
+pickYo = 13@
+pickZo = 14@
+pickAo = 15@
+
+maxval = 1@
+picktype = 16@
+step = 17@
+speed = 18@
+which_key_pressed = 19@
+
+str = 20@v
+
+end
+
+var
+index : int
+pickarray : int
+pickpoint : int
+8@ : int
+readmem : int
+writemem : int
+pickXo : int
+pickYo : int
+pickZo : int
+pickAo : int
+
+picktype : int
+
+step : int
+end
+
+add_text_label 'MSZPIKA' "pickup select"
+
+add_text_label 'MSZPS01' "step = 1.0"
+add_text_label 'MSZPS10' "step = 10.0"
+
+add_text_label 'MSZPST' "speed = TRUE"
+add_text_label 'MSZPSF' "speed = FALSE"
+
+add_text_label 'MSZARRN' "number = ~1~"
+
+/*
+add_text_label 'MSZP_A' "~1~.~1~"
+add_text_label 'MSZP_0' "~1~.0~1~"
+add_text_label 'MSZP_N' "-~1~.~1~"
+add_text_label 'MSZPN0' "-~1~.0~1~"
+
+add_text_label 'MSZIKP' "is key pressed"
+add_text_label 'MSZNKP' "no key pressed"
+*/
+
+step = 8
+speed = False
+
+:start_of_script
+
+if not does_file_exist "cleo\pickupselect.ini"
+then
+print_string_now "pickupselect.ini not found" 4000
+goto @end_of_script
+end
+
+/*
+while true
+wait 100
+if is_key_pressed 0x68 // numpad 8
+then
+break
+end
+end
+*/
+
+wait 2000
+TIMERA = 0
+while TIMERA < 2000
+wait 0
+use_text_commands True
+display_text 490.0 10.0 'MSZPIKA'
+use_text_commands False
+end
+
+/*
+3032 = pickup_weapon
+3257 = pickup_flowers
+3297 = pickup_armour
+3345 = pickup_bribe
+*/
+
+if not picktype = read_int_from_ini_file "cleo\pickupselect.ini" "config" "index"
+then picktype = 0
+end
+
+switch picktype
+case 0
+str = "weapon"
+if not readmem = read_int_from_ini_file "cleo\pickupselect.ini" str "offset"
+then readmem = 3032
+end
+if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" str "maxval"
+then maxval = 217
+end
+case 1
+str = "flower"
+if not readmem = read_int_from_ini_file "cleo\pickupselect.ini" str "offset"
+then readmem = 3257
+end
+if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" str "maxval"
+then maxval = 40
+end
+case 2
+str = "armour"
+if not readmem = read_int_from_ini_file "cleo\pickupselect.ini" str "offset"
+then readmem = 3297
+end
+if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" str "maxval"
+then maxval = 48
+end
+case 3
+str = "bribe"
+if not readmem = read_int_from_ini_file "cleo\pickupselect.ini" str "offset"
+then readmem = 3345
+end
+if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" str "maxval"
+then maxval = 50
+end
+end
+
+if not index = read_int_from_ini_file "cleo\pickupselect.ini" str "index"
+then index = 0
+end
+
+8@ = index
+
+readmem *= 4
+readmem += 0xA49960
+// https://gtamods.com/wiki/Memory_Addresses_(SA)
+
+index *= 4
+readmem += index
+
+pickarray = read_memory address readmem size 4 vp False
+
+if does_pickup_exist pickarray
+then
+remove_blip bliptoadd
+
+//get_pickup_coordinates pickarray store_to pickX pickY pickZ
+bliptoadd = add_blip_for_pickup pickarray
+
+while true
+wait 0
+
+use_text_commands True
+
+gosub @text_display
+
+gosub @get_coords
+
+gosub @which_key_press
+
+gosub @write_coords
+
+gosub @save_coords
+
+use_text_commands False
+
+end
+
+end
+//end
+
+//goto @start_of_script
+
+:end_of_script
+terminate_this_custom_script
+
+:text_display
+set_text_wrapx 640.0
+set_text_right_justify True
+if step == 8
+then
+display_text 490.0 30.0 'MSZPS01'
+else
+display_text 490.0 30.0 'MSZPS10'
+end
+
+set_text_wrapx 640.0
+set_text_right_justify True
+if speed == 1
+then
+display_text 490.0 50.0 'MSZPST'
+else
+display_text 490.0 50.0 'MSZPSF'
+end
+
+set_text_wrapx 640.0
+set_text_right_justify True
+display_text_with_number 490.0 70.0 'MSZARRN' 8@
+
+/*
+display_text 490.0 10.0 'MSZP_A'
+display_text 490.0 10.0 'MSZP_0'
+display_text 490.0 10.0 'MSZP_N'
+display_text 490.0 10.0 'MSZPN0'
+*/
+return
+
+// maybe useful
+// https://gtaforums.com/topic/989882-search-for-pickups-on-the-map/
+// https://gtaforums.com/topic/409207-struct-of-car/
+// https://gtamods.com/wiki/Saves_(GTA_SA)
+
+:get_coords
+pickpoint = get_pickup_pointer pickarray
+pickpoint += 0x10
+pickXo = read_memory address pickpoint size 2 vp False
+pickpoint += 0x2
+pickYo = read_memory address pickpoint size 2 vp False
+pickpoint += 0x2
+pickZo = read_memory address pickpoint size 2 vp False
+pickpoint += 0x2
+pickAo = read_memory address pickpoint size 4 vp False // align
+return
+
+:which_key_press
+/*
+i = 0x49 // up
+j = 0x4a // left
+k = 0x4b // down
+l = 0x4c // right
+u = 0x55 // above
+o = 0x4f // below
+
+I = Y++
+J = X--
+K = Y--
+L = X++
+U = Z++
+O = Z--
+
+speed = FALSE // stop after each
+speed = TRUE // don't stop
+*/
+
+if and
+not is_key_pressed 0x49 // I
+not is_key_pressed 0x4a // J
+not is_key_pressed 0x4b // K
+not is_key_pressed 0x4c // L
+not is_key_pressed 0x55 // U
+not is_key_pressed 0x4f // O
+then
+which_key_pressed = 0
+end
+
+if which_key_pressed == 4
+then
+if speed == False
+then
+return
+end
+end
+
+if is_key_pressed 0x4d // m
+then
+if step == 8
+then step = 80
+else step = 8
+end
+end
+
+while is_key_pressed 0x4d // m
+wait 0
+end
+
+if is_key_pressed 0xbe // .
+then
+if speed == True
+then speed = False
+else speed = True
+end
+end
+
+while is_key_pressed 0xbe // .
+wait 0
+end
+
+if is_key_pressed 0x49 // I
+then
+pickYo += step
+which_key_pressed = 1 // up/down
+end
+
+if is_key_pressed 0x4a // J
+then
+pickXo -= step
+which_key_pressed = 2 // left/right
+end
+
+if is_key_pressed 0x4b // K
+then
+pickYo -= step
+which_key_pressed = 1 // up/down
+end
+
+if is_key_pressed 0x4c // L
+then
+pickXo += step
+which_key_pressed = 2 // left/right
+end
+
+if is_key_pressed 0x55 // U
+then
+pickZo += step
+which_key_pressed = 3 // above/below
+end
+
+if is_key_pressed 0x4f // O
+then
+pickZo -= step
+which_key_pressed = 3 // above/below
+end
+
+return
+
+:write_coords
+pickpoint = get_pickup_pointer pickarray
+
+if which_key_pressed > 0
+then
+
+pickpoint += 0x10
+if which_key_pressed = 1 // left/right
+then
+write_memory address pickpoint size 4 value writemem False
+else
+write_memory address pickpoint size 4 value pickXo False
+end
+
+pickpoint += 0x2
+if which_key_pressed = 2 // up/down
+then
+write_memory address pickpoint size 4 value writemem False
+else
+write_memory address pickpoint size 4 value pickYo False
+end
+
+pickpoint += 0x2
+if which_key_pressed = 3 // above/below
+then
+write_memory address pickpoint size 4 value writemem False
+else
+write_memory address pickpoint size 4 value pickZo False
+end
+
+pickpoint += 0x2
+write_memory address pickpoint size 4 value pickAo False // align
+
+which_key_pressed = 4
+end
+
+return
+
+:save_coords
+
+if is_key_pressed 0xbc // ,
+then
+pickhandle = get_pickup_this_coord pickX pickY pickZ True
+
+get_pickup_coordinates pickarray store_to pickX pickY pickZ
+
+
+string_format str "%d[%d]" picktype index
+write_int_to_ini_file index "cleo\pickupselect.ini" str "ID"
+
+write_float_to_ini_file pickX "cleo\pickupselect.ini" str "x"
+write_float_to_ini_file pickY "cleo\pickupselect.ini" str "y"
+write_float_to_ini_file pickZ "cleo\pickupselect.ini" str "z"
+end
+
+return
+
+/*
+:temp_var_storage
+hex
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+end
+*/
+
+/*
+:float2int
+// original from: https://gtamods.com/wiki/Display_float_in_text
+0092: floatint =# origfloat
+0093: floatdec =# floatint
+0087: intfloat = origfloat
+0063: intfloat -= floatdec
+0013: intfloat *= 100.0
+0092: floatdint =# intfloat
+0095: floatdint = abs_lvar_int
+if and
+    0.0 > origfloat
+    origfloat > -1.0
+then
+    if
+        floatdint > 9
+    then
+05AA: set_lvar_text_label str = 'MSZP_N'
+    else
+05AA: set_lvar_text_label str = 'MSZPN0'
+    end
+else
+    if
+        floatdint > 9
+    then
+05AA: set_lvar_text_label str = 'MSZP_A'
+    else
+05AA: set_lvar_text_label str = 'MSZP_0'
+    end
+end
+return
+*/

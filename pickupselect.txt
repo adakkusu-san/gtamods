@@ -1,55 +1,39 @@
 {$CLEO .cs}
 {$NOSOURCE}
 {$USE INI,CLEO+}
-script_name "MSZPIKA"
+script_name 'MSZPIKA'
 wait 2000
 
-const
-index = 0@
-pickarray = 2@
+int index
+int indexnum
+int pickarray
 
-pickX = 3@
-pickY = 4@
-pickZ = 5@
+float pickX
+float pickY
+float pickZ
 
-bliptoadd = 6@
-pickhandle = 7@
+int bliptoadd
+int pickhandle
 
-pickpoint = 9@
+int pickpoint
 
-readmem = 10@
-writemem = 11@
-pickXo = 12@
-pickYo = 13@
-pickZo = 14@
-pickAo = 15@
+int readmem
+int writemem
+int pickXo
+int pickYo
+int pickZo
+int pickAo
 
-maxval = 1@
-picktype = 16@
-step = 17@
-speed = 18@
-which_key_pressed = 19@
+int maxval
+int picktype
+int step
+int speed 
+int which_key_pressed
 
-str = 20@v
+float temp_float
 
-end
-
-var
-index : int
-pickarray : int
-pickpoint : int
-8@ : int
-readmem : int
-writemem : int
-pickXo : int
-pickYo : int
-pickZo : int
-pickAo : int
-
-picktype : int
-
-step : int
-end
+string gxtname
+longstring str
 
 add_text_label 'MSZPIKA' "pickup select"
 
@@ -60,6 +44,13 @@ add_text_label 'MSZPST' "speed = TRUE"
 add_text_label 'MSZPSF' "speed = FALSE"
 
 add_text_label 'MSZARRN' "number = ~1~"
+
+add_text_label 'MSZ_X' "X ="
+add_text_label 'MSZ_Y' "Y ="
+add_text_label 'MSZ_Z' "Z ="
+
+add_text_label 'MSZSAVE' "saved to INI"
+
 
 /*
 add_text_label 'MSZP_A' "~1~.~1~"
@@ -108,6 +99,7 @@ end
 3345 = pickup_bribe
 */
 
+
 if not picktype = read_int_from_ini_file "cleo\pickupselect.ini" "config" "index"
 then picktype = 0
 end
@@ -151,7 +143,8 @@ if not index = read_int_from_ini_file "cleo\pickupselect.ini" str "index"
 then index = 0
 end
 
-8@ = index
+/*
+indexnum = index
 
 readmem *= 4
 readmem += 0xA49960
@@ -161,12 +154,15 @@ index *= 4
 readmem += index
 
 pickarray = read_memory address readmem size 4 vp False
+*/
+indexnum = index
+index += readmem
+pickarray = &0(index,16384i)
 
 if does_pickup_exist pickarray
 then
 remove_blip bliptoadd
 
-//get_pickup_coordinates pickarray store_to pickX pickY pickZ
 bliptoadd = add_blip_for_pickup pickarray
 
 while true
@@ -197,8 +193,7 @@ end
 terminate_this_custom_script
 
 :text_display
-set_text_wrapx 640.0
-set_text_right_justify True
+gosub @text_display_setup
 if step == 8
 then
 display_text 490.0 30.0 'MSZPS01'
@@ -206,8 +201,7 @@ else
 display_text 490.0 30.0 'MSZPS10'
 end
 
-set_text_wrapx 640.0
-set_text_right_justify True
+gosub @text_display_setup
 if speed == 1
 then
 display_text 490.0 50.0 'MSZPST'
@@ -215,16 +209,38 @@ else
 display_text 490.0 50.0 'MSZPSF'
 end
 
+gosub @text_display_setup
+display_text_with_number 490.0 70.0 'MSZARRN' indexnum
+
+
+get_pickup_coordinates pickarray store_to pickX pickY pickZ
+pickXo =# pickX
+pickYo =# pickY
+pickZo =# pickZ
+
+gosub @text_display_setup
+display_text 440.0 100.0 'MSZ_X'
+gosub @text_display_setup
+set_text_proportional False
+display_text_with_number 490.0 100.0 'NUMBER' pickXo
+
+gosub @text_display_setup
+display_text 440.0 110.0 'MSZ_Y'
+gosub @text_display_setup
+set_text_proportional False
+display_text_with_number 490.0 110.0 'NUMBER' pickYo
+
+gosub @text_display_setup
+display_text 440.0 120.0 'MSZ_Z'
+gosub @text_display_setup
+set_text_proportional False
+display_text_with_number 490.0 120.0 'NUMBER' pickZo
+
+return
+
+:text_display_setup
 set_text_wrapx 640.0
 set_text_right_justify True
-display_text_with_number 490.0 70.0 'MSZARRN' 8@
-
-/*
-display_text 490.0 10.0 'MSZP_A'
-display_text 490.0 10.0 'MSZP_0'
-display_text 490.0 10.0 'MSZP_N'
-display_text 490.0 10.0 'MSZPN0'
-*/
 return
 
 // maybe useful
@@ -263,6 +279,15 @@ O = Z--
 speed = FALSE // stop after each
 speed = TRUE // don't stop
 */
+
+if is_key_pressed 0x58 // X
+then
+print_string_now "reloaded pickup select" 2000
+while is_key_pressed 0x58
+wait 0
+end
+goto @start_of_script
+end
 
 if and
 not is_key_pressed 0x49 // I
@@ -343,6 +368,11 @@ pickZo -= step
 which_key_pressed = 3 // above/below
 end
 
+if is_key_pressed 0x42 // B
+then
+which_key_pressed = 9 // ground Z
+end
+
 return
 
 :write_coords
@@ -352,27 +382,56 @@ if which_key_pressed > 0
 then
 
 pickpoint += 0x10
-if which_key_pressed = 1 // left/right
-then
-write_memory address pickpoint size 4 value writemem False
-else
 write_memory address pickpoint size 4 value pickXo False
-end
-
 pickpoint += 0x2
-if which_key_pressed = 2 // up/down
-then
-write_memory address pickpoint size 4 value writemem False
-else
 write_memory address pickpoint size 4 value pickYo False
+pickpoint += 0x2
+write_memory address pickpoint size 4 value pickZo False
+
+if which_key_pressed == 9 // ground z
+then
+
+//goto @skipthisfornow
+pickpoint = get_pickup_pointer pickarray
+pickpoint += 0x10
+pickXo = read_memory address pickpoint size 2 vp False
+pickpoint += 0x2
+pickYo = read_memory address pickpoint size 2 vp False
+pickpoint += 0x2
+pickZo = read_memory address pickpoint size 2 vp False
+
+pickX =# pickXo
+pickY =# pickYo
+pickZ =# pickZo
+
+pickX /= 8.0
+pickY /= 8.0
+pickZ /= 8.0
+//pickXo /= 8
+//pickYo /= 8
+//pickZo /= 8
+
+temp_float = get_ground_z_for_3d_coord pickX pickY pickZ
+temp_float += 2.0
+pickZo =# temp_float
+pickZo *= 8
+
+write_memory address pickpoint size 4 value pickZo vp False
+
+
+//print_formatted "%f.0 %f.0 %f.0 %d %d %d" 2000 pickX pickY pickZ pickXo pickYo pickZo temp_float
+/*
+:skipthisfornow
+
+get_char_coordinates $scplayer store_to pickX pickY pickZ
+temp_float = get_ground_z_for_3d_coord pickX pickY pickZ
+print_formatted "%1.f %1.f %1.f~n~%1.f" 2000 pickX pickY pickZ temp_float 
+*/
+
+while is_key_pressed 0x42
+wait 0
 end
 
-pickpoint += 0x2
-if which_key_pressed = 3 // above/below
-then
-write_memory address pickpoint size 4 value writemem False
-else
-write_memory address pickpoint size 4 value pickZo False
 end
 
 pickpoint += 0x2
@@ -392,12 +451,26 @@ pickhandle = get_pickup_this_coord pickX pickY pickZ True
 get_pickup_coordinates pickarray store_to pickX pickY pickZ
 
 
-string_format str "%d[%d]" picktype index
-write_int_to_ini_file index "cleo\pickupselect.ini" str "ID"
+string_format str "%d" picktype
+write_int_to_ini_file index "cleo\pickupselect.ini" str "global_variable"
+write_int_to_ini_file indexnum "cleo\pickupselect.ini" str "array_index"
 
 write_float_to_ini_file pickX "cleo\pickupselect.ini" str "x"
 write_float_to_ini_file pickY "cleo\pickupselect.ini" str "y"
 write_float_to_ini_file pickZ "cleo\pickupselect.ini" str "z"
+
+TIMERA = 0
+TIMERB = 0
+while TIMERA < 1000
+wait 0
+display_text_with_number 490.0 200.0 'MSZSAVE' indexnum
+end
+
+
+while is_key_pressed 0xbc
+wait 0
+end
+
 end
 
 return
@@ -412,35 +485,4 @@ hex
 end
 */
 
-/*
-:float2int
-// original from: https://gtamods.com/wiki/Display_float_in_text
-0092: floatint =# origfloat
-0093: floatdec =# floatint
-0087: intfloat = origfloat
-0063: intfloat -= floatdec
-0013: intfloat *= 100.0
-0092: floatdint =# intfloat
-0095: floatdint = abs_lvar_int
-if and
-    0.0 > origfloat
-    origfloat > -1.0
-then
-    if
-        floatdint > 9
-    then
-05AA: set_lvar_text_label str = 'MSZP_N'
-    else
-05AA: set_lvar_text_label str = 'MSZPN0'
-    end
-else
-    if
-        floatdint > 9
-    then
-05AA: set_lvar_text_label str = 'MSZP_A'
-    else
-05AA: set_lvar_text_label str = 'MSZP_0'
-    end
-end
-return
-*/
+

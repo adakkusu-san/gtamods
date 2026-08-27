@@ -1,0 +1,149 @@
+{$CLEO .cs}
+{$NOSOURCE}
+wait 2000
+script_name 'sfldtp' // San Fierro Ladder Teleport
+
+int count
+float x
+float y
+float z
+
+:ladder_loop
+wait 2500 // decrease this if needed
+
+while get_fading_status
+then goto @ladder_loop
+end
+
+if not is_player_playing $player1
+then goto @ladder_loop
+end
+
+count = get_city_player_is_in $player1
+if not count == 2
+then goto @ladder_loop
+end
+
+// TODO: maybe change this up and read the values from an INI file
+count = 0
+while count < 11
+switch count
+// coords are from juniordjjr's mod, thank you ^^
+// I just needed something that would teleport the player similar to using an ENEX 
+// without having to do an animation
+// and I know, I could've set up ENEX in IPL or whatever but heh, 
+// too much work, this is simpler
+case 0
+x = -1361.05
+y = -696.8
+z = 1.9609
+case 1
+x = -1603.3967
+y = -696.7675
+z = 1.9609
+case 2
+x = -1154.1812
+y = -476.7963
+z = 1.9609
+case 3
+x = -1081.7765
+y = -207.9118
+z = 1.9609
+case 4
+x = -1182.5297
+y = 60.4368
+z = 1.9609
+case 5
+x = -1115.7112
+y = 335.1707
+z = 1.9609
+case 6
+x = -1164.7069
+y = 370.1683
+z = 1.9609
+case 7
+x = -1444.5359
+y = 90.3538
+z = 1.9609
+case 8
+x = -1618.7654
+y = -83.8916
+z = 1.9609
+case 9
+x = -1736.5709
+y = -445.9409
+z = 1.9609
+case 10
+x = -2328.95
+y = 1528.6772
+z = 1.0
+end
+
+if locate_char_on_foot_3d x y z 1.2 1.2 2.0 True // debug these numbers
+then goto @teleport_player
+end
+count++
+end // while
+
+goto @ladder_loop
+
+:teleport_player
+do_fade 500 Fade.Out
+
+// TODO: same for this
+switch count
+// again coords from juniordjjr mod
+case 0
+x = -1361.0426
+y = -695.9332
+z = 14.1484
+case 1
+x = -1603.425
+y = -695.6976
+z = 14.144
+case 2
+x = -1154.9327
+y = -476.3408
+z = 14.1484
+case 3
+x = -1082.6849
+y = -208.285
+z = 14.144
+case 4
+x = -1183.1382
+y = 59.8215
+z = 14.1484
+case 5
+x = -1116.3635
+y = 335.8349
+z = 14.1442
+case 6
+x = -1163.975
+y = 369.3844
+z = 14.1484
+case 7
+x = -1443.8506
+y = 89.7052
+z = 14.1466
+case 8
+x = -1618.0922
+y = -84.6188
+z = 14.1484
+case 9
+x = -1735.7155
+y = -445.8881
+z = 14.1484
+case 10
+x = -2329.2673
+y = 1529.6362
+z = 18.6507
+end
+
+while get_fading_status
+wait 500
+end
+
+set_char_coordinates $scplayer x y z
+do_fade 500 Fade.In
+
+goto @ladder_loop

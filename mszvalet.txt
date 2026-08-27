@@ -1,0 +1,200 @@
+{$CLEO .cs}
+{$NOSOURCE}
+wait 1000
+
+:start_of_script
+
+while true
+wait 250
+if is_key_pressed 0xc0
+then
+break
+end
+end
+
+if not is_player_playing $scplayer
+then
+goto @start_of_script
+end
+
+0@ = create_menu 'VALET' 30.0 140.0 200.0 1 True True Align.Left
+set_menu_column_orientation 0@ 0 Align.Left
+set_menu_column 0@ 0 'FED_BL1' 'LA' 'SF' 'VE' 'VALET' 'LA' 'SF' 'VE' 'FEC_VES' 'KART' 'DUMMY' 'DUMMY' 'DUMMY'
+print_help_forever 'WARDH3'
+
+highlight_menu_item 0@ 3 False
+activate_menu_item 0@ 3 False
+highlight_menu_item 0@ 7 False
+activate_menu_item 0@ 7 False
+
+set_player_control $player1 False
+set_everyone_ignore_player $player1 True
+
+while true
+wait 250
+1@ = get_menu_item_selected 0@
+
+if is_button_pressed 0 Button.Cross // Select
+then
+
+switch 1@
+case 0
+gosub @LS_T
+case 1
+gosub @SF_T
+case 2
+gosub @LV_T
+
+case 4
+gosub @LS_V
+case 5
+gosub @SF_V
+case 6
+gosub @LV_V
+
+case 8
+gosub @kart_spawn
+end
+
+break
+
+end
+
+if is_button_pressed 0 Button.Triangle // Exit
+then
+break
+end
+
+end
+
+delete_menu 0@
+clear_help
+set_player_control $player1 True
+set_everyone_ignore_player $player1 False
+
+goto @start_of_script
+
+:check_player
+while not is_player_playing $scplayer
+wait 250
+end
+gosub @displaytext
+return
+
+:kart_request
+request_model #KART
+while not has_model_loaded #KART
+wait 250
+request_model #KART
+end
+return
+
+:LS_T
+gosub @check_player
+request_collision 332.3 -1510.7
+load_scene_in_direction 386.3 -1516.2 32.5 40.9
+set_char_coordinates $scplayer 464.6 -1608.9 33.1
+set_char_heading $scplayer 40.9 //LS
+gosub @kart_request
+clear_area 464.5 -1618.2 32.45 5.0 False
+2@ = create_car #KART 464.5 -1618.2 32.45
+set_car_heading 2@ 90.0
+mark_model_as_no_longer_needed #KART
+mark_car_as_no_longer_needed 2@
+return
+
+:SF_T
+gosub @check_player
+request_collision -1753.1 959.1
+load_scene_in_direction -1753.3 941.3 24.8 359.7
+set_char_coordinates $scplayer -1744.1 800.3 33.8
+set_char_heading $scplayer 359.7 //SF
+gosub @kart_request
+clear_area -1730.3 800.0 24.1 5.0 False
+2@ = create_car #KART -1730.3 800.0 24.1
+set_car_heading 2@ 0.0
+mark_model_as_no_longer_needed #KART
+mark_car_as_no_longer_needed 2@
+return
+
+:LV_T
+gosub @check_player
+request_collision 2023.1 1922.5
+load_scene_in_direction 2029.3 1929.3 12.2 178.8
+set_char_coordinates $scplayer 2214.6 1840.1 19.4
+set_char_heading $scplayer 178.8 //LV
+gosub @kart_request
+clear_area 2211.0 1839.0 18.9 5.0 False
+2@ = create_car #KART 2211.0 1839.0 18.9
+set_car_heading 2@ 90.0
+mark_model_as_no_longer_needed #KART
+mark_car_as_no_longer_needed 2@
+return
+
+:LS_V
+request_collision 332.3 -1510.7
+set_char_coordinates $scplayer 386.3 -1516.2 32.5
+set_char_heading $scplayer 40.9
+return
+
+:SF_V
+request_collision -1753.1 959.1
+set_char_coordinates $scplayer -1753.3 941.3 24.8
+set_char_heading $scplayer 359.7
+return
+
+:LV_V
+request_collision 2023.1 1922.5
+set_char_coordinates $scplayer 2029.3 1929.3 12.2
+set_char_heading $scplayer 178.8
+return
+
+:kart_spawn
+if locate_char_any_means_2d $scplayer 301.7 -1527.9 20.0 20.0 False
+then
+gosub @kart_request
+clear_area 301.7 -1527.9 24.9 5.0 False
+2@ = create_car #KART 301.7 -1527.9 24.9
+set_car_heading 2@ 0.0
+mark_model_as_no_longer_needed #KART
+mark_car_as_no_longer_needed 2@
+end
+
+if locate_char_any_means_2d $scplayer -1711.5 995.7 20.0 20.0 False
+then
+gosub @kart_request
+clear_area -1711.5 995.7 17.9 5.0 False
+2@ = create_car #KART -1711.5 995.7 17.9
+set_car_heading 2@ 0.0
+mark_model_as_no_longer_needed #KART
+mark_car_as_no_longer_needed 2@
+end
+
+if locate_char_any_means_2d $scplayer 1928.4 1762.0 20.0 20.0 False
+then
+gosub @kart_request
+clear_area 1928.4 1762.0 17.9 5.0 False
+2@ = create_car #KART 1928.4 1762.0 12.0
+set_car_heading 2@ 0.0
+mark_model_as_no_longer_needed #KART
+mark_car_as_no_longer_needed 2@
+end
+
+return
+
+:displaytext
+/*
+TIMERA = 0
+TIMERB = 0
+while TIMERA < 250
+wait 0
+use_text_commands 1
+display_text_with_number 600.0 400.0 'NUMBER' 0@
+display_text_with_number 600.0 420.0 'NUMBER' 1@
+use_text_commands 0
+end
+*/
+return
+
+:end_of_script
+terminate_this_custom_script

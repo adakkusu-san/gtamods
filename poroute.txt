@@ -1,0 +1,184 @@
+{$CLEO .cs}
+{$NOSOURCE}
+wait 2000
+03A4: script_name 'PHOTOP'
+
+var
+4@ : float
+9@ : float
+10@ : float
+end
+
+const
+floatint = 0@
+intfloat = 1@
+floatdec = 2@
+floatdint = 3@
+origfloat = 4@
+str = 5@s
+uct = 7@
+stage = 8@
+part = 9@
+fov = 10@
+tochar = 11@
+currentchar = 12@
+ideal_fov = 20.0
+lower_heading = 120.0
+upper_heading = 240.0
+end
+
+0ADF: add_text_label "MSZP_A" "~1~.~1~"
+0ADF: add_text_label "MSZP_0" "~1~.0~1~"
+0ADF: add_text_label "MSZP_N" "-~1~.~1~"
+0ADF: add_text_label "MSZPN0" "-~1~.0~1~"
+
+:start_of_script
+while true
+wait 250
+7@ = get_script_struct_named 'SYN1'
+if not 7@ == 0
+then
+break
+end
+end
+
+while true
+wait 0
+
+0AB1: cleo_call @lvar num 1 arg 34 store stage
+0AB1: cleo_call @lvar num 1 arg 35 store part
+fov = get_camera_fov
+
+gosub @display_text
+
+if part <= 6
+then
+draw_sphere -2210.9 -2477.7 30.0 2.0
+end
+if part <= 10
+then
+draw_sphere -2178.5 -2448.8 30.0 4.0
+end
+if part > 12
+then
+goto @end_of_script
+end
+end
+
+:display_text
+03F0: use_text_commands True
+gosub @textset
+0340: set_text_colour 208 95 208 255 // violet
+045A: display_text_with_number 490.0 20.0 "NUMBER" stage
+gosub @textset
+0340: set_text_colour 39 215 215 255 // cyan
+045A: display_text_with_number 490.0 40.0 "NUMBER" part
+origfloat = fov
+gosub @float2int
+gosub @textset
+if fov < ideal_fov
+then
+0340: set_text_colour 135 215 135 255 // green
+else
+0340: set_text_colour 239 111 111 255 // red
+end
+045B: display_text_with_2_numbers 490.0 60.0 str floatint floatdint
+origfloat = 0.0
+switch part
+case 3
+currentchar = 391 // ryder
+gosub @getheading
+case 6
+currentchar = 406 // tbone
+gosub @getheading
+case 9
+currentchar = 436 // toreno
+gosub @getheading
+case 12
+currentchar = 420 // jizzy
+gosub @getheading
+default
+end
+if not origfloat == 0.0
+then
+gosub @float2int
+gosub @textset
+if or
+origfloat > upper_heading
+origfloat < lower_heading
+then
+0340: set_text_colour 135 215 135 255 // green
+else
+0340: set_text_colour 239 111 111 255 // red
+end
+045B: display_text_with_2_numbers 490.0 80.0 str floatint floatdint
+end
+03F0: use_text_commands False
+return
+
+/*
+0340: set_text_colour 239 111 111 255 // red
+0340: set_text_colour 135 215 135 255 // green
+0340: set_text_colour 199 199 7 255 // yellow
+0340: set_text_colour 39 215 215 255 // cyan
+0340: set_text_colour 208 95 208 255 // violet
+*/
+
+:getheading
+0AB1: cleo_call @lvar num 1 arg currentchar store tochar // ryder
+if not is_char_dead tochar
+then
+get_char_heading tochar origfloat
+end
+return
+
+:lvar
+0@ *= 4
+0@ += 0xA48960
+1@ = read_memory 0@ size 4 vp 0
+0AB2: cleo_return num 1 param 1@
+
+:textset
+0343: set_text_wrapx 640.0
+03E4: set_text_right_justify true
+03E0: set_text_draw_before_fade false
+0348: set_text_proportional false
+return
+
+:float2int
+// original from: https://gtamods.com/wiki/Display_float_in_text
+0092: floatint =# origfloat
+0093: floatdec =# floatint
+0087: intfloat = origfloat
+0063: intfloat -= floatdec
+0013: intfloat *= 100.0
+0092: floatdint =# intfloat
+0095: floatdint = abs_lvar_int
+if and
+0.0 > origfloat
+origfloat > -1.0
+then
+if
+floatdint > 9
+then
+05AA: set_lvar_text_label str = 'MSZP_N'
+else
+05AA: set_lvar_text_label str = 'MSZPN0'
+end
+else
+if
+floatdint > 9
+then
+05AA: set_lvar_text_label str = 'MSZP_A'
+else
+05AA: set_lvar_text_label str = 'MSZP_0'
+end
+end
+return
+
+:end_of_script
+0AE0: remove_text_label "MSZP_A"
+0AE0: remove_text_label "MSZP_0"
+0AE0: remove_text_label "MSZP_N"
+0AE0: remove_text_label "MSZPN0"
+0A93: terminate_this_custom_script

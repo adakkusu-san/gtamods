@@ -1,0 +1,191 @@
+{$CLEO .cs}
+{$NOSOURCE}
+//{$USE CLEO+}
+//{USE ini} //TODO
+// TODO need to change coords to something nearby
+script_name 'mistl' // Mission Time-Lapse
+
+int count
+
+:mission_loop
+wait 2500
+
+if get_fading_status
+then goto @mission_loop
+end
+
+if not is_player_playing $player1
+then goto @mission_loop
+end
+
+if not can_player_start_mission $player1
+then goto @mission_loop
+end
+
+if not $onmission == 0
+then goto @mission_loop
+end
+
+count = get_script_struct_named 'SWEET'
+if count > 0
+then
+if locate_char_on_foot_3d $scplayer 2515.07 -1673.98 12.71 1.2 1.2 2.0 False
+then
+if $flag_sweet_mission_counter == 8
+then
+$onmission = 1
+print_string "Time-lapse" 1000
+//print_big 'SWEET_7' 1000 2 // Los Sepulcros
+gosub @player_walk
+load_and_launch_mission_internal 20 // Los Sepulcros
+end // count
+end // locate
+end // script
+
+count = get_script_struct_named 'RYDER'
+if count > 0
+then
+if locate_char_on_foot_3d $scplayer 2459.55 -1687.75 12.56 1.6 1.2 2.0 False
+then
+if $flag_ryder_mission_counter == 0
+then
+$onmission = 1
+print_string "Time-lapse" 1000
+//print_big 'RYDER_1' 1000 2 // Home Invasion
+gosub @player_walk
+load_and_launch_mission_internal 24 // Home Invasion
+end // count
+end // locate
+end // script
+
+count = get_script_struct_named 'STRAP'
+if count > 0
+then
+if locate_char_on_foot_3d $scplayer 790.54 -1627.91 12.39 1.2 1.2 2.0 False
+then
+if $flag_strap_mission_counter == 0
+then
+$onmission = 1
+print_string "Time-lapse" 1000
+//print_big 'STRAP_1' 1000 2 // Life's a Beach
+gosub @player_walk
+load_and_launch_mission_internal 31 // Life's a Beach
+end // count
+if $flag_strap_mission_counter == 2
+then
+$onmission = 1
+print_string "Time-lapse" 1000
+//print_big 'STRAP_3' 1000 2 // Management Issues
+gosub @player_walk
+load_and_launch_mission_internal 33 // Management Issues
+end // count
+end // locate
+if locate_char_on_foot_3d $scplayer 2486.61 -1649.42 12.48 1.2 1.2 2.0 False
+then
+if $flag_strap_mission_counter == 4
+then
+$onmission = 1
+print_string "Time-lapse" 1000
+//print_big 'STRAP_4' 1000 2 // House Party
+gosub @player_walk
+load_and_launch_mission_internal 34 // House Party
+end // count
+end // locate
+end // script
+
+count = get_script_struct_named 'WUZI'
+if count > 0
+then
+if locate_char_on_foot_3d $scplayer -2154.2080 645.3251 51.3516 1.2 1.2 2.0 False
+then
+if $flag_wuzi_mission_counter == 3
+then
+$onmission = 1
+print_string "Time-lapse" 1000
+//print_big 'WUZI_2' 1000 2 // Amphibious Assault
+gosub @player_walk
+load_and_launch_mission_internal 56 // Amphibious Assault
+end // count
+end // locate
+end // script
+
+count = get_script_struct_named 'SYND'
+if count > 0
+then
+if locate_char_on_foot_3d $scplayer -2030.4019 148.8279 27.8359 1.2 1.2 2.0 False
+then
+if and
+$flag_synd_mission_counter == 6
+$flag_scrash_mission_counter == 2
+then
+$onmission = 1
+print_string "Time-lapse" 1000
+//print_big 'SYND_4' 1000 2 // Ice Cold Killa
+gosub @player_walk
+load_and_launch_mission_internal 61 // Ice Cold Killa
+end // count
+end // locate
+end // script
+
+count = get_script_struct_named 'DESERT'
+if count > 0
+then
+if locate_char_on_foot_3d $scplayer -685.2156 923.2191 11.1531 1.2 1.2 2.0 False
+then
+if $flag_desert_mission_counter == 7
+then
+$onmission = 1
+print_string "Time-lapse" 1000
+//print_big 'DESERT8' 1000 2 // Black Project
+gosub @player_walk
+load_and_launch_mission_internal 81 // Black Project
+end // count
+end // locate
+end // script
+
+count = get_script_struct_named 'HEIST'
+if count > 0
+then
+if locate_char_on_foot_3d $scplayer 2270.6335 1635.5992 1007.3672 1.2 1.2 2.0 False
+then
+if $flag_heist_mission_counter == 4
+then
+$onmission = 1
+print_string "Time-lapse" 1000
+//print_big 'HEIST_5' 1000 2 // Up, Up and Away!
+gosub @player_walk
+load_and_launch_mission_internal 100 // Up, Up and Away!
+end // count
+end // locate
+end // script
+
+count = get_script_struct_named 'RIOT'
+if count > 0
+then
+if locate_char_on_foot_3d $scplayer 2515.07 -1673.98 12.71 1.2 1.2 2.0 False
+then
+if $flag_riot_mission_counter == 2
+then
+$onmission = 1
+print_string "Time-lapse" 1000
+//print_big 'RIOT_4' 1000 2 // End Of The Line
+gosub @player_walk
+load_and_launch_mission_internal 110 // End Of The Line (1)
+end // count
+end // locate
+end // script
+
+goto @mission_loop
+
+:end_loop
+terminate_this_custom_script
+
+:player_walk
+if is_player_playing $player1
+then
+set_player_control $player1 False
+switch_widescreen True
+set_fading_colour 0 0 0
+do_fade 500 Fade.Out
+end
+return

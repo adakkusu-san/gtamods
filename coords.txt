@@ -9,8 +9,12 @@ intfloat = 1@
 floatdec = 2@
 floatdint = 3@
 origfloat = 4@
-endkey = 5@
+enable = 5@
+coords = 6@
+heading = 7@
+area = 8@
 str = 9@s
+right = 18@
 t_x = 19@
 t_y = 20@
 p_x = 13@
@@ -18,8 +22,10 @@ p_y = 14@
 p_z = 15@
 p_h = 16@
 p_a = 17@
-txo = 21@
-tyo = 22@
+custom = 21@
+txo = 22@
+tyo = 23@
+playcar = 24@
 end
 
 var
@@ -35,19 +41,45 @@ txo : float
 tyo : float
 end
 
+
 if
 0AAB: does_file_exist "cleo\mszcoord.ini"
 then
-if or
-not t_x = read_float_from_ini_file "cleo\mszcoord.ini" {section} "mszcoord" {key} "x"
-not t_y = read_float_from_ini_file "cleo\mszcoord.ini" {section} "mszcoord" {key} "y"
-then
-t_x = 610.0
-t_y = 210.0
+if not enable = read_int_from_ini_file "cleo\mszcoord.ini" {section} "mszcoord" {key} "enable"
+then enable = 0
 end
-if not endkey = read_float_from_ini_file "cleo\mszcoord.ini" {section} "mszcoord" {key} "endkey"
+if enable == 0
 then
-endkey = 0xdc
+print_string "mszcoord ini~n~is not set to enable" 3000
+goto @end_of_script
+end
+if not coords = read_int_from_ini_file "cleo\mszcoord.ini" {section} "mszcoord" {key} "coords"
+then coords = 0
+end
+if not heading = read_int_from_ini_file "cleo\mszcoord.ini" {section} "mszcoord" {key} "heading"
+then heading = 0
+end
+if not area = read_int_from_ini_file "cleo\mszcoord.ini" {section} "mszcoord" {key} "area"
+then area = 0
+end
+if not right = read_int_from_ini_file "cleo\mszcoord.ini" {section} "mszcoord" {key} "right"
+then right = 0
+end
+if not t_x = read_float_from_ini_file "cleo\mszcoord.ini" {section} "mszcoord" {key} "x"
+then t_x = 0.0
+end
+if not t_y = read_float_from_ini_file "cleo\mszcoord.ini" {section} "mszcoord" {key} "y"
+then t_y = 0.0
+end
+if or
+t_x == 0.0
+t_y == 0.0
+then
+custom = 0
+else
+custom = 1
+txo = t_x
+tyo = t_y
 end
 else
 print_string "mszcoord ini doesn't exist~n~please make it work" 3000
@@ -59,36 +91,69 @@ end
 0ADF: add_text_label "MSZP_N" "-~1~.~1~"
 0ADF: add_text_label "MSZPN0" "-~1~.0~1~"
 
-txo = t_x
-tyo = t_y
 
 while true
 TIMERA = 0
-TIMERB = 0
 
+if coords == 1
+then
 if is_player_playing $scplayer
 then
-00A0: get_char_coordinates $scplayer p_x p_y p_z
-0172: get_char_heading $scplayer p_h
-end
 
-077E: get_area_visible p_a
-
-if is_key_pressed endkey
+if not is_char_in_any_car $scplayer
 then
-while is_key_pressed endkey
-wait 0
+00A0: get_char_coordinates $scplayer p_x p_y p_z
+else
+03C0: store_car_char_is_in_no_save $scplayer playcar
+00AA: get_car_coordinates playcar p_x p_y p_z
 end
-goto @end_of_script
+
+
+end
+end
+
+if heading == 1
+then
+if is_player_playing $scplayer
+then
+
+if not is_char_in_any_car $scplayer
+then
+0172: get_char_heading $scplayer p_h
+else
+03C0: store_car_char_is_in_no_save $scplayer playcar
+0174: get_car_heading playcar p_h
+end
+
+end
+end
+
+if area == 1
+then
+077E: get_area_visible p_a
 end
 
 while TIMERA < 500
 wait 0
 03F0: use_text_commands true
 
+if custom == 0
+then
+if right == 1
+then
+t_x = 610.0 
+t_y = 210.0
+else
+t_x = 40.0
+t_y = 280.0
+end
+else
 t_x = txo
 t_y = tyo
+end
 
+if coords == 1
+then
 origfloat = p_x
 gosub @float2int
 gosub @text_format
@@ -103,16 +168,34 @@ gosub @float2int
 gosub @text_format
 t_y += 10.0
 045B: display_text_with_2_numbers t_x t_y str floatint floatdint
+t_y += 10.0
+end
+
+if heading == 1
+then
 origfloat = p_h
 gosub @float2int
 gosub @text_format
-t_y += 10.0
 045B: display_text_with_2_numbers t_x t_y str floatint floatdint
-gosub @text_format
 t_y += 20.0
+end
+
+if area == 1
+then
+gosub @text_format
 045A: display_text_with_number t_x t_y "NUMBER" p_a
+end
 
 03F0: use_text_commands false
+
+if is_key_pressed 0xdc
+then
+while is_key_pressed 0xdc
+wait 0
+end
+goto @end_of_script
+end
+
 end
 end
 
@@ -124,8 +207,12 @@ end
 terminate_this_custom_script
 
 :text_format
+if right == 1
+then
 0343: set_text_wrapx 640.0
 03E4: set_text_right_justify true
+else
+end
 03E0: set_text_draw_before_fade false
 return
 
@@ -139,23 +226,23 @@ return
 0092: floatdint =# intfloat
 0095: floatdint = abs_lvar_int
 if and
-0.0 > origfloat
-origfloat > -1.0
+    0.0 > origfloat
+    origfloat > -1.0
 then
-if
-floatdint > 9
-then
+    if
+        floatdint > 9
+    then
 05AA: set_lvar_text_label str = 'MSZP_N'
-else
+    else
 05AA: set_lvar_text_label str = 'MSZPN0'
-end
+    end
 else
-if
-floatdint > 9
-then
+    if
+        floatdint > 9
+    then
 05AA: set_lvar_text_label str = 'MSZP_A'
-else
+    else
 05AA: set_lvar_text_label str = 'MSZP_0'
-end
+    end
 end
 return

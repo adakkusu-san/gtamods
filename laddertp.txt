@@ -9,10 +9,10 @@ float y
 float z
 
 :ladder_loop
-wait 2500 // decrease this if needed
+wait 1000 // decrease this if needed
 
 while get_fading_status
-then goto @ladder_loop
+goto @ladder_loop
 end
 
 if not is_player_playing $player1
@@ -79,7 +79,7 @@ y = 1528.6772
 z = 1.0
 end
 
-if locate_char_on_foot_3d x y z 1.2 1.2 2.0 True // debug these numbers
+if locate_char_on_foot_3d $scplayer x y z 1.2 1.2 2.0 True // debug these numbers
 then goto @teleport_player
 end
 count++
@@ -140,10 +140,11 @@ z = 18.6507
 end
 
 while get_fading_status
-wait 500
+wait 0
 end
 
-set_char_coordinates $scplayer x y z
+//set_char_coordinates $scplayer x y z
+set_char_coordinates_no_offset $scplayer x y z
 do_fade 500 Fade.In
 
 goto @ladder_loop

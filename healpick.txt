@@ -1,0 +1,225 @@
+{$CLEO .cs}
+{$NOSOURCE}
+script_name 'healpk'
+wait 5000 // idk how long until the pickups are made
+
+int count
+float x
+float y
+float z
+int pick
+
+count = 0
+while count < 50
+switch count
+case 0 // moved
+x = 1494.0
+y = 2605.0
+z = 11.0
+case 1 // orig
+x = 2257.0
+y = 2530.0
+z = 11.0
+case 2 // orig
+x = 2418.0
+y = 2119.0
+z = 24.0
+case 3 // orig
+x = 2458.0
+y = 1293.0
+z = 11.0
+case 4 // orig
+x = 2098.0
+y = 1161.0
+z = 12.0
+case 5 // orig
+x = 1913.0
+y = 702.0
+z = 11.0
+case 6 // orig
+x = 2624.0
+y = -1600.0
+z = 10.0
+case 7 // moved
+x = 2873.0
+y = -2125.0
+z = 4.0
+case 8 // orig
+x = 2791.0
+y = -1096.0
+z = 31.0
+case 9 // orig
+x = 2062.0
+y = -1966.0
+z = 13.0
+case 10 // orig
+x = 1574.0
+y = -1888.0
+z = 14.0
+case 11 // orig
+x = 1339.0
+y = -1841.0
+z = 14.0
+case 12 // orig
+x = 2250.0
+y = -1060.0
+z = 56.0
+case 13 // orig
+x = 1099.0
+y = -1335.0
+z = 13.0
+case 14 // orig
+x = 1014.0
+y = -1006.0
+z = 32.0
+case 15 // orig
+x = 153.0
+y = -1965.0
+z = 4.0
+case 16 // orig
+x = 1750.0
+y = -2273.0
+z = 26.0
+case 17 // orig
+x = -2661.0
+y = -198.0
+z = 4.0
+case 18 // orig
+x = -2871.0
+y = 835.0
+z = 40.0
+case 19 // moved
+x = -2309.0
+y = -113.0
+z = 35.0
+case 20 // orig
+x = -2155.0
+y = -83.0
+z = 35.0
+case 21 // moved
+x = -1690.0
+y = 12.0
+z = 3.0
+case 22 // orig
+x = -1398.0
+y = 502.0
+z = 10.0
+case 23 // moved
+x = -2071.0
+y = 971.0
+z = 63.0
+case 24 // orig
+x = -1451.0
+y = -116.0
+z = 6.0
+case 25 // moved
+x = -1979.0
+y = 431.0
+z = 25.0
+case 26 // orig
+x = -2307.0
+y = -1602.0
+z = 484.0
+case 27 // orig
+x = -1831.0
+y = -1623.0
+z = 23.0
+case 28 // moved
+x = -1559.0
+y = -2722.0
+z = 49.0
+case 29 // moved
+x = -2159.0
+y = -2555.0
+z = 31.0
+case 30 // orig
+x = 112.0
+y = -224.0
+z = 2.0
+case 31 // moved
+x = -551.0
+y = -181.0
+z = 78.0
+case 32 // orig
+x = 144.0
+y = 1875.0
+z = 18.0
+case 33 // moved
+x = -103.0
+y = 1369.0
+z = 10.0
+case 34 // moved
+x = -2097.0
+y = 2317.0
+z = 24.0
+case 35 // orig
+x = -837.0
+y = 2761.0
+z = 46.0
+case 36 // orig
+x = -1466.0
+y = 2639.0
+z = 56.0
+case 37 // orig
+x = -2386.0
+y = 2216.0
+z = 5.0
+case 38 // orig
+x = 492.0
+y = 781.0
+z = -22.0
+case 39 // moved
+x = -295.0
+y = 2671.0
+z = 63.0
+case 40 // orig
+x = 1245.0
+y = -775.0
+z = 1084.0
+case 41 // orig
+x = 934.0
+y = -935.0
+z = 57.0
+case 42 // moved
+x = 1717.0
+y = -1640.0
+z = 20.0
+case 43 // orig
+x = 1278.0
+y = -773.0
+z = 1083.0
+case 44 // orig // LS1
+x = 1173.0
+y = -1324.0
+z = 15.0
+case 45 // orig // LS2
+x = 2033.0
+y = -1404.0
+z = 17.0
+case 46 // orig // BL1
+x = 1254.0
+y = 327.0
+z = 20.0
+case 47 // added // BL2
+x = -2205.0
+y = -2313.0
+z = 30.0
+case 48 // orig // SF
+x = -2653.0
+y = 610.0
+z = 14.0
+case 49 // orig // LV
+x = 1581.0
+y = 1776.0
+z = 10.0
+end
+
+if not is_any_pickup_at_coords x y z
+then
+pick = create_pickup #health PickupType.OnStreetSlow x y z
+end
+
+count++
+end // while
+
+terminate_this_custom_script

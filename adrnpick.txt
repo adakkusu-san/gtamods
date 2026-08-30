@@ -1,0 +1,64 @@
+{$CLEO .cs}
+{$NOSOURCE}
+script_name 'adrnpk'
+wait 5000 // idk how long until the pickups are made
+
+int count
+float x
+float y
+float z
+int pick
+
+count = 0
+while count < 9
+switch count
+// LS
+case 0 // E6 : Jefferson : On roof of hospital
+x = 2055.0
+y = -1389.0
+z = 24.0
+case 1 // F4 : Santa Maria Beach : At foot of pier's ferris wheel
+x = 364.0
+y = -2055.0
+z = 15.0
+// SF
+case 2 // C1 : City Hall : In doorway
+x = -2802.0
+y = 375.0
+z = 6.0
+case 3 // D2 : Foster Valley : Outside arena
+x = -2023.0
+y = -406.0
+z = 39.0
+// LV
+case 4 // A6 : KACC : In corner of fence behind packing crates
+x = 2503.0
+y = 2823.0
+z = 11.0
+case 5 // B6 : The Ring Master : In corner of building
+x = 2300.0
+y = 1820.0
+z = 16.0
+case 6 // B6 : Pilgrim : Middle of alleyway
+x = 2468.0
+y = 1787.0
+z = 11.0
+case 7 // B5 : The High Roller : In corner on roof
+x = 1947.0
+y = 1333.0
+z = 16.0
+case 8 // B5 : Last Dime Motel : In corner, slightly hidden in flowers
+x = 1955.0
+y = 665.0
+z = 14.0
+end
+
+if not is_any_pickup_at_coords x y z
+then
+pick = create_pickup #adrenaline PickupType.OnStreetSlow x y z
+end
+
+count++
+end // while
+
+terminate_this_custom_script

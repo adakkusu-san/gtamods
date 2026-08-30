@@ -20,6 +20,9 @@ Simple but maybe unstable
 * laddertp: 
 [Info](https://github.com/adakkusu-san/gtamods/tree/laddertp) |
 [Download](https://github.com/adakkusu-san/gtamods/archive/refs/heads/laddertp.zip)
+* healpick: 
+[Info](https://github.com/adakkusu-san/gtamods/tree/healpick) |
+[Download](https://github.com/adakkusu-san/gtamods/archive/refs/heads/healpick.zip)
 
 Speedrun purpose
 * om0: 
@@ -47,7 +50,7 @@ Notes for me :3
 Other things
 * mods i use: 
 [Info](https://github.com/adakkusu-san/gtamods/tree/inuse)
-* replays
+* replays: 
 [Info](https://github.com/adakkusu-san/gtamods/tree/replay)
 
 most of them are intended for CLEO4, I don't know what CLEO5 is and I also 

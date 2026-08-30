@@ -22,6 +22,9 @@ end
 count = get_city_player_is_in $player1
 if not count == 2
 then goto @ladder_loop
+else if count == 0 // one of them doesn't work because it's not 'in' SF for some reason
+then wait 1000
+end
 end
 
 // TODO: maybe change this up and read the values from an INI file

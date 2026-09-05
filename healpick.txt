@@ -1,14 +1,21 @@
 {$CLEO .cs}
 {$NOSOURCE}
+{$USE CLEO+}
 script_name 'healpk'
-wait 5000 // idk how long until the pickups are made
 
 int count
-float x
-float y
-float z
-int pick
+float x,y,z
+int vMakepicks = False
+int current_pick
+int pickup_mem = allocate_memory 200 // 50 pickup vars * 4 bytes (int)
 
+count = generate_random_int_in_range 4500 5500
+wait count // idk how long until the pickups are made
+
+set_script_event_save_confirmation True @SaveConfirm count
+// last param needs to be a var or something, idk, wouldn't work otherwise
+
+:makepicks
 count = 0
 while count < 50
 switch count
@@ -214,12 +221,31 @@ y = 1776.0
 z = 10.0
 end
 
-if not is_any_pickup_at_coords x y z
-then
-pick = create_pickup #health PickupType.OnStreetSlow x y z
-end
+current_pick = create_pickup #health PickupType.OnStreetSlow x y z
+write_struct_param pickup_mem count current_pick
+// make the pickup and write the handle to memory, offset by the current `count` number
+// there's 50 pickups, need to keep track of them somehow
 
 count++
 end // while
 
-terminate_this_custom_script
+vMakepicks = False
+
+:pick_loop // after it's done making the picks, it'll wait in case it has to make them again
+wait 5000
+if vMakepicks == True
+then
+gosub @makepicks
+vMakepicks = False
+end
+goto @pick_loop
+
+:SaveConfirm // goes here when the savegame menu pops up
+count = 0
+while count < 50
+current_pick = read_struct_param pickup_mem count
+remove_pickup current_pick // read the handles we wrote to memory and remove the pickups
+count++
+end
+vMakepicks = True
+return_script_event

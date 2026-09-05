@@ -1,104 +1,44 @@
 {$CLEO .cs}
-{$USE ini}
 {$NOSOURCE}
-wait 1000
+{$USE ini}
+script_name 'mszclth'
 
-/*
-0 = torso
-2 = legs
-3 = shoes
-13 = chains
-14 = watch
-15 = glasses
-16 = hats
+wait 2000
 
-1 = haircut
-4~12 = tattoo
-*/
+int count
+longstring current_part,model_name,texture_name
 
-var
-0@ : int
-end
-
-if
-not does_file_exist "cleo\mszcloth.ini"
+if not does_file_exist "cleo\mszcloth.ini"
 then
-goto @savekey
-else
-if
-not 3@ = read_int_from_ini_file "cleo\mszcloth.ini" "0" "txd"
+print_help_string "mszcloth.ini~n~not found"
+goto @end_of_script
+end
+
+while not is_player_playing $player1
+wait 0
+end
+
+count = 0
+while count < 17
+if count == 4 // not implemented yet
+then count = 13
+end
+string_format current_part "%d" count
+model_name = read_string_from_ini_file "cleo\mszcloth.ini" current_part "dff"
+if not model_name == "skip"
 then
-goto @savekey
+if model_name == "remove"
+then
+give_player_clothes_outside_shop $player1 0 0 count
 else
+texture_name = read_string_from_ini_file "cleo\mszcloth.ini" current_part "txd"
+give_player_clothes_outside_shop $player1 texture_name model_name count
 end
 end
-
-:dressup
-0@ = 0
-while 0@ < 17
-wait 10
-if 0@ == 1
-then 0@++
-else
-if 0@ == 4
-then 0@ = 13
-end
+count++
 end
 
-01E5: print_with_number_now "NUMBER" 0@ 1000 1
-0AD3: string_format 5@s format "%d" 0@
-0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "txd" 1@
-0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "dff" 2@
-0784: give_player_clothes $player1 1@ 2@ 0@
+build_player_model $player1
 
-0@++
-end
-
-0@ = 1
-01E5: print_with_number_now "NUMBER" 0@ 1000 1
-0AD3: string_format 5@s format "%d" 0@
-0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "txd" 1@
-0AF0: read_int_from_ini_file "cleo\mszcloth.ini" 5@s "dff" 2@
-0784: give_player_clothes $player1 1@ 2@ 0@
-
-070D: build_player_model $player1
-
-0ACC: print_string "clothes loaded from mszcloth.ini" 2500
-
-goto @endofscript
-
-:savekey
-while not is_key_pressed 0x50 // P
-wait 500
-end
-0@ = 0
-while 0@ < 17
-wait 10
-if 0@ == 1
-then 0@++
-else
-if 0@ == 4
-then 0@ = 13
-end
-end
-
-01E5: print_with_number_now "NUMBER" 0@ 1000 1
-0AD3: string_format 5@s format "%d" 0@
-08F7: get_clothes_item $player1 0@ 1@ 2@
-0AF1: write_int_to_ini_file 1@ "cleo\mszcloth.ini" 5@s "txd"
-0AF1: write_int_to_ini_file 2@ "cleo\mszcloth.ini" 5@s "dff"
-
-0@++
-end
-
-0@ = 1
-01E5: print_with_number_now "NUMBER" 0@ 1000 1
-0AD3: string_format 5@s format "%d" 0@
-08F7: get_clothes_item $player1 0@ 1@ 2@
-0AF1: write_int_to_ini_file 1@ "cleo\mszcloth.ini" 5@s "txd"
-0AF1: write_int_to_ini_file 2@ "cleo\mszcloth.ini" 5@s "dff"
-
-0ACC: print_string "clothes saved to mszcloth.ini" 2500
-
-:endofscript
+:end_of_script
 terminate_this_custom_script

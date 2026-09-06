@@ -4,87 +4,52 @@
 script_name 'MSZPIKA'
 wait 2000
 
-int index
-int indexnum
-int pickarray
+int iTemp
+float fTemp
+int count
 
-float pickX
-float pickY
-float pickZ
+float pickXf,pickYf,pickZf
+int pickXi,pickYi,pickZi
 
-int bliptoadd
-int pickhandle
+int pickpoint,keypoint
 
-int pickpoint
+// TODO: use extravars for some of these
+int gvar,maxval
 
-int readmem
-int writemem
-int pickXo
-int pickYo
-int pickZo
-int pickAo
+int index,index_array,pickarray,bliptoadd
 
-int maxval
-int picktype
-int step
-int speed 
-int which_key_pressed
+int step,speed // TODO use bitwise
+int which_key_bit
+int bStatus // bitwise / 0=invalid, 1=getcoords, 2=writecoords, 3=wrote
+// ran out of variables to use, had to do bitwise
+// after I figure out how, I'll make those variables into a single one
 
-float temp_float
-
-string gxtname
+longstring picktype
 longstring str
 
 add_text_label 'MSZPIKA' "pickup select"
-
 add_text_label 'MSZPS01' "step = 1.0"
 add_text_label 'MSZPS10' "step = 10.0"
-
 add_text_label 'MSZPST' "speed = TRUE"
 add_text_label 'MSZPSF' "speed = FALSE"
-
 add_text_label 'MSZARRN' "number = ~1~"
-
 add_text_label 'MSZ_X' "X ="
 add_text_label 'MSZ_Y' "Y ="
 add_text_label 'MSZ_Z' "Z ="
-
 add_text_label 'MSZSAVE' "saved to INI"
 
-
-/*
-add_text_label 'MSZP_A' "~1~.~1~"
-add_text_label 'MSZP_0' "~1~.0~1~"
-add_text_label 'MSZP_N' "-~1~.~1~"
-add_text_label 'MSZPN0' "-~1~.0~1~"
-
-add_text_label 'MSZIKP' "is key pressed"
-add_text_label 'MSZNKP' "no key pressed"
-*/
-
 step = 8
-speed = False
+speed = True
 
 :start_of_script
-
 if not does_file_exist "cleo\pickupselect.ini"
 then
 print_string_now "pickupselect.ini not found" 4000
 goto @end_of_script
 end
-
-/*
-while true
-wait 100
-if is_key_pressed 0x68 // numpad 8
-then
-break
-end
-end
-*/
-
 wait 2000
 TIMERA = 0
+TIMERB = 0
 while TIMERA < 2000
 wait 0
 use_text_commands True
@@ -92,108 +57,144 @@ display_text 490.0 10.0 'MSZPIKA'
 use_text_commands False
 end
 
-/*
-3032 = pickup_weapon
-3257 = pickup_flowers
-3297 = pickup_armour
-3345 = pickup_bribe
-*/
-
-
-if not picktype = read_int_from_ini_file "cleo\pickupselect.ini" "config" "index"
-then picktype = 0
-end
-
-switch picktype
+keypoint = get_label_pointer @key_vars
+count = 0
+while count < 12
+switch count // TODO: do it with the command thing instead of this
 case 0
-str = "weapon"
-if not readmem = read_int_from_ini_file "cleo\pickupselect.ini" str "offset"
-then readmem = 3032
-end
-if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" str "maxval"
-then maxval = 217
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "up"
+then iTemp = 0x49 // I
 end
 case 1
-str = "flower"
-if not readmem = read_int_from_ini_file "cleo\pickupselect.ini" str "offset"
-then readmem = 3257
-end
-if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" str "maxval"
-then maxval = 40
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "left"
+then iTemp = 0x4a // J
 end
 case 2
-str = "armour"
-if not readmem = read_int_from_ini_file "cleo\pickupselect.ini" str "offset"
-then readmem = 3297
-end
-if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" str "maxval"
-then maxval = 48
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "down"
+then iTemp = 0x4b // K
 end
 case 3
-str = "bribe"
-if not readmem = read_int_from_ini_file "cleo\pickupselect.ini" str "offset"
-then readmem = 3345
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "right"
+then iTemp = 0x4c // L
 end
-if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" str "maxval"
-then maxval = 50
+case 4
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "above"
+then iTemp = 0x55 // U
 end
+case 5
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "below"
+then iTemp = 0x4f // O
+end
+case 6
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "step"
+then iTemp = 0x4d // M
+end
+case 7
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "speed"
+then iTemp = 0xbe // .
+end
+case 8
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "reload"
+then iTemp = 0x58 // X
+end
+case 9
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "groundz"
+then iTemp = 0x42 // B
+end
+case 10
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "save"
+then iTemp = 0xbc // ,
+end
+case 11
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "teleport"
+then iTemp = 0x54 // T
+end
+end
+write_struct_offset keypoint count 1 iTemp
+count++
 end
 
-if not index = read_int_from_ini_file "cleo\pickupselect.ini" str "index"
+picktype = read_string_from_ini_file "cleo\pickupselect.ini" "config" "picktype"
+switch picktype
+case "weapon"
+if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "weapon" "offset"
+then gvar = 3032
+end
+if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" "weapon" "maxval"
+then maxval = 217
+end
+case "flower"
+if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "flower" "offset"
+then gvar = 3257
+end
+if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" "flower" "maxval"
+then maxval = 40
+end
+case "armour"
+if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "armour" "offset"
+then gvar = 3297
+end
+if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" "armour" "maxval"
+then maxval = 48
+end
+case "bribe"
+if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "bribe" "offset"
+then gvar = 3345
+end
+if not maxval = read_int_from_ini_file "cleo\pickupselect.ini" "bribe" "maxval"
+then maxval = 50
+end
+default
+gvar = read_int_from_ini_file "cleo\pickupselect.ini" picktype "offset"
+maxval = read_int_from_ini_file "cleo\pickupselect.ini" picktype "maxval"
+end
+
+if not index = read_int_from_ini_file "cleo\pickupselect.ini" picktype "index"
 then index = 0
 end
 
-/*
-indexnum = index
+index_array = index
+index += gvar
+pickarray = &0(gvar,16384i)
 
-readmem *= 4
-readmem += 0xA49960
-// https://gtamods.com/wiki/Memory_Addresses_(SA)
+set_local_var_bit_const bStatus 0 // invalid
+set_local_var_bit_const bStatus 1 // getcoords
+clear_local_var_bit_lvar bStatus 2 // writecoords
+clear_local_var_bit_lvar bStatus 3 // wrotethem
 
-index *= 4
-readmem += index
+gosub @pick_check
 
-pickarray = read_memory address readmem size 4 vp False
-*/
-indexnum = index
-index += readmem
-pickarray = &0(index,16384i)
-
-if does_pickup_exist pickarray
-then
-remove_blip bliptoadd
-
-bliptoadd = add_blip_for_pickup pickarray
-
-while true
+:pick_loop
 wait 0
-
 use_text_commands True
 
 gosub @text_display
 
-gosub @get_coords
+// gosub @select_pick // TODO
+
+if is_local_var_bit_set_const bStatus 0 // invalid
+then goto @skip_it_all
+end
 
 gosub @which_key_press
 
-gosub @write_coords
+if is_local_var_bit_set_const bStatus 2
+then gosub @write_coords
+clear_local_var_bit_lvar bStatus 2
+end
 
+iTemp = read_struct_offset keypoint 10 1
+if is_key_pressed iTemp
+then
 gosub @save_coords
+end
 
+:skip_it_all
 use_text_commands False
-
-end
-
-end
-//end
-
-//goto @start_of_script
-
-:end_of_script
-terminate_this_custom_script
+goto @pick_loop
 
 :text_display
-gosub @text_display_setup
+gosub @text_setup
 if step == 8
 then
 display_text 490.0 30.0 'MSZPS01'
@@ -201,288 +202,258 @@ else
 display_text 490.0 30.0 'MSZPS10'
 end
 
-gosub @text_display_setup
-if speed == 1
+gosub @text_setup
+if speed == True
 then
 display_text 490.0 50.0 'MSZPST'
 else
 display_text 490.0 50.0 'MSZPSF'
 end
 
-gosub @text_display_setup
-display_text_with_number 490.0 70.0 'MSZARRN' indexnum
+gosub @text_setup
+display_text_with_number 490.0 70.0 'MSZARRN' index_array
 
+get_pickup_coordinates pickarray store_to pickXf pickYf pickZf
+pickXi =# pickXf
+pickYi =# pickYf
+pickZi =# pickZf
 
-get_pickup_coordinates pickarray store_to pickX pickY pickZ
-pickXo =# pickX
-pickYo =# pickY
-pickZo =# pickZ
-
-gosub @text_display_setup
+gosub @text_setup
 display_text 440.0 100.0 'MSZ_X'
-gosub @text_display_setup
+gosub @text_setup
 set_text_proportional False
-display_text_with_number 490.0 100.0 'NUMBER' pickXo
+display_text_with_number 490.0 100.0 'NUMBER' pickXi
 
-gosub @text_display_setup
+gosub @text_setup
 display_text 440.0 110.0 'MSZ_Y'
-gosub @text_display_setup
+gosub @text_setup
 set_text_proportional False
-display_text_with_number 490.0 110.0 'NUMBER' pickYo
+display_text_with_number 490.0 110.0 'NUMBER' pickYi
 
-gosub @text_display_setup
+gosub @text_setup
 display_text 440.0 120.0 'MSZ_Z'
-gosub @text_display_setup
+gosub @text_setup
 set_text_proportional False
-display_text_with_number 490.0 120.0 'NUMBER' pickZo
+display_text_with_number 490.0 120.0 'NUMBER' pickZi
 
 return
 
-:text_display_setup
+:text_setup
 set_text_wrapx 640.0
 set_text_right_justify True
 return
 
-// maybe useful
-// https://gtaforums.com/topic/989882-search-for-pickups-on-the-map/
-// https://gtaforums.com/topic/409207-struct-of-car/
-// https://gtamods.com/wiki/Saves_(GTA_SA)
+:select_pick
+// not done yet
+return
+
+:pick_check
+remove_blip bliptoadd
+if does_pickup_exist pickarray
+then
+bliptoadd = add_blip_for_pickup pickarray
+clear_local_var_bit_lvar bStatus 0
+else
+set_local_var_bit_const bStatus 0 // invalid
+end
+return
 
 :get_coords
 pickpoint = get_pickup_pointer pickarray
-pickpoint += 0x10
-pickXo = read_memory address pickpoint size 2 vp False
-pickpoint += 0x2
-pickYo = read_memory address pickpoint size 2 vp False
-pickpoint += 0x2
-pickZo = read_memory address pickpoint size 2 vp False
-pickpoint += 0x2
-pickAo = read_memory address pickpoint size 4 vp False // align
+pickXi = read_struct_offset pickpoint 0x10 2
+pickYi = read_struct_offset pickpoint 0x12 2
+pickZi = read_struct_offset pickpoint 0x14 2
 return
 
 :which_key_press
-/*
-i = 0x49 // up
-j = 0x4a // left
-k = 0x4b // down
-l = 0x4c // right
-u = 0x55 // above
-o = 0x4f // below
-
-I = Y++
-J = X--
-K = Y--
-L = X++
-U = Z++
-O = Z--
-
-speed = FALSE // stop after each
-speed = TRUE // don't stop
-*/
-
-if is_key_pressed 0x58 // X
+iTemp = read_struct_offset keypoint 8 1
+if is_key_pressed iTemp
 then
 print_string_now "reloaded pickup select" 2000
-while is_key_pressed 0x58
-wait 0
-end
+gosub @wait_key_release
 goto @start_of_script
 end
 
-if and
-not is_key_pressed 0x49 // I
-not is_key_pressed 0x4a // J
-not is_key_pressed 0x4b // K
-not is_key_pressed 0x4c // L
-not is_key_pressed 0x55 // U
-not is_key_pressed 0x4f // O
+which_key_bit = 0
+clear_local_var_bit_const bStatus 2 // write
+count = 0
+while count < 6
+iTemp = read_struct_offset keypoint count 1
+if is_key_pressed iTemp
 then
-which_key_pressed = 0
+set_local_var_bit_lvar which_key_bit count
+set_local_var_bit_const bStatus 1 // read
+set_local_var_bit_const bStatus 2 // write
+break
+end
+count++
 end
 
-if which_key_pressed == 4
+if which_key_bit > 0
 then
 if speed == False
 then
-return
+if is_local_var_bit_set_const bStatus 3
+then
+clear_local_var_bit_const bStatus 2 // write
+which_key_bit = 0
 end
+end
+else
+clear_local_var_bit_const bStatus 3 // wrote
 end
 
-if is_key_pressed 0x4d // m
+if is_local_var_bit_set_const bStatus 1
+then gosub @get_coords
+clear_local_var_bit_const bStatus 1
+end
+
+iTemp = read_struct_offset keypoint 6 1
+if is_key_pressed iTemp
 then
 if step == 8
 then step = 80
 else step = 8
 end
+gosub @wait_key_release
 end
 
-while is_key_pressed 0x4d // m
-wait 0
-end
-
-if is_key_pressed 0xbe // .
+iTemp = read_struct_offset keypoint 7 1
+if is_key_pressed iTemp
 then
 if speed == True
 then speed = False
 else speed = True
 end
+gosub @wait_key_release
 end
 
-while is_key_pressed 0xbe // .
-wait 0
-end
-
-if is_key_pressed 0x49 // I
+if which_key_bit > 0
 then
-pickYo += step
-which_key_pressed = 1 // up/down
+count = 0
+while count < 6
+if is_local_var_bit_set_lvar which_key_bit count
+then
+switch count // TODO: do it with the command thing instead of this
+case 0 // up
+pickYi += step
+case 1 // left
+pickXi -= step
+case 2 // down
+pickYi -= step
+case 3 // right
+pickXi += step
+case 4 // above
+pickZi += step
+case 5 // below
+pickZi -= step
+end//switch
+end//if
+count++
+end//while
+end//if
+
+iTemp = read_struct_offset keypoint 9 1 // ground_z
+if is_key_pressed iTemp
+then
+which_key_bit = 0
+set_local_var_bit_lvar which_key_bit 6
+set_local_var_bit_const bStatus 2
+gosub @wait_key_release
 end
 
-if is_key_pressed 0x4a // J
+iTemp = read_struct_offset keypoint 11 1 // teleport
+if is_key_pressed iTemp
 then
-pickXo -= step
-which_key_pressed = 2 // left/right
+do_fade 500 Fade.Out
+pickpoint = get_pickup_pointer pickarray
+get_pickup_coordinates pickarray store_to pickXf pickYf pickZf
+get_pickup_coordinates pickarray store_to pickXi pickYi pickZi
+while get_fading_status
+wait 250
 end
-
-if is_key_pressed 0x4b // K
-then
-pickYo -= step
-which_key_pressed = 1 // up/down
-end
-
-if is_key_pressed 0x4c // L
-then
-pickXo += step
-which_key_pressed = 2 // left/right
-end
-
-if is_key_pressed 0x55 // U
-then
-pickZo += step
-which_key_pressed = 3 // above/below
-end
-
-if is_key_pressed 0x4f // O
-then
-pickZo -= step
-which_key_pressed = 3 // above/below
-end
-
-if is_key_pressed 0x42 // B
-then
-which_key_pressed = 9 // ground Z
+load_scene pickXf pickYf pickZf
+request_collision pickXf pickYf
+get_closest_char_node pickXi pickYi pickZi store_to pickXf pickYf pickZf
+pickZf += 2.0
+fTemp = get_ground_z_for_3d_coord pickXf pickYf pickZf
+set_char_coordinates $scplayer pickXf pickYf fTemp
+do_fade 500 Fade.In
+gosub @wait_key_release
 end
 
 return
 
 :write_coords
-pickpoint = get_pickup_pointer pickarray
-
-if which_key_pressed > 0
+if which_key_bit > 0
 then
-
-pickpoint += 0x10
-write_memory address pickpoint size 4 value pickXo False
-pickpoint += 0x2
-write_memory address pickpoint size 4 value pickYo False
-pickpoint += 0x2
-write_memory address pickpoint size 4 value pickZo False
-
-if which_key_pressed == 9 // ground z
-then
-
-//goto @skipthisfornow
 pickpoint = get_pickup_pointer pickarray
-pickpoint += 0x10
-pickXo = read_memory address pickpoint size 2 vp False
-pickpoint += 0x2
-pickYo = read_memory address pickpoint size 2 vp False
-pickpoint += 0x2
-pickZo = read_memory address pickpoint size 2 vp False
+if not is_local_var_bit_set_lvar which_key_bit 6 // ground_z
+then
+write_struct_offset pickpoint 0x10 2 pickXi
+write_struct_offset pickpoint 0x12 2 pickYi
+write_struct_offset pickpoint 0x14 2 pickZi
+else
+get_pickup_coordinates pickarray store_to pickXf pickYf pickZf
+fTemp = get_ground_z_for_3d_coord pickXf pickYf pickZf
+fTemp += 2.0
+pickZi =# fTemp
+pickZi *= 8
 
-pickX =# pickXo
-pickY =# pickYo
-pickZ =# pickZo
+write_struct_offset pickpoint 0x14 2 pickZi
 
-pickX /= 8.0
-pickY /= 8.0
-pickZ /= 8.0
-//pickXo /= 8
-//pickYo /= 8
-//pickZo /= 8
-
-temp_float = get_ground_z_for_3d_coord pickX pickY pickZ
-temp_float += 2.0
-pickZo =# temp_float
-pickZo *= 8
-
-write_memory address pickpoint size 4 value pickZo vp False
-
-
-//print_formatted "%f.0 %f.0 %f.0 %d %d %d" 2000 pickX pickY pickZ pickXo pickYo pickZo temp_float
-/*
-:skipthisfornow
-
-get_char_coordinates $scplayer store_to pickX pickY pickZ
-temp_float = get_ground_z_for_3d_coord pickX pickY pickZ
-print_formatted "%1.f %1.f %1.f~n~%1.f" 2000 pickX pickY pickZ temp_float 
-*/
-
-while is_key_pressed 0x42
-wait 0
+iTemp = read_struct_offset keypoint 9 1 // ground_z
+gosub @wait_key_release
 end
 
+set_local_var_bit_const bStatus 3 // wrotethem
 end
-
-pickpoint += 0x2
-write_memory address pickpoint size 4 value pickAo False // align
-
-which_key_pressed = 4
-end
-
 return
 
 :save_coords
-
-if is_key_pressed 0xbc // ,
-then
-pickhandle = get_pickup_this_coord pickX pickY pickZ True
-
-get_pickup_coordinates pickarray store_to pickX pickY pickZ
-
-
-string_format str "%d" picktype
+get_pickup_coordinates pickarray store_to pickXf pickYf pickZf
+string_format str "%d" pickarray
 write_int_to_ini_file index "cleo\pickupselect.ini" str "global_variable"
-write_int_to_ini_file indexnum "cleo\pickupselect.ini" str "array_index"
-
-write_float_to_ini_file pickX "cleo\pickupselect.ini" str "x"
-write_float_to_ini_file pickY "cleo\pickupselect.ini" str "y"
-write_float_to_ini_file pickZ "cleo\pickupselect.ini" str "z"
+write_int_to_ini_file index_array "cleo\pickupselect.ini" str "index_array"
+write_float_to_ini_file pickXf "cleo\pickupselect.ini" str "x"
+write_float_to_ini_file pickYf "cleo\pickupselect.ini" str "y"
+write_float_to_ini_file pickZf "cleo\pickupselect.ini" str "z"
 
 TIMERA = 0
 TIMERB = 0
 while TIMERA < 1000
 wait 0
-display_text_with_number 490.0 200.0 'MSZSAVE' indexnum
+display_text_with_number 490.0 200.0 'MSZSAVE' index_array
 end
 
-
-while is_key_pressed 0xbc
-wait 0
-end
-
-end
-
+gosub @wait_key_release
 return
 
-/*
-:temp_var_storage
-hex
-00 00 00 00 00 00 00 00 
-00 00 00 00 00 00 00 00 
-00 00 00 00 00 00 00 00 
-00 00 00 00 00 00 00 00 
+:wait_key_release
+while is_key_pressed iTemp
+wait 0
 end
+return
+
+:end_of_script
+terminate_this_custom_script
+
+:key_vars
+hex
+00 00 00 00 00 00 00 00 00 00 00 00
+end
+/*
+iTemp = read_struct_offset keypoint v 1
+0=up
+1=left
+2=down
+3=right
+4=above
+5=below
+6=step
+7=speed
+8=reload
+9=ground
+10=save
+11=teleport
 */
-
-

@@ -5,7 +5,7 @@ script_name 'adrnpk'
 
 int count
 float x,y,z
-int vMakepicks = False
+int vMakepicks
 int current_pick
 int pickup_mem = allocate_memory 36 // 9 pickup vars * 4 bytes (int)
 
@@ -18,47 +18,56 @@ set_script_event_save_confirmation True @SaveConfirm count
 :makepicks
 count = 0
 while count < 9
-switch count
+switch_start count 9 has_def False @makepicks incase 0 go @c_0 incase 1 go @c_1 incase 2 go @c_2 incase 3 go @c_3 incase 4 go @c_4 incase 5 go @c_5 incase 6 go @c_6
+switch_continued incase 7 go @c_7 incase 8 go @c_8 skip -1 @cEnd -1 @cEnd -1 @cEnd -1 @cEnd -1 @cEnd -1 @cEnd -1 @cEnd
 // LS
-case 0 // E6 : Jefferson : On roof of hospital
+:c_0 // E6 : Jefferson : On roof of hospital
 x = 2055.0
 y = -1389.0
 z = 24.0
-case 1 // F4 : Santa Maria Beach : At foot of pier's ferris wheel
+goto @cEnd
+:c_1 // F4 : Santa Maria Beach : At foot of pier's ferris wheel
 x = 364.0
 y = -2055.0
 z = 15.0
+goto @cEnd
 // SF
-case 2 // C1 : City Hall : In doorway
+:c_2 // C1 : City Hall : In doorway
 x = -2802.0
 y = 375.0
 z = 6.0
-case 3 // D2 : Foster Valley : Outside arena
+goto @cEnd
+:c_3 // D2 : Foster Valley : Outside arena
 x = -2023.0
 y = -406.0
 z = 39.0
+goto @cEnd
 // LV
-case 4 // A6 : KACC : In corner of fence behind packing crates
+:c_4 // A6 : KACC : In corner of fence behind packing crates
 x = 2503.0
 y = 2823.0
 z = 11.0
-case 5 // B6 : The Ring Master : In corner of building
+goto @cEnd
+:c_5 // B6 : The Ring Master : In corner of building
 x = 2300.0
 y = 1820.0
 z = 16.0
-case 6 // B6 : Pilgrim : Middle of alleyway
+goto @cEnd
+:c_6 // B6 : Pilgrim : Middle of alleyway
 x = 2468.0
 y = 1787.0
 z = 11.0
-case 7 // B5 : The High Roller : In corner on roof
+goto @cEnd
+:c_7 // B5 : The High Roller : In corner on roof
 x = 1947.0
 y = 1333.0
 z = 16.0
-case 8 // B5 : Last Dime Motel : In corner, slightly hidden in flowers
+goto @cEnd
+:c_8 // B5 : Last Dime Motel : In corner, slightly hidden in flowers
 x = 1955.0
 y = 665.0
 z = 14.0
-end
+:cEnd
 
 current_pick = create_pickup #adrenaline PickupType.OnStreetSlow x y z
 write_struct_param pickup_mem count current_pick

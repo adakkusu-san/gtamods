@@ -3,12 +3,18 @@
 wait 2000
 script_name 'sfldtp' // San Fierro Ladder Teleport
 
-int count
+int count,city
 float x,y,z
 
 :ladder_loop
-wait 2000 // decrease this if needed
-// set to 0 if the locate thing is True
+if or
+city == 2
+city == 0
+then
+wait 100
+else
+wait 2500
+end
 
 if get_fading_status
 then goto @ladder_loop
@@ -18,18 +24,19 @@ if not is_player_playing $player1
 then goto @ladder_loop
 end
 
-count = get_city_player_is_in $player1
-if not count == 2
+city = get_city_player_is_in $player1
+if not city == 2
 then
-if count == 0 // one of them didn't work because it's not 'in' SF for some reason
-then wait 1000
+if city == 0 // one of them didn't work because it's not 'in' SF for some reason
+then wait 250
 else goto @ladder_loop
 end
 end
 
 // TODO: maybe change this up and read the values from an INI file
-count = 0
-while count < 10
+if count > 9
+then count = 0
+end
 switch_start count 10 has_def False @bEnd incase 0 go @b_0 incase 1 go @b_1 incase 2 go @b_2 incase 3 go @b_3 incase 4 go @b_4 incase 5 go @b_5 incase 6 go @b_6
 switch_continued incase 7 go @b_7 incase 8 go @b_8 incase 9 go @b_9 skip -1 @bEnd -1 @bEnd -1 @bEnd -1 @bEnd -1 @bEnd -1 @bEnd
 
@@ -93,7 +100,6 @@ if locate_char_on_foot_3d $scplayer x y z 1.2 1.2 2.0 False // change to True an
 then goto @teleport_player
 end
 count++
-end // while
 
 goto @ladder_loop
 

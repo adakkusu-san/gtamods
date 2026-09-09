@@ -1,11 +1,10 @@
 {$CLEO .cs}
 {$NOSOURCE}
-{$USE ini}
-script_name 'mszclth'
+{$USE ini,CLEO+}
+script_name 'clthpk'
 
-wait 2000
-
-int count
+int iTemp,current_pick
+float x,y,z
 longstring current_part,model_name,texture_name
 
 if not does_file_exist "cleo\mszcloth.ini"
@@ -14,31 +13,98 @@ print_help_string "mszcloth.ini~n~not found"
 goto @end_of_script
 end
 
+iTemp = read_int_from_ini_file "cleo\mszcloth.ini" "config" "usepickup"
+if not iTemp == 1
+then
+wait 2000
+while get_fading_status
+wait 0
+end
 while not is_player_playing $player1
 wait 0
 end
-
-count = 0
-while count < 17
-if count == 4 // not implemented yet
-then count = 13
+iTemp = read_int_from_ini_file "cleo\mszcloth.ini" "config" "dofade"
+if not iTemp == 0
+then
+do_fade 500 Fade.Out
+while get_fading_status
+wait 0
 end
-string_format current_part "%d" count
+end
+gosub @dressup
+do_fade 500 Fade.In
+goto @end_of_script
+end
+
+iTemp = generate_random_int_in_range 4500 5500
+wait iTemp // idk how long until the pickups are made
+
+if not x = read_float_from_ini_file "cleo\mszcloth.ini" "config" "x"
+then x = 205.0
+end
+if not y = read_float_from_ini_file "cleo\mszcloth.ini" "config" "y"
+then y = -98.0
+end
+if not z = read_float_from_ini_file "cleo\mszcloth.ini" "config" "z"
+then z = 1005.0
+end
+
+set_script_event_save_confirmation True @SaveConfirm iTemp
+gosub @makepick
+
+iTemp = False
+
+:pick_loop
+wait 1000
+if has_pickup_been_collected current_pick
+then
+do_fade 500 Fade.Out
+while get_fading_status
+wait 0
+end
+gosub @dressup
+remove_pickup current_pick
+do_fade 500 Fade.In
+goto @end_of_script
+end
+if iTemp == True
+then
+gosub @makepick
+iTemp = False
+end
+goto @pick_loop
+
+:makepick
+current_pick = create_pickup #clothesp PickupType.Once x y z
+return
+
+:dressup
+iTemp = 0
+while iTemp < 18
+if iTemp == 4 // not implemented yet
+then iTemp = 13
+end
+string_format current_part "%d" iTemp
 model_name = read_string_from_ini_file "cleo\mszcloth.ini" current_part "dff"
 if not model_name == "skip"
 then
 if model_name == "remove"
 then
-give_player_clothes_outside_shop $player1 0 0 count
+give_player_clothes $player1 0 0 iTemp
 else
 texture_name = read_string_from_ini_file "cleo\mszcloth.ini" current_part "txd"
-give_player_clothes_outside_shop $player1 texture_name model_name count
+give_player_clothes_outside_shop $player1 texture_name model_name iTemp
 end
 end
-count++
+iTemp++
 end
-
 build_player_model $player1
+return
+
+:SaveConfirm
+remove_pickup current_pick
+iTemp = True
+return_script_event
 
 :end_of_script
 terminate_this_custom_script

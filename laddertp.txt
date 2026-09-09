@@ -4,15 +4,14 @@ wait 2000
 script_name 'sfldtp' // San Fierro Ladder Teleport
 
 int count
-float x
-float y
-float z
+float x,y,z
 
 :ladder_loop
-wait 1000 // decrease this if needed
+wait 2000 // decrease this if needed
+// set to 0 if the locate thing is True
 
-while get_fading_status
-goto @ladder_loop
+if get_fading_status
+then goto @ladder_loop
 end
 
 if not is_player_playing $player1
@@ -21,68 +20,76 @@ end
 
 count = get_city_player_is_in $player1
 if not count == 2
-then goto @ladder_loop
-else if count == 0 // one of them doesn't work because it's not 'in' SF for some reason
+then
+if count == 0 // one of them didn't work because it's not 'in' SF for some reason
 then wait 1000
+else goto @ladder_loop
 end
 end
 
 // TODO: maybe change this up and read the values from an INI file
 count = 0
-while count < 11
-switch count
+while count < 10
+switch_start count 10 has_def False @bEnd incase 0 go @b_0 incase 1 go @b_1 incase 2 go @b_2 incase 3 go @b_3 incase 4 go @b_4 incase 5 go @b_5 incase 6 go @b_6
+switch_continued incase 7 go @b_7 incase 8 go @b_8 incase 9 go @b_9 skip -1 @bEnd -1 @bEnd -1 @bEnd -1 @bEnd -1 @bEnd -1 @bEnd
+
 // coords are from juniordjjr's mod, thank you ^^
 // I just needed something that would teleport the player similar to using an ENEX 
 // without having to do an animation
 // and I know, I could've set up ENEX in IPL or whatever but heh, 
 // too much work, this is simpler
-case 0
+:b_0
 x = -1361.05
 y = -696.8
 z = 1.9609
-case 1
+goto @bEnd
+:b_1
 x = -1603.3967
 y = -696.7675
 z = 1.9609
-case 2
+goto @bEnd
+:b_2
 x = -1154.1812
 y = -476.7963
 z = 1.9609
-case 3
+goto @bEnd
+:b_3
 x = -1081.7765
 y = -207.9118
 z = 1.9609
-case 4
+goto @bEnd
+:b_4
 x = -1182.5297
 y = 60.4368
 z = 1.9609
-case 5
+goto @bEnd
+:b_5
 x = -1115.7112
 y = 335.1707
 z = 1.9609
-case 6
+goto @bEnd
+:b_6
 x = -1164.7069
 y = 370.1683
 z = 1.9609
-case 7
+goto @bEnd
+:b_7
 x = -1444.5359
 y = 90.3538
 z = 1.9609
-case 8
+goto @bEnd
+:b_8
 x = -1618.7654
 y = -83.8916
 z = 1.9609
-case 9
+goto @bEnd
+:b_9
 x = -1736.5709
 y = -445.9409
 z = 1.9609
-case 10
-x = -2328.95
-y = 1528.6772
-z = 1.0
-end
+:bEnd
 
-if locate_char_on_foot_3d $scplayer x y z 1.2 1.2 2.0 True // debug these numbers
+if locate_char_on_foot_3d $scplayer x y z 1.2 1.2 2.0 False // change to True and debug these numbers
 then goto @teleport_player
 end
 count++
@@ -94,53 +101,59 @@ goto @ladder_loop
 do_fade 500 Fade.Out
 
 // TODO: same for this
-switch count
+switch_start count 10 has_def False @tEnd incase 0 go @t_0 incase 1 go @t_1 incase 2 go @t_2 incase 3 go @t_3 incase 4 go @t_4 incase 5 go @t_5 incase 6 go @t_6
+switch_continued incase 7 go @t_7 incase 8 go @t_8 incase 9 go @t_9 skip -1 @tEnd -1 @tEnd -1 @tEnd -1 @tEnd -1 @tEnd -1 @tEnd
 // again coords from juniordjjr mod
-case 0
+:t_0
 x = -1361.0426
 y = -695.9332
 z = 14.1484
-case 1
+goto @tEnd
+:t_1
 x = -1603.425
 y = -695.6976
 z = 14.144
-case 2
+goto @tEnd
+:t_2
 x = -1154.9327
 y = -476.3408
 z = 14.1484
-case 3
+goto @tEnd
+:t_3
 x = -1082.6849
 y = -208.285
 z = 14.144
-case 4
+goto @tEnd
+:t_4
 x = -1183.1382
 y = 59.8215
 z = 14.1484
-case 5
+goto @tEnd
+:t_5
 x = -1116.3635
 y = 335.8349
 z = 14.1442
-case 6
+goto @tEnd
+:t_6
 x = -1163.975
 y = 369.3844
 z = 14.1484
-case 7
+goto @tEnd
+:t_7
 x = -1443.8506
 y = 89.7052
 z = 14.1466
-case 8
+goto @tEnd
+:t_8
 x = -1618.0922
 y = -84.6188
 z = 14.1484
-case 9
+goto @tEnd
+:t_9
 x = -1735.7155
 y = -445.8881
 z = 14.1484
-case 10
-x = -2329.2673
-y = 1529.6362
-z = 18.6507
-end
+:tEnd
 
 while get_fading_status
 wait 0

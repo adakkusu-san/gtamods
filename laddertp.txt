@@ -3,13 +3,13 @@
 wait 2000
 script_name 'sfldtp' // San Fierro Ladder Teleport
 
-int count,city
+int count
 float x,y,z
 
 :ladder_loop
 if or
-city == 2
-city == 0
+$im_players_city == 2
+$im_players_city == 0
 then
 wait 100
 else
@@ -24,10 +24,9 @@ if not is_player_playing $player1
 then goto @ladder_loop
 end
 
-city = get_city_player_is_in $player1
-if not city == 2
+if not $im_players_city == 2
 then
-if city == 0 // one of them didn't work because it's not 'in' SF for some reason
+if $im_players_city == 0 // one of them didn't work because it's not 'in' SF for some reason
 then wait 250
 else goto @ladder_loop
 end

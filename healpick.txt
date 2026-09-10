@@ -3,22 +3,21 @@
 {$USE CLEO+}
 script_name 'healpk'
 
-int count
+int iTemp
 float x,y,z
-int vMakepicks
 int current_pick
-int pickup_mem = allocate_memory 200 // 50 pickup vars * 4 bytes (int)
+int pickup_mem = get_label_pointer @pickmem
 
-count = generate_random_int_in_range 4500 5500
-wait count // idk how long until the pickups are made
+iTemp = generate_random_int_in_range 4500 5500
+wait iTemp // idk how long until the pickups are made
 
-set_script_event_save_confirmation True @SaveConfirm count
+set_script_event_save_confirmation True @SaveConfirm iTemp
 // last param needs to be a var or something, idk, wouldn't work otherwise
 
 :makepicks
-count = 0
-while count < 50
-switch_start count 50 has_def False @makepicks       incase  0 go @c_0 incase  1 go @c_1 incase  2 go @c_2 incase  3 go @c_3 incase  4 go @c_4 incase  5 go @c_5 incase  6 go @c_6
+iTemp = 0
+while iTemp < 50
+switch_start iTemp 50 has_def False @makepicks       incase  0 go @c_0 incase  1 go @c_1 incase  2 go @c_2 incase  3 go @c_3 incase  4 go @c_4 incase  5 go @c_5 incase  6 go @c_6
 switch_continued incase  7 go @c_7 incase  8 go @c_8 incase  9 go @c_9 incase 10 go @c10 incase 11 go @c11 incase 12 go @c12 incase 13 go @c13 incase 14 go @c14 incase 15 go @c15
 switch_continued incase 16 go @c16 incase 17 go @c17 incase 18 go @c18 incase 19 go @c19 incase 20 go @c20 incase 21 go @c21 incase 22 go @c22 incase 23 go @c23 incase 24 go @c24
 switch_continued incase 25 go @c25 incase 26 go @c26 incase 27 go @c27 incase 28 go @c28 incase 29 go @c29 incase 30 go @c30 incase 31 go @c31 incase 32 go @c32 incase 33 go @c33
@@ -277,30 +276,36 @@ z = 10.0
 :cEnd
 
 current_pick = create_pickup #health PickupType.OnStreetSlow x y z
-write_struct_param pickup_mem count current_pick
-// make the pickup and write the handle to memory, offset by the current `count` number
+write_struct_param pickup_mem iTemp current_pick
+// make the pickup and write the handle to memory, offset by the current `iTemp` number
 // there's 50 pickups, need to keep track of them somehow
 
-count++
+iTemp++
 end // while
 
-vMakepicks = False
+iTemp = False
 
 :pick_loop // after it's done making the picks, it'll wait in case it has to make them again
 wait 5000
-if vMakepicks == True
+if iTemp == True
 then
 gosub @makepicks
-vMakepicks = False
 end
 goto @pick_loop
 
 :SaveConfirm // goes here when the savegame menu pops up
-count = 0
-while count < 50
-current_pick = read_struct_param pickup_mem count
-remove_pickup current_pick // read the handles we wrote to memory and remove the pickups
-count++
+iTemp = 0
+while iTemp < 50
+current_pick = read_struct_param pickup_mem iTemp
+if does_pickup_exist iTemp
+then remove_pickup current_pick // read the handles we wrote to memory and remove the pickups
 end
-vMakepicks = True
+iTemp++
+end
+iTemp = True
 return_script_event
+
+:pickmem
+hex
+00(200) // 50 pickup vars * 4 bytes (int)
+end

@@ -1,0 +1,126 @@
+{$CLEO .cs}
+{$NOSOURCE}
+{$USE ini}
+script_name 'teleini'
+
+wait 2000
+
+int iTemp,iTemp2
+float x,y,z,x2,y2,z2
+int hMenu,item_select
+string current_coords
+longstring coords
+
+if not does_file_exist "cleo\msztele.ini"
+then
+print_help_string "msztele.ini~n~not found"
+goto @end_of_script
+end
+
+add_text_label 'MSZTELE' "Teleport menu"
+add_text_label 'MSZTP' "Let's go to"
+add_text_label 'MSZTLN' "Number ~1~"
+
+:tele_loop
+wait 250
+if not is_player_playing $player1
+then
+goto @tele_loop
+end
+if test_cheat "TELE"
+then
+goto @menu_make
+end
+goto @tele_loop
+
+:menu_make
+hMenu = create_menu 'MSZTELE' 30.0 140.0 200.0 1 True True Align.Left
+set_menu_column_orientation hMenu 0 Align.Left
+set_menu_column hMenu 0 'MSZTP' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+iTemp = 0
+while iTemp < 10
+string_format current_coords "tp%d" iTemp
+coords = read_string_from_ini_file "cleo\msztele.ini" "config" current_coords
+scan_string coords "%f %f %f" iTemp2 x y z
+if iTemp2 == 3
+then
+if and
+not x == 0.0
+not y == 0.0
+not z == 0.0
+then
+set_menu_item_with_number hMenu {col} 0 {row} iTemp {gxt} 'MSZTLN' {num} iTemp
+end
+end
+iTemp++
+end
+
+set_player_control $player1 False
+set_everyone_ignore_player $player1 True
+
+:wait_for_key
+wait 250
+
+if is_button_pressed 0 Button.Cross // Select
+then
+item_select = get_menu_item_selected hMenu
+
+string_format current_coords "tp%d" item_select
+coords = read_string_from_ini_file "cleo\msztele.ini" "config" current_coords
+scan_string coords "%f %f %f" iTemp2 x y z
+
+load_scene x y z
+request_collision x y
+z += 2.0
+get_ground_z_for_3d_coord x y z store_to z
+
+x2 = x
+y2 = y
+z2 = z
+iTemp = read_int_from_ini_file "cleo\msztele.ini" "config" "type"
+
+switch_start iTemp 3 True @cEnd 1 @c_1 2 @c_2 3 @c_3 -1 @cEnd -1 @cEnd -1 @cEnd -1 @cEnd
+
+:c_1
+get_closest_char_node x y z store_to x2 y2 z2
+goto @cEnd
+
+:c_2
+get_closest_car_node x y z store_to x2 y2 z2
+goto @cEnd
+
+:c_3
+if not is_char_sitting_in_any_car $scplayer
+then
+get_closest_char_node x y z store_to x2 y2 z2
+else
+get_closest_car_node x y z store_to x2 y2 z2
+end
+:cEnd
+
+set_char_coordinates_no_offset $scplayer x2 y2 z2
+goto @menu_remove
+end
+
+if is_button_pressed 0 Button.Triangle // Exit
+then
+goto @menu_remove
+end
+
+goto @wait_for_key
+
+:menu_remove
+delete_menu hMenu
+clear_help
+set_player_control $player1 True
+set_everyone_ignore_player $player1 False
+wait 1000
+goto @tele_loop
+
+:end_of_script
+terminate_this_custom_script
+
+:inistring
+hex
+00(64)
+end

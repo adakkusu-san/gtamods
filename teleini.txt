@@ -9,7 +9,7 @@ int iTemp,iTemp2
 float x,y,z,x2,y2,z2
 int hMenu,item_select
 string current_coords
-longstring coords
+int coords = get_label_pointer @inistring
 
 if not does_file_exist "cleo\msztele.ini"
 then
@@ -20,6 +20,7 @@ end
 add_text_label 'MSZTELE' "Teleport menu"
 add_text_label 'MSZTP' "Let's go to"
 add_text_label 'MSZTLN' "Number ~1~"
+add_text_label 'MSZTLM' "Marker on map"
 
 :tele_loop
 wait 250
@@ -44,15 +45,24 @@ coords = read_string_from_ini_file "cleo\msztele.ini" "config" current_coords
 scan_string coords "%f %f %f" iTemp2 x y z
 if iTemp2 == 3
 then
-if and
+if or
+not x == 0
+not y == 0
+not z == 0
 not x == 0.0
 not y == 0.0
 not z == 0.0
 then
 set_menu_item_with_number hMenu {col} 0 {row} iTemp {gxt} 'MSZTLN' {num} iTemp
-end
-end
+end//if
+end//string
 iTemp++
+end//while
+
+iTemp = read_memory 0xba6774 4 False // marker Target
+if iTemp == 1
+then
+set_menu_item_with_number hMenu {col} 10 {row} iTemp {gxt} 'MSZTLM' {num} 0
 end
 
 set_player_control $player1 False
@@ -69,14 +79,14 @@ string_format current_coords "tp%d" item_select
 coords = read_string_from_ini_file "cleo\msztele.ini" "config" current_coords
 scan_string coords "%f %f %f" iTemp2 x y z
 
-load_scene x y z
 request_collision x y
-z += 2.0
+load_scene x y z
+z += 100.0
 get_ground_z_for_3d_coord x y z store_to z
 
 x2 = x
 y2 = y
-z2 = z
+z2 = -100.0
 iTemp = read_int_from_ini_file "cleo\msztele.ini" "config" "type"
 
 switch_start iTemp 3 True @cEnd 1 @c_1 2 @c_2 3 @c_3 -1 @cEnd -1 @cEnd -1 @cEnd -1 @cEnd
@@ -98,7 +108,9 @@ get_closest_car_node x y z store_to x2 y2 z2
 end
 :cEnd
 
-set_char_coordinates_no_offset $scplayer x2 y2 z2
+set_char_coordinates $scplayer x2 y2 z2
+restore_camera_jumpcut
+
 goto @menu_remove
 end
 

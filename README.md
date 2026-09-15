@@ -23,6 +23,9 @@ Simple but maybe unstable
 * healpick: 
 [Info](https://github.com/adakkusu-san/gtamods/tree/healpick) |
 [Download](https://github.com/adakkusu-san/gtamods/archive/refs/heads/healpick.zip)
+* teleini: 
+[Info](https://github.com/adakkusu-san/gtamods/tree/teleini) |
+[Download](https://github.com/adakkusu-san/gtamods/archive/refs/heads/teleini.zip)
 
 Speedrun purpose
 * om0: 

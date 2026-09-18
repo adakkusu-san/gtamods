@@ -5,7 +5,7 @@ script_name 'teleini'
 
 wait 2000
 
-int iTemp,iTemp2
+int count,iTemp
 float x,y,z,x2,y2,z2
 int hMenu,item_select
 string current_coords
@@ -38,31 +38,24 @@ goto @tele_loop
 hMenu = create_menu 'MSZTELE' 30.0 140.0 200.0 1 True True Align.Left
 set_menu_column_orientation hMenu 0 Align.Left
 set_menu_column hMenu 0 'MSZTP' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
-iTemp = 0
-while iTemp < 10
-string_format current_coords "tp%d" iTemp
-coords = read_string_from_ini_file "cleo\msztele.ini" "config" current_coords
-scan_string coords "%f %f %f" iTemp2 x y z
-if iTemp2 == 3
+count = 0
+while count < 10
+string_format current_coords "tp%d" count
+if coords = read_string_from_ini_file "cleo\msztele.ini" "config" current_coords
 then
-if or
-not x == 0
-not y == 0
-not z == 0
-not x == 0.0
-not y == 0.0
-not z == 0.0
+scan_string coords "%f %f %f" iTemp x y z
+if iTemp == 3
 then
-set_menu_item_with_number hMenu {col} 0 {row} iTemp {gxt} 'MSZTLN' {num} iTemp
+set_menu_item_with_number hMenu {col} 0 {row} count {gxt} 'MSZTLN' {num} count
 end//if
 end//string
-iTemp++
+count++
 end//while
 
 iTemp = read_memory 0xba6774 4 False // marker Target
-if iTemp == 1
+if iTemp > 0
 then
-set_menu_item_with_number hMenu {col} 10 {row} iTemp {gxt} 'MSZTLM' {num} 0
+set_menu_item_with_number hMenu {col} 0 {row} count {gxt} 'MSZTLM' {num} 0
 end
 
 set_player_control $player1 False
@@ -75,21 +68,26 @@ if is_button_pressed 0 Button.Cross // Select
 then
 item_select = get_menu_item_selected hMenu
 
+if item_select < 10
+then
 string_format current_coords "tp%d" item_select
 coords = read_string_from_ini_file "cleo\msztele.ini" "config" current_coords
-scan_string coords "%f %f %f" iTemp2 x y z
+scan_string coords "%f %f %f" iTemp x y z
+else
+get_target_blip_coords store_to x y z
+end
 
 request_collision x y
 load_scene x y z
-z += 100.0
+z += 10.0
 get_ground_z_for_3d_coord x y z store_to z
 
 x2 = x
 y2 = y
 z2 = -100.0
-iTemp = read_int_from_ini_file "cleo\msztele.ini" "config" "type"
+count = read_int_from_ini_file "cleo\msztele.ini" "config" "type"
 
-switch_start iTemp 3 True @cEnd 1 @c_1 2 @c_2 3 @c_3 -1 @cEnd -1 @cEnd -1 @cEnd -1 @cEnd
+switch_start count 3 True @cEnd 1 @c_1 2 @c_2 3 @c_3 -1 @cEnd -1 @cEnd -1 @cEnd -1 @cEnd
 
 :c_1
 get_closest_char_node x y z store_to x2 y2 z2

@@ -73,16 +73,19 @@ end
 goto @coord_loop
 
 :text_format
-switch c
-case 0
+switch_start c 4 False @cEnd incase 0 go @c_0 incase 1 go @c_1 incase 2 go @c_2 incase 3 go @c_3 skip -1 @cEnd -1 @cEnd -1 @cEnd
+:c_0
 g = 'MSZP_A'
-case 1
+goto @cEnd
+:c_1
 g = 'MSZP_0'
-case 2
+goto @cEnd
+:c_2
 g = 'MSZP_N'
-case 3
+goto @cEnd
+:c_3
 g = 'MSZPN0'
-end
+:cEnd
 set_text_wrapx 640.0
 set_text_right_justify True
 set_text_draw_before_fade False

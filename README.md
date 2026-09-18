@@ -18,7 +18,7 @@ makes sense, or at least close to what's mentioned
 I didn't check all the pickups yet, there's 50 health pickups and 10 adrenaline 
 pickups in total, it's possible some of them may be too close to the ground. 
 Pickup coords are saved with no decimal precision, and I'm yet not sure if 
-they're rounded or not. Anyway, I removed the precision from all coords but 
+the number is rounded or not. Anyway, I removed the precision from all coords but 
 didn't check what it did
 
 Also they shouldn't get stuck in savegames, which means there shouldn't be 
@@ -26,4 +26,4 @@ multiple pickups in the same location (unless you're using another mod that
 does the same thing)
 
 I know there may or may not be other mods that would do the same thing I did, 
-but these ones are mine :3
+but this one is mine and I know what it does :3

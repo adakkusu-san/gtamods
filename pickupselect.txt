@@ -169,41 +169,22 @@ end
 picktype = read_string_from_ini_file "cleo\pickupselect.ini" "config" "picktype"
 switch picktype
 case 'weapon'
-if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "weapon" "offset"
-then gvar = 3032
-end
-if not a_index_max = read_int_from_ini_file "cleo\pickupselect.ini" "weapon" "maxval"
-then a_index_max = 217
-end
+gvar = 3032
+a_index_max = 217
 case 'flower'
-if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "flower" "offset"
-then gvar = 3257
-end
-if not a_index_max = read_int_from_ini_file "cleo\pickupselect.ini" "flower" "maxval"
-then a_index_max = 40
-end
+gvar = 3257
+a_index_max = 40
 case 'armour'
-if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "armour" "offset"
-then gvar = 3297
-end
-if not a_index_max = read_int_from_ini_file "cleo\pickupselect.ini" "armour" "maxval"
-then a_index_max = 48
-end
+gvar = 3297
+a_index_max = 48
 case 'bribe'
-if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "bribe" "offset"
-then gvar = 3345
+gvar = 3345
+a_index_max = 50
 end
-if not a_index_max = read_int_from_ini_file "cleo\pickupselect.ini" "bribe" "maxval"
-then a_index_max = 50
-end
-default
 gvar = read_int_from_ini_file "cleo\pickupselect.ini" picktype "offset"
 a_index_max = read_int_from_ini_file "cleo\pickupselect.ini" picktype "maxval"
-end
 
-if not v_index = read_int_from_ini_file "cleo\pickupselect.ini" picktype "index"
-then v_index = 0
-end
+v_index = read_int_from_ini_file "cleo\pickupselect.ini" picktype "index"
 
 a_index = v_index
 v_index += gvar

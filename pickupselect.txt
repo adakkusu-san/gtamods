@@ -14,14 +14,14 @@ int pickpoint,keypoint
 // TODO: use extravars for some of these
 int gvar,a_index_max
 
-int v_index,a_index,pickarray,bliptoadd
+int v_index,a_index,a_pickup,a_blip
 
 int which_key_bit,bStatus // bitwise
 // ran out of variables to use, had to do bitwise
 // after I figure out how, I'll make those variables into a single one
 
-longstring picktype
-longstring str
+string picktype
+string str
 
 :start_of_script
 if not does_file_exist "cleo\pickupselect.ini"
@@ -72,13 +72,17 @@ pReloadKey = 8
 pGroundZKey = 9
 pSaveKey = 10
 pTeleportKey = 11
+pPrevKey=12
+pNextKey=13
+pPrev10Key=14
+pNext10Key=15
 end
 
 keypoint = get_label_pointer @key_vars
 count = 0
-while count < 12
-switch_start count 12 has_def False @k_end incase pUpKey go @k_Up incase pLeftKey go @k_Left incase pDownKey go @k_Down incase pRightKey go @k_Right incase pAboveKey go @k_Above incase pBelowKey go @k_Below incase pStepKey go @k_Step
-switch_continued incase pSpeedKey go @k_Speed incase pReloadKey go @k_Reload incase pGroundZKey go @k_GroundZ incase pSaveKey go @k_Save incase pTeleportKey go @k_Teleport skip -1 @k_end -1 @k_end -1 @k_end -1 @k_end
+while count < 16
+switch_start count 16 has_def False @k_end incase pUpKey go @k_Up incase pLeftKey go @k_Left incase pDownKey go @k_Down incase pRightKey go @k_Right incase pAboveKey go @k_Above incase pBelowKey go @k_Below incase pStepKey go @k_Step
+switch_continued incase pSpeedKey go @k_Speed incase pReloadKey go @k_Reload incase pGroundZKey go @k_GroundZ incase pSaveKey go @k_Save incase pTeleportKey go @k_Teleport incase pPrevKey go @k_Prev incase pNextKey go @k_Next incase pPrev10Key go @k_Prev10 incase pNext10Key go @k_Next10
 :k_Up
 if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "up"
 then iTemp = 0x49 // I
@@ -138,6 +142,26 @@ goto @k_end
 if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "teleport"
 then iTemp = 0x54 // T
 end
+goto @k_end
+:k_Prev
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "prev"
+then iTemp = 0x47 // G
+end
+goto @k_end
+:k_Next
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "next"
+then iTemp = 0x48 // H
+end
+goto @k_end
+:k_Prev10
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "prev10"
+then iTemp = 0x4E // N
+end
+goto @k_end
+:k_Next10
+if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "config" "next10"
+then iTemp = 0x59 // Y
+end
 :k_end
 write_struct_offset keypoint count 1 iTemp
 count++
@@ -145,28 +169,28 @@ end
 
 picktype = read_string_from_ini_file "cleo\pickupselect.ini" "config" "picktype"
 switch picktype
-case "weapon"
+case 'weapon'
 if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "weapon" "offset"
 then gvar = 3032
 end
 if not a_index_max = read_int_from_ini_file "cleo\pickupselect.ini" "weapon" "maxval"
 then a_index_max = 217
 end
-case "flower"
+case 'flower'
 if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "flower" "offset"
 then gvar = 3257
 end
 if not a_index_max = read_int_from_ini_file "cleo\pickupselect.ini" "flower" "maxval"
 then a_index_max = 40
 end
-case "armour"
+case 'armour'
 if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "armour" "offset"
 then gvar = 3297
 end
 if not a_index_max = read_int_from_ini_file "cleo\pickupselect.ini" "armour" "maxval"
 then a_index_max = 48
 end
-case "bribe"
+case 'bribe'
 if not gvar = read_int_from_ini_file "cleo\pickupselect.ini" "bribe" "offset"
 then gvar = 3345
 end
@@ -184,7 +208,7 @@ end
 
 a_index = v_index
 v_index += gvar
-pickarray = &0(v_index,16384i)
+a_pickup = &0(v_index,16384i)
 
 set_local_var_bit_const bStatus bInvalid
 set_local_var_bit_const bStatus bGetCoords
@@ -195,13 +219,25 @@ set_local_var_bit_const bStatus bSpeed
 
 gosub @pick_check
 
+// debug
+// 0@ = get_max_wanted_level
+set_max_wanted_level 0
+
 :pick_loop
 wait 0
 use_text_commands True
 
 gosub @text_display
 
-// gosub @select_pick // TODO 
+gosub @select_pick
+
+iTemp = read_struct_offset keypoint pReloadKey 1
+if is_key_pressed iTemp
+then
+print_string_now "reloaded pickup select" 2000
+gosub @wait_key_release
+goto @start_of_script
+end
 
 if is_local_var_bit_set_const bStatus bInvalid
 then goto @skip_it_all
@@ -246,7 +282,7 @@ end
 gosub @text_setup
 display_text_with_number 490.0 70.0 'MSZARRN' a_index
 
-get_pickup_coordinates pickarray store_to pickXf pickYf pickZf
+get_pickup_coordinates a_pickup store_to pickXf pickYf pickZf
 pickXi =# pickXf
 pickYi =# pickYf
 pickZi =# pickZf
@@ -277,77 +313,64 @@ set_text_right_justify True
 return
 
 :select_pick
-/*
-count = 0
-if or
-is_button_pressed 0 Button.DpadUp // G
-is_button_pressed 0 Button.DpadDown // H
-is_button_pressed 0 Button.DpadLeft // N
-is_button_pressed 0 Button.DpadRight // Y
+which_key_bit = 0
+count = 12
+while count < 16
+iTemp = read_struct_offset keypoint count 1
+if is_key_pressed iTemp
 then
-count = 1
+set_local_var_bit_lvar which_key_bit count
+break
+end
+count++
 end
 
-if is_button_pressed 0 Button.DpadUp // G
+if which_key_bit > 0
 then
+switch_start count 4 has_def False @s_end incase pPrevKey go @s_Prev incase pNextKey go @s_Next incase pPrev10Key go @s_Prev10 incase pNext10Key go @s_Next10 skip -1 @s_end -1 @s_end -1 @s_end
+:s_Prev
 a_index--
 if a_index < 0
 then
 a_index = a_index_max
 a_index--
 end
-end
-if is_button_pressed 0 Button.DpadDown // H
-then
+goto @s_end
+:s_Next
 a_index++
 if a_index >= a_index_max
 then
 a_index = 0
 end
-end
-if is_button_pressed 0 Button.DpadLeft // N
-then
+goto @s_end
+:s_Prev10
 a_index -= 10
 if a_index < 0
 then
 a_index += a_index_max
 end
-end
-if is_button_pressed 0 Button.DpadRight // Y
-then
+goto @s_end
+:s_Next10
 a_index += 10
 if a_index >= a_index_max
 then
 a_index -= a_index_max
 end
-end
-
-if count > 0
-then
+:s_end
 v_index = a_index
 v_index += gvar
-pickarray = &0(v_index,16384i)
-end
-
-while count > 0
-wait 100
-if and
-not is_button_pressed 0 Button.DpadUp // G
-not is_button_pressed 0 Button.DpadDown // H
-not is_button_pressed 0 Button.DpadLeft // N
-not is_button_pressed 0 Button.DpadRight // Y
-then
-count = 0
-end
-end
-*/
+a_pickup = &0(v_index,16384i)
+gosub @wait_key_release
+gosub @pick_check
+end//if
 return
 
 :pick_check
-remove_blip bliptoadd
-if does_pickup_exist pickarray
+remove_blip a_blip
+if does_pickup_exist a_pickup
 then
-bliptoadd = add_blip_for_pickup pickarray
+a_blip = add_blip_for_pickup a_pickup
+change_blip_display a_blip BlipDisplay.Both
 clear_local_var_bit_lvar bStatus bInvalid
 else
 set_local_var_bit_const bStatus bInvalid
@@ -355,21 +378,16 @@ end
 return
 
 :get_coords
-pickpoint = get_pickup_pointer pickarray
+if does_pickup_exist a_pickup
+then
+pickpoint = get_pickup_pointer a_pickup
 pickXi = read_struct_offset pickpoint 0x10 2
 pickYi = read_struct_offset pickpoint 0x12 2
 pickZi = read_struct_offset pickpoint 0x14 2
+end
 return
 
 :which_key_press
-iTemp = read_struct_offset keypoint pReloadKey 1
-if is_key_pressed iTemp
-then
-print_string_now "reloaded pickup select" 2000
-gosub @wait_key_release
-goto @start_of_script
-end
-
 which_key_bit = 0
 clear_local_var_bit_const bStatus bWriteCoords
 count = 0
@@ -434,31 +452,30 @@ if not is_local_var_bit_set_const bStatus bStep
 then iTemp = 8
 else iTemp = 80
 end
-switch_start count 6 has_def False @c_end incase 0 go @c_0 incase 1 go @c_1 incase 2 go @c_2 incase 3 go @c_3 incase 4 go @c_4 incase 5 go @c_5 skip -1 @c_end
-:c_0 // up
+switch_start count 6 has_def False @c_end incase pUpKey go @c_Up incase pLeftKey go @c_Left incase pDownKey go @c_Down incase pRightKey go @c_Right incase pAboveKey go @c_Above incase pBelowKey go @c_Below skip -1 @c_end
+:c_Up
 pickYi += iTemp
 goto @c_end
 
-:c_1 // left
+:c_Left
 pickXi -= iTemp
 goto @c_end
 
-:c_2 // down
+:c_Down
 pickYi -= iTemp
 goto @c_end
 
-:c_3 // right
+:c_Right
 pickXi += iTemp
 goto @c_end
 
-:c_4 // above
+:c_Above
 pickZi += iTemp
 goto @c_end
 
-:c_5 // below
+:c_Below
 pickZi -= iTemp
 :c_end
-
 end//if
 count++
 end//while
@@ -477,35 +494,45 @@ iTemp = read_struct_offset keypoint pTeleportKey 1
 if is_key_pressed iTemp
 then
 do_fade 500 Fade.Out
-pickpoint = get_pickup_pointer pickarray
-get_pickup_coordinates pickarray store_to pickXf pickYf pickZf
-get_pickup_coordinates pickarray store_to pickXi pickYi pickZi
+pickpoint = get_pickup_pointer a_pickup
+get_pickup_coordinates a_pickup store_to pickXf pickYf pickZf
 while get_fading_status
 wait 250
 end
 pickZf += 10.0
 load_scene pickXf pickYf pickZf
 request_collision pickXf pickYf
-load_all_models_now // hotfix // remove later
-get_closest_char_node pickXi pickYi pickZi store_to pickXf pickYf pickZf
+wait 100
+get_closest_char_node pickXf pickYf pickZf store_to pickXf pickYf pickZf
+if or
+pickXf == 0.0
+pickYf == 0.0
+then
+get_pickup_coordinates a_pickup store_to pickXf pickYf pickZf
+end
+pickZf += 100.0
+set_char_coordinates $scplayer pickXf pickYf pickZf
+wait 100
+pickZf = get_ground_z_for_3d_coord pickXf pickYf pickZf
 set_char_coordinates $scplayer pickXf pickYf pickZf
 do_fade 500 Fade.In
 gosub @wait_key_release
 end
-
 return
 
 :write_coords
 if which_key_bit > 0
 then
-pickpoint = get_pickup_pointer pickarray
+if does_pickup_exist a_pickup
+then
+pickpoint = get_pickup_pointer a_pickup
 if not is_local_var_bit_set_lvar which_key_bit pGroundZKey
 then
 write_struct_offset pickpoint 0x10 2 pickXi
 write_struct_offset pickpoint 0x12 2 pickYi
 write_struct_offset pickpoint 0x14 2 pickZi
 else
-get_pickup_coordinates pickarray store_to pickXf pickYf pickZf
+get_pickup_coordinates a_pickup store_to pickXf pickYf pickZf
 pickZf = get_ground_z_for_3d_coord pickXf pickYf pickZf
 pickZf += 2.0
 pickZi =# pickZf
@@ -519,13 +546,14 @@ end
 
 set_local_var_bit_const bStatus bWritten
 end
+end
 return
 
 :save_coords
-get_pickup_coordinates pickarray store_to pickXf pickYf pickZf
-string_format str "%d" pickarray
-write_int_to_ini_file v_index "cleo\pickupselect.ini" str "global_variable"
-write_int_to_ini_file a_index "cleo\pickupselect.ini" str "a_index"
+get_pickup_coordinates a_pickup store_to pickXf pickYf pickZf
+string_format str '%d' a_pickup
+write_int_to_ini_file v_index "cleo\pickupselect.ini" str "var"
+write_int_to_ini_file a_index "cleo\pickupselect.ini" str "index"
 write_float_to_ini_file pickXf "cleo\pickupselect.ini" str "x"
 write_float_to_ini_file pickYf "cleo\pickupselect.ini" str "y"
 write_float_to_ini_file pickZf "cleo\pickupselect.ini" str "z"
@@ -551,8 +579,7 @@ terminate_this_custom_script
 
 :key_vars
 hex
-00 00 00 00 00 00 00 00 00 00 00 00
-//00 00 00 00
+00(16)
 end
 /*
 iTemp = read_struct_offset keypoint v 1

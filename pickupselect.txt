@@ -408,8 +408,6 @@ end
 
 if bWhichKey > 0
 then
-count = 0
-while count < 6
 if is_local_var_bit_set_lvar bWhichKey count
 then
 if not is_local_var_bit_set_const bStatus bStep
@@ -440,10 +438,8 @@ goto @c_end
 :c_Below
 pickZi -= iTemp
 :c_end
-end//if
-count++
-end//while
-end//if
+end
+end
 
 iTemp = read_struct_offset keypoint pGroundZKey 1
 if is_key_pressed iTemp

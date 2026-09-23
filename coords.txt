@@ -3,8 +3,8 @@
 script_name 'coord'
 wait 2000
 
-int c,d,e,a,p
-float b,x,y,z,h
+int d,e,a,p
+float c,b,x,y,z,h
 string g
 
 add_text_label 'MSZP_A' "~1~.~1~"
@@ -40,23 +40,27 @@ while TIMERA < 500
 wait 0
 use_text_commands True
 
-cleo_call @float2int 1 x d e c
+cleo_call @float2int 1 x d e
 b = 210.0
+c = x
 gosub @text_format
 display_text_with_2_numbers 610.0 b g d e
 
-cleo_call @float2int 1 y d e c
+cleo_call @float2int 1 y d e
 b += 10.0
+c = y
 gosub @text_format
 display_text_with_2_numbers 610.0 b g d e
 
-cleo_call @float2int 1 z d e c
+cleo_call @float2int 1 z d e
 b += 10.0
+c = z
 gosub @text_format
 display_text_with_2_numbers 610.0 b g d e
 
-cleo_call @float2int 1 h d e c
+cleo_call @float2int 1 h d e
 b += 10.0
+c = h
 gosub @text_format
 display_text_with_2_numbers 610.0 b g d e
 
@@ -73,19 +77,24 @@ end
 goto @coord_loop
 
 :text_format
-switch_start c 4 False @cEnd incase 0 go @c_0 incase 1 go @c_1 incase 2 go @c_2 incase 3 go @c_3 skip -1 @cEnd -1 @cEnd -1 @cEnd
-:c_0
-g = 'MSZP_A'
-goto @cEnd
-:c_1
-g = 'MSZP_0'
-goto @cEnd
-:c_2
+if and
+0.0 > c
+c > -1.0
+then
+if e > 9
+then
 g = 'MSZP_N'
-goto @cEnd
-:c_3
+else
 g = 'MSZPN0'
-:cEnd
+end
+else
+if e > 9
+then
+g = 'MSZP_A'
+else
+g = 'MSZP_0'
+end
+end
 set_text_wrapx 640.0
 set_text_right_justify True
 set_text_draw_before_fade False
@@ -100,24 +109,4 @@ return
 0013: 2@ *= 100.0 
 0092: 4@ = float 2@ to_integer
 0095: make 4@ absolute_integer
-if and
-0.0 > 0@
-0@ > -1.0
-then
-if
-4@ > 9
-then
-5@ = 2
-else
-5@ = 3
-end
-else
-if
-4@ > 9
-then
-5@ = 0
-else
-5@ = 1
-end
-end
-cleo_return 3 1@ 4@ 5@
+cleo_return 2 1@ 4@

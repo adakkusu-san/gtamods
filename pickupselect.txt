@@ -20,7 +20,7 @@ int bWhichKey,bStatus // bitwise
 // after I figure out how, I'll make those variables into a single one
 
 string picktype
-string str
+longstring str
 
 :start_of_script
 if not does_file_exist "cleo\pickupselect.ini"
@@ -83,85 +83,70 @@ while count < 16
 switch_start count 16 has_def False @k_end incase pUpKey go @k_Up incase pLeftKey go @k_Left incase pDownKey go @k_Down incase pRightKey go @k_Right incase pAboveKey go @k_Above incase pBelowKey go @k_Below incase pStepKey go @k_Step
 switch_continued incase pSpeedKey go @k_Speed incase pReloadKey go @k_Reload incase pGroundZKey go @k_GroundZ incase pSaveKey go @k_Save incase pTeleportKey go @k_Teleport incase pPrevKey go @k_Prev incase pNextKey go @k_Next incase pPrev10Key go @k_Prev10 incase pNext10Key go @k_Next10
 :k_Up
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "up"
-then iTemp = 0x49 // I
-end
+str = "up"
+iTemp = 0x49 // I
 goto @k_end
 :k_Left
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "left"
-then iTemp = 0x4a // J
-end
+str = "left"
+iTemp = 0x4a // J
 goto @k_end
 :k_Down
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "down"
-then iTemp = 0x4b // K
-end
+str = "down"
+iTemp = 0x4b // K
 goto @k_end
 :k_Right
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "right"
-then iTemp = 0x4c // L
-end
+str = "right"
+iTemp = 0x4c // L
 goto @k_end
 :k_Above
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "above"
-then iTemp = 0x55 // U
-end
+str = "above"
+iTemp = 0x55 // U
 goto @k_end
 :k_Below
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "below"
-then iTemp = 0x4f // O
-end
+str = "below"
+iTemp = 0x4f // O
 goto @k_end
 :k_Step
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "step"
-then iTemp = 0x4d // M
-end
+str = "step"
+iTemp = 0x4d // M
 goto @k_end
 :k_Speed
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "speed"
-then iTemp = 0xbe // .
-end
+str = "speed"
+iTemp = 0xbe // .
 goto @k_end
 :k_Reload
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "reload"
-then iTemp = 0x58 // X
-end
+str = "reload"
+iTemp = 0x58 // X
 goto @k_end
 :k_GroundZ
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "groundz"
-then iTemp = 0x42 // B
-end
+str = "groundz"
+iTemp = 0x42 // B
 goto @k_end
 :k_Save
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "save"
-then iTemp = 0xbc // ,
-end
+str = "save"
+iTemp = 0xbc // ,
 goto @k_end
 :k_Teleport
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "teleport"
-then iTemp = 0x54 // T
-end
+str = "teleport"
+iTemp = 0x54 // T
 goto @k_end
 :k_Prev
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "prev"
-then iTemp = 0x47 // G
-end
+str = "prev"
+iTemp = 0x47 // G
 goto @k_end
 :k_Next
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "next"
-then iTemp = 0x48 // H
-end
+str = "next"
+iTemp = 0x48 // H
 goto @k_end
 :k_Prev10
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "prev10"
-then iTemp = 0x4E // N
-end
+str = "prev10"
+iTemp = 0x4E // N
 goto @k_end
 :k_Next10
-if not iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" "next10"
-then iTemp = 0x59 // Y
-end
+str = "next10"
+iTemp = 0x59 // Y
 :k_end
+iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" str
 write_struct_offset keypoint count 1 iTemp
 count++
 end
@@ -205,9 +190,10 @@ gosub @pick_check
 
 :pick_loop
 wait 0
-use_text_commands True
 
+use_text_commands True
 gosub @text_display
+use_text_commands False
 
 gosub @select_pick
 
@@ -220,7 +206,7 @@ goto @start_of_script
 end
 
 if is_local_var_bit_set_const bStatus bInvalid
-then goto @skip_it_all
+then goto @pick_loop
 end
 
 gosub @which_key_press
@@ -236,8 +222,6 @@ then
 gosub @save_coords
 end
 
-:skip_it_all
-use_text_commands False
 goto @pick_loop
 
 :text_display
@@ -542,7 +526,9 @@ TIMERA = 0
 TIMERB = 0
 while TIMERA < 1000
 wait 0
+use_text_commands True
 display_text_with_number 490.0 200.0 'MSZSAVE' a_index
+use_text_commands False
 end
 
 gosub @wait_key_release

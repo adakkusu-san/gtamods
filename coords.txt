@@ -3,7 +3,7 @@
 script_name 'coord'
 wait 2000
 
-int d,e,a,p
+int p,d,e,a
 float c,b,x,y,z,h
 string g
 
@@ -40,27 +40,27 @@ while TIMERA < 500
 wait 0
 use_text_commands True
 
-cleo_call @float2int 1 x d e
 b = 210.0
 c = x
+gosub @text_float
 gosub @text_format
 display_text_with_2_numbers 610.0 b g d e
 
-cleo_call @float2int 1 y d e
 b += 10.0
 c = y
+gosub @text_float
 gosub @text_format
 display_text_with_2_numbers 610.0 b g d e
 
-cleo_call @float2int 1 z d e
 b += 10.0
 c = z
+gosub @text_float
 gosub @text_format
 display_text_with_2_numbers 610.0 b g d e
 
-cleo_call @float2int 1 h d e
 b += 10.0
 c = h
+gosub @text_float
 gosub @text_format
 display_text_with_2_numbers 610.0 b g d e
 
@@ -69,7 +69,7 @@ gosub @text_format
 display_text_with_number 610.0 b 'NUMBER' a
 
 // all that for this
-// display_text_formatted 610.0 210.0 "%.2f~n~%.2f~n~%.2f~n~%.2f~n~%d" x y z h a  
+// display_text_formatted 610.0 210.0 "%.2f~n~%.2f~n~%.2f~n~%.2f~n~%d" x y z h a
 
 use_text_commands False
 end
@@ -77,6 +77,13 @@ end
 goto @coord_loop
 
 :text_format
+set_text_wrapx 640.0
+set_text_right_justify True
+set_text_draw_before_fade False
+return
+
+:text_float
+cleo_call @float2int 1 c d e
 if and
 0.0 > c
 c > -1.0
@@ -95,9 +102,6 @@ else
 g = 'MSZP_0'
 end
 end
-set_text_wrapx 640.0
-set_text_right_justify True
-set_text_draw_before_fade False
 return
 
 :float2int

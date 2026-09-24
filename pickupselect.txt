@@ -56,6 +56,7 @@ bWriteCoords = 2
 bWritten = 3
 bStep = 4
 bSpeed = 5
+bScriptName = 6
 end
 
 const
@@ -71,10 +72,10 @@ pReloadKey = 8
 pGroundZKey = 9
 pSaveKey = 10
 pTeleportKey = 11
-pPrevKey=12
-pNextKey=13
-pPrev10Key=14
-pNext10Key=15
+pPrevKey = 12
+pNextKey = 13
+pPrev10Key = 14
+pNext10Key = 15
 end
 
 keypoint = get_label_pointer @key_vars
@@ -151,29 +152,31 @@ write_struct_offset keypoint count 1 iTemp
 count++
 end
 
-picktype = read_string_from_ini_file "cleo\pickupselect.ini" "config" "picktype"
-switch picktype
-case 'weapon'
-gvar = 3032
-a_index_max = 217
-case 'flower'
-gvar = 3257
-a_index_max = 40
-case 'armour'
-gvar = 3297
-a_index_max = 48
-case 'bribe'
-gvar = 3345
-a_index_max = 50
+if not picktype = read_string_from_ini_file "cleo\pickupselect.ini" "config" "picktype"
+then picktype = 'config'
 end
 gvar = read_int_from_ini_file "cleo\pickupselect.ini" picktype "offset"
 a_index_max = read_int_from_ini_file "cleo\pickupselect.ini" picktype "maxval"
+a_index = read_int_from_ini_file "cleo\pickupselect.ini" picktype "index"
+v_index = a_index
 
-v_index = read_int_from_ini_file "cleo\pickupselect.ini" picktype "index"
-
-a_index = v_index
+if not picktype = read_string_from_ini_file "cleo\pickupselect.ini" picktype "name"
+then clear_local_var_bit_const bStatus bScriptName
 v_index += gvar
 a_pickup = &0(v_index,16384i)
+else set_local_var_bit_const bStatus bScriptName
+iTemp = 0
+while not iTemp > 0
+wait 100
+iTemp = get_script_struct_named picktype
+end
+a_pickup = 0
+while not a_pickup > 0
+wait 100
+a_pickup = get_script_var iTemp gvar
+a_pickup = read_memory a_pickup 4 False
+end // while
+end // name
 
 set_local_var_bit_const bStatus bInvalid
 set_local_var_bit_const bStatus bGetCoords
@@ -183,10 +186,6 @@ clear_local_var_bit_lvar bStatus bStep
 set_local_var_bit_const bStatus bSpeed
 
 gosub @pick_check
-
-// debug
-// 0@ = get_max_wanted_level
-// set_max_wanted_level 0
 
 :pick_loop
 wait 0
@@ -322,11 +321,22 @@ a_index -= a_index_max
 end
 :s_end
 v_index = a_index
+
+if not is_local_var_bit_set_const bStatus bScriptName
+then
 v_index += gvar
 a_pickup = &0(v_index,16384i)
+else
+v_index *= 4
+a_pickup = get_script_struct_named picktype
+a_pickup = get_script_var a_pickup gvar
+a_pickup += v_index
+a_pickup = read_memory a_pickup 4 False
+end
+
 gosub @wait_key_release
 gosub @pick_check
-end//if
+end // if key press
 return
 
 :pick_check
@@ -369,16 +379,13 @@ end
 
 if bWhichKey > 0
 then
-if not is_local_var_bit_set_const bStatus bSpeed
-then
-if is_local_var_bit_set_const bStatus bWritten
-then
+if and
+not is_local_var_bit_set_const bStatus bSpeed
+is_local_var_bit_set_const bStatus bWritten
+then bWhichKey = 0
 clear_local_var_bit_const bStatus bWriteCoords
-bWhichKey = 0
 end
-end
-else
-clear_local_var_bit_const bStatus bWritten
+else clear_local_var_bit_const bStatus bWritten
 end
 
 if is_local_var_bit_set_const bStatus bGetCoords
@@ -408,8 +415,6 @@ end
 
 if bWhichKey > 0
 then
-if is_local_var_bit_set_lvar bWhichKey count
-then
 if not is_local_var_bit_set_const bStatus bStep
 then iTemp = 8
 else iTemp = 80
@@ -438,8 +443,7 @@ goto @c_end
 :c_Below
 pickZi -= iTemp
 :c_end
-end
-end
+end // if key press
 
 iTemp = read_struct_offset keypoint pGroundZKey 1
 if is_key_pressed iTemp
@@ -476,8 +480,11 @@ wait 100
 pickZf = get_ground_z_for_3d_coord pickXf pickYf pickZf
 set_char_coordinates $scplayer pickXf pickYf pickZf
 do_fade 500 Fade.In
-gosub @wait_key_release
+while get_fading_status
+wait 250
 end
+gosub @wait_key_release
+end // if key press
 return
 
 :write_coords
@@ -494,19 +501,17 @@ write_struct_offset pickpoint 0x14 2 pickZi
 else
 get_pickup_coordinates a_pickup store_to pickXf pickYf pickZf
 pickZf = get_ground_z_for_3d_coord pickXf pickYf pickZf
-pickZf += 2.0
 pickZi =# pickZf
+pickZi += 2
 pickZi *= 8
-
 write_struct_offset pickpoint 0x14 2 pickZi
-
 iTemp = read_struct_offset keypoint pGroundZKey 1
 gosub @wait_key_release
 end
 
 set_local_var_bit_const bStatus bWritten
 end
-end
+end // if key press
 return
 
 :save_coords

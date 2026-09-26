@@ -76,13 +76,15 @@ pPrevKey = 12
 pNextKey = 13
 pPrev10Key = 14
 pNext10Key = 15
+pBringKey = 16
 end
 
 keypoint = get_label_pointer @key_vars
 count = 0
-while count < 16
-switch_start count 16 has_def False @k_end incase pUpKey go @k_Up incase pLeftKey go @k_Left incase pDownKey go @k_Down incase pRightKey go @k_Right incase pAboveKey go @k_Above incase pBelowKey go @k_Below incase pStepKey go @k_Step
+while count < 17
+switch_start count 17 has_def False @k_end incase pUpKey go @k_Up incase pLeftKey go @k_Left incase pDownKey go @k_Down incase pRightKey go @k_Right incase pAboveKey go @k_Above incase pBelowKey go @k_Below incase pStepKey go @k_Step
 switch_continued incase pSpeedKey go @k_Speed incase pReloadKey go @k_Reload incase pGroundZKey go @k_GroundZ incase pSaveKey go @k_Save incase pTeleportKey go @k_Teleport incase pPrevKey go @k_Prev incase pNextKey go @k_Next incase pPrev10Key go @k_Prev10 incase pNext10Key go @k_Next10
+switch_continued incase pBringKey go @k_Bring skip 99 7 99 6 99 5 99 4 99 3 99 2 99 1 99 0
 :k_Up
 str = "up"
 iTemp = 0x49 // I
@@ -146,6 +148,10 @@ goto @k_end
 :k_Next10
 str = "next10"
 iTemp = 0x59 // Y
+goto @k_end
+:k_Bring
+str = "bring"
+iTemp = 0xBA // ;
 :k_end
 iTemp = read_int_from_ini_file "cleo\pickupselect.ini" "keys" str
 write_struct_offset keypoint count 1 iTemp
@@ -180,9 +186,9 @@ end // name
 
 set_local_var_bit_const bStatus bInvalid
 set_local_var_bit_const bStatus bGetCoords
-clear_local_var_bit_lvar bStatus bWriteCoords
-clear_local_var_bit_lvar bStatus bWritten
-clear_local_var_bit_lvar bStatus bStep
+clear_local_var_bit_const bStatus bWriteCoords
+clear_local_var_bit_const bStatus bWritten
+clear_local_var_bit_const bStatus bStep
 set_local_var_bit_const bStatus bSpeed
 
 gosub @pick_check
@@ -212,7 +218,7 @@ gosub @which_key_press
 
 if is_local_var_bit_set_const bStatus bWriteCoords
 then gosub @write_coords
-clear_local_var_bit_lvar bStatus bWriteCoords
+clear_local_var_bit_const bStatus bWriteCoords
 end
 
 iTemp = read_struct_offset keypoint pSaveKey 1
@@ -227,19 +233,15 @@ goto @pick_loop
 gosub @text_setup
 
 if not is_local_var_bit_set_const bStatus bStep
-then
-display_text 490.0 30.0 'MSZPS01'
-else
-display_text 490.0 30.0 'MSZPS10'
+then display_text 490.0 30.0 'MSZPS01'
+else display_text 490.0 30.0 'MSZPS10'
 end
 
 gosub @text_setup
 
 if is_local_var_bit_set_const bStatus bSpeed
-then
-display_text 490.0 50.0 'MSZPST'
-else
-display_text 490.0 50.0 'MSZPSF'
+then display_text 490.0 50.0 'MSZPST'
+else display_text 490.0 50.0 'MSZPSF'
 end
 
 gosub @text_setup
@@ -290,7 +292,7 @@ end
 
 if bWhichKey > 0
 then
-switch_start count 4 has_def False @s_end incase pPrevKey go @s_Prev incase pNextKey go @s_Next incase pPrev10Key go @s_Prev10 incase pNext10Key go @s_Next10 skip -1 @s_end -1 @s_end -1 @s_end
+switch_start count 4 has_def False @s_end incase pPrevKey go @s_Prev incase pNextKey go @s_Next incase pPrev10Key go @s_Prev10 incase pNext10Key go @s_Next10 skip 99 2 99 1 99 0
 :s_Prev
 a_index--
 if a_index < 0
@@ -345,7 +347,7 @@ if does_pickup_exist a_pickup
 then
 a_blip = add_blip_for_pickup a_pickup
 change_blip_display a_blip BlipDisplay.Both
-clear_local_var_bit_lvar bStatus bInvalid
+clear_local_var_bit_const bStatus bInvalid
 else
 set_local_var_bit_const bStatus bInvalid
 end
@@ -397,7 +399,7 @@ iTemp = read_struct_offset keypoint pStepKey 1
 if is_key_pressed iTemp
 then
 if not is_local_var_bit_set_const bStatus bStep
-then set_local_var_bit_lvar bStatus bStep
+then set_local_var_bit_const bStatus bStep
 else clear_local_var_bit_const bStatus bStep
 end
 gosub @wait_key_release
@@ -407,7 +409,7 @@ iTemp = read_struct_offset keypoint pSpeedKey 1
 if is_key_pressed iTemp
 then
 if is_local_var_bit_set_const bStatus bSpeed
-then clear_local_var_bit_lvar bStatus bSpeed
+then clear_local_var_bit_const bStatus bSpeed
 else set_local_var_bit_const bStatus bSpeed
 end
 gosub @wait_key_release
@@ -419,7 +421,7 @@ if not is_local_var_bit_set_const bStatus bStep
 then iTemp = 8
 else iTemp = 80
 end
-switch_start count 6 has_def False @c_end incase pUpKey go @c_Up incase pLeftKey go @c_Left incase pDownKey go @c_Down incase pRightKey go @c_Right incase pAboveKey go @c_Above incase pBelowKey go @c_Below skip -1 @c_end
+switch_start count 6 has_def False @c_end incase pUpKey go @c_Up incase pLeftKey go @c_Left incase pDownKey go @c_Down incase pRightKey go @c_Right incase pAboveKey go @c_Above incase pBelowKey go @c_Below skip -1 0
 :c_Up
 pickYi += iTemp
 goto @c_end
@@ -450,6 +452,16 @@ if is_key_pressed iTemp
 then
 bWhichKey = 0
 set_local_var_bit_lvar bWhichKey pGroundZKey
+set_local_var_bit_const bStatus bWriteCoords
+gosub @get_coords
+gosub @wait_key_release
+end
+
+iTemp = read_struct_offset keypoint pBringKey 1
+if is_key_pressed iTemp
+then
+bWhichKey = 0
+set_local_var_bit_const bWhichKey pBringKey
 set_local_var_bit_const bStatus bWriteCoords
 gosub @wait_key_release
 end
@@ -493,21 +505,43 @@ then
 if does_pickup_exist a_pickup
 then
 pickpoint = get_pickup_pointer a_pickup
-if not is_local_var_bit_set_lvar bWhichKey pGroundZKey
+
+if is_local_var_bit_set_const bWhichKey pGroundZKey
 then
-write_struct_offset pickpoint 0x10 2 pickXi
-write_struct_offset pickpoint 0x12 2 pickYi
-write_struct_offset pickpoint 0x14 2 pickZi
-else
 get_pickup_coordinates a_pickup store_to pickXf pickYf pickZf
 pickZf = get_ground_z_for_3d_coord pickXf pickYf pickZf
 pickZi =# pickZf
 pickZi += 2
 pickZi *= 8
-write_struct_offset pickpoint 0x14 2 pickZi
 iTemp = read_struct_offset keypoint pGroundZKey 1
 gosub @wait_key_release
 end
+
+if is_local_var_bit_set_const bWhichKey pBringKey
+then
+get_char_coordinates $scplayer store_to pickXi pickYi pickZf
+get_char_heading $scplayer store_to pickZi
+pickZf = get_ground_z_for_3d_coord pickXi pickYi pickZf
+pickXf = sin pickZi
+pickXf *= -4.0
+005B: pickXf += pickXi
+pickYf = cos pickZi
+pickYf *= 4.0
+005B: pickYf += pickYi
+pickXi =# pickXf
+pickYi =# pickYf
+pickZi =# pickZf
+pickZi += 2
+pickXi *= 8
+pickYi *= 8
+pickZi *= 8
+iTemp = read_struct_offset keypoint pBringKey 1
+gosub @wait_key_release
+end
+
+write_struct_offset pickpoint 0x10 2 pickXi
+write_struct_offset pickpoint 0x12 2 pickYi
+write_struct_offset pickpoint 0x14 2 pickZi
 
 set_local_var_bit_const bStatus bWritten
 end
@@ -546,7 +580,7 @@ terminate_this_custom_script
 
 :key_vars
 hex
-00(16)
+00(17)
 end
 /*
 iTemp = read_struct_offset keypoint v 1
@@ -566,4 +600,5 @@ iTemp = read_struct_offset keypoint v 1
 13=next
 14=prev-10
 15=next+10
+16=bring
 */

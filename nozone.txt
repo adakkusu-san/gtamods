@@ -1,0 +1,7 @@
+{$CLEO .cs}
+{$NOSOURCE}
+script_name 'nozone'
+:loop
+wait 250
+display_zone_names False
+goto @loop

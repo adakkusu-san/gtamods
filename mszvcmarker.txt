@@ -1,0 +1,8 @@
+{$CLEO .cs}
+wait 1000
+
+0A8C: write_memory 0x725BD0 size 4 value 0xE9BA66 vp False
+0A8C: write_memory 0x725BCC size 4 value 0x81B966 vp False
+0A8C: write_memory 0x725BD5 size 4 value 0xB1B866 vp False
+
+terminate_this_custom_script

@@ -8,21 +8,24 @@ float x,y,z
 int current_pick
 int pickup_mem = get_label_pointer @pickmem
 
-iTemp = generate_random_int_in_range 4500 5500
-wait iTemp // idk how long until the pickups are made
-
-set_script_event_save_confirmation True @SaveConfirm iTemp
+set_script_event_save_confirmation True @SaveConfirm current_pick
 // last param needs to be a var or something, idk, wouldn't work otherwise
+
+iTemp = get_current_save_slot
+if iTemp > 0 // wait until the default pickups are done
+then wait 10
+else wait 3500
+end
 
 :makepicks
 iTemp = 0
 while iTemp < 50
-switch_start iTemp 50 has_def False @makepicks       incase  0 go @c_0 incase  1 go @c_1 incase  2 go @c_2 incase  3 go @c_3 incase  4 go @c_4 incase  5 go @c_5 incase  6 go @c_6
-switch_continued incase  7 go @c_7 incase  8 go @c_8 incase  9 go @c_9 incase 10 go @c10 incase 11 go @c11 incase 12 go @c12 incase 13 go @c13 incase 14 go @c14 incase 15 go @c15
-switch_continued incase 16 go @c16 incase 17 go @c17 incase 18 go @c18 incase 19 go @c19 incase 20 go @c20 incase 21 go @c21 incase 22 go @c22 incase 23 go @c23 incase 24 go @c24
-switch_continued incase 25 go @c25 incase 26 go @c26 incase 27 go @c27 incase 28 go @c28 incase 29 go @c29 incase 30 go @c30 incase 31 go @c31 incase 32 go @c32 incase 33 go @c33
-switch_continued incase 34 go @c34 incase 35 go @c35 incase 36 go @c36 incase 37 go @c37 incase 38 go @c38 incase 39 go @c39 incase 40 go @c40 incase 41 go @c41 incase 42 go @c42
-switch_continued incase 43 go @c43 incase 44 go @c44 incase 45 go @c45 incase 46 go @c46 incase 47 go @c47 incase 48 go @c48 incase 49 go @c49 skip -1 @cEnd -1 @cEnd
+switch_start iTemp count 49     has_def True go @c_0 incase  1 go @c_1 incase  2 go @c_2 incase  3 go @c_3 incase  4 go @c_4 incase  5 go @c_5 incase  6 go @c_6 incase  7 go @c_7
+switch_continued incase  8 go @c_8 incase  9 go @c_9 incase 10 go @c10 incase 11 go @c11 incase 12 go @c12 incase 13 go @c13 incase 14 go @c14 incase 15 go @c15 incase 16 go @c16
+switch_continued incase 17 go @c17 incase 18 go @c18 incase 19 go @c19 incase 20 go @c20 incase 21 go @c21 incase 22 go @c22 incase 23 go @c23 incase 24 go @c24 incase 25 go @c25
+switch_continued incase 26 go @c26 incase 27 go @c27 incase 28 go @c28 incase 29 go @c29 incase 30 go @c30 incase 31 go @c31 incase 32 go @c32 incase 33 go @c33 incase 34 go @c34
+switch_continued incase 35 go @c35 incase 36 go @c36 incase 37 go @c37 incase 38 go @c38 incase 39 go @c39 incase 40 go @c40 incase 41 go @c41 incase 42 go @c42 incase 43 go @c43
+switch_continued incase 44 go @c44 incase 45 go @c45 incase 46 go @c46 incase 47 go @c47 incase 48 go @c48 incase 49 go @c49 skip 99 9 99 9 99 9
 
 :c_0 // moved
 x = 1494.0
@@ -283,26 +286,21 @@ write_struct_param pickup_mem iTemp current_pick
 iTemp++
 end // while
 
-iTemp = False
-
 :pick_loop // after it's done making the picks, it'll wait in case it has to make them again
-wait 5000
-if iTemp == True
+wait 1234
+if iTemp <= 0
 then
-gosub @makepicks
+goto @makepicks
 end
 goto @pick_loop
 
 :SaveConfirm // goes here when the savegame menu pops up
-iTemp = 0
-while iTemp < 50
+// iTemp is currently the total amount
+while iTemp > 0
+iTemp--
 current_pick = read_struct_param pickup_mem iTemp
-if does_pickup_exist iTemp
-then remove_pickup current_pick // read the handles we wrote to memory and remove the pickups
+remove_pickup current_pick // read the handles we wrote to memory and remove the pickups
 end
-iTemp++
-end
-iTemp = True
 return_script_event
 
 :pickmem

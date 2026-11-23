@@ -4,13 +4,10 @@
 script_name 'namstrm'
 wait 2000
 
-int i,n,t
+int i,n,t,o
 float f
-int buffer = get_label_pointer @bufferCurrent
-int the_names = get_label_pointer @bufferAll
-the_names = create_list ListType.string
-
-gosub @name_setup
+string b
+int m = get_label_pointer @the_names
 
 :loop
 wait 0
@@ -24,12 +21,13 @@ n = get_number_of_instances_of_streamed_script i
 if n > 0
 then
 gosub @text_setup
-buffer = get_list_string_value_by_index the_names i
+o = i * 8
+b = read_struct_offset m o 8
 if n > 9
 then
-display_text_formatted 490.0 f "%s = %d" buffer n
+display_text_formatted 490.0 f "%s = %d" b n
 else
-display_text_formatted 490.0 f "%s =  %d" buffer n
+display_text_formatted 490.0 f "%s =  %d" b n
 end
 f += 10.0
 t += n
@@ -51,93 +49,84 @@ set_text_proportional False
 set_text_right_justify True
 return
 
-:name_setup
-list_add_string the_names "PLCHUTE"
-list_add_string the_names "PARACH"
-list_add_string the_names "BCESAR2"
-list_add_string the_names "COKEC"
-list_add_string the_names "BANDIT"
-list_add_string the_names "ROULETE"
-list_add_string the_names "OTB_MSC"
-list_add_string the_names "ARCADE"
-list_add_string the_names "VENDING"
-list_add_string the_names "FODVEND"
-list_add_string the_names "GATEOS"
-list_add_string the_names "GYMBIKE"
-list_add_string the_names "GYMBENC"
-list_add_string the_names "GYMTREA"
-list_add_string the_names "GYMDUMB"
-list_add_string the_names "BBALL"
-list_add_string the_names "VIDPOK"
-list_add_string the_names "BLACKJ"
-list_add_string the_names "WOF"
-list_add_string the_names "DEALER"
-list_add_string the_names "HMLES"
-list_add_string the_names "POOL"
-list_add_string the_names "LOWRCON"
-list_add_string the_names "BURGLAR"
-list_add_string the_names "GFMEET"
-list_add_string the_names "GFDATE"
-list_add_string the_names "GFSEX"
-list_add_string the_names "CASAMB"
-list_add_string the_names "BAR"
-list_add_string the_names "PSHOP"
-list_add_string the_names "OTBSHP"
-list_add_string the_names "STRIP"  
-list_add_string the_names "PLANES"
-list_add_string the_names "TRAINS"
-list_add_string the_names "RCSHOP"
-list_add_string the_names "DANCE"
-list_add_string the_names "SKBRAIN"
-list_add_string the_names "FFPNC"
-list_add_string the_names "BARSTAF"
-list_add_string the_names "BOUNCER"
-list_add_string the_names "OTBSTAF"
-list_add_string the_names "PCHAIR"
-list_add_string the_names "PCUSTOM"
-list_add_string the_names "OTBWTCH"
-list_add_string the_names "OTBSLP"
-list_add_string the_names "OTBTILL"
-list_add_string the_names "FBOOTHR"
-list_add_string the_names "FBOOTHL"
-list_add_string the_names "BARGUY"
-list_add_string the_names "PEDROUL"
-list_add_string the_names "PEDCARD"
-list_add_string the_names "PEDSLOT"
-list_add_string the_names "DANCER"
-list_add_string the_names "STRIPW"
-list_add_string the_names "STRIPM"
-list_add_string the_names "BROWSE"
-list_add_string the_names "COPSIT"
-list_add_string the_names "COPLOOK"
-list_add_string the_names "TICKET"
-list_add_string the_names "SHOPPER"
-list_add_string the_names "AMUNAT"
-list_add_string the_names "TATTO"
-list_add_string the_names "BARB"
-list_add_string the_names "WARROBE"
-list_add_string the_names "CLOTH"
-list_add_string the_names "JFUD"
-list_add_string the_names "CARMOD"
-list_add_string the_names "CRANE1"
-list_add_string the_names "CRANE2"
-list_add_string the_names "CRANE3"
-list_add_string the_names "CARPRK1"
-list_add_string the_names "IMPND"
-list_add_string the_names "VALET"
-list_add_string the_names "PHOTO"
-list_add_string the_names "PRISONR"
-list_add_string the_names "CAMERA"
-list_add_string the_names "DEBT"
-list_add_string the_names "HOTDOGV"
-return
-
-:bufferCurrent
+:the_names
 hex
-00(128)
-end
-
-:bufferAll
-hex
-00(640) // 8 * 80
+"PLCHUTE" 00
+"PARACH" 00 00
+"BCESAR2" 00
+"COKEC" 00 00 00
+"BANDIT" 00 00
+"ROULETE" 00
+"OTB_MSC" 00
+"ARCADE" 00 00
+"VENDING" 00
+"FODVEND" 00
+"GATEOS" 00 00
+"GYMBIKE" 00
+"GYMBENC" 00
+"GYMTREA" 00
+"GYMDUMB" 00
+"BBALL" 00 00 00
+"VIDPOK" 00 00
+"BLACKJ" 00 00
+"WOF" 00 00 00 00 00
+"DEALER" 00 00
+"HMLES" 00 00 00
+"POOL" 00 00 00 00
+"LOWRCON" 00
+"BURGLAR" 00
+"GFMEET" 00 00
+"GFDATE" 00 00
+"GFSEX" 00 00 00
+"CASAMB" 00 00
+"BAR" 00 00 00 00 00
+"PSHOP" 00 00 00
+"OTBSHP" 00 00
+"STRIP" 00 00 00  
+"PLANES" 00 00
+"TRAINS" 00 00
+"RCSHOP" 00 00
+"DANCE" 00 00 00
+"SKBRAIN" 00
+"FFPNC" 00 00 00
+"BARSTAF" 00
+"BOUNCER" 00
+"OTBSTAF" 00
+"PCHAIR" 00 00
+"PCUSTOM" 00
+"OTBWTCH" 00
+"OTBSLP" 00 00
+"OTBTILL" 00
+"FBOOTHR" 00
+"FBOOTHL" 00
+"BARGUY" 00 00
+"PEDROUL" 00
+"PEDCARD" 00
+"PEDSLOT" 00
+"DANCER" 00 00
+"STRIPW" 00 00
+"STRIPM" 00 00
+"BROWSE" 00 00
+"COPSIT" 00 00
+"COPLOOK" 00
+"TICKET" 00 00
+"SHOPPER" 00
+"AMUNAT" 00 00
+"TATTO" 00 00 00
+"BARB" 00 00 00 00
+"WARROBE" 00
+"CLOTH" 00 00 00
+"JFUD" 00 00 00 00
+"CARMOD" 00 00
+"CRANE1" 00 00
+"CRANE2" 00 00
+"CRANE3" 00 00
+"CARPRK1" 00
+"IMPND" 00 00 00
+"VALET" 00 00 00
+"PHOTO" 00 00 00
+"PRISONR" 00
+"CAMERA" 00 00
+"DEBT" 00 00 00 00
+"HOTDOGV" 00
 end

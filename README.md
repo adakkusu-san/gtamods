@@ -1,24 +1,16 @@
 valet also in LS and LV
 
-somehow, valet was also available in LS and LV, but it was a bit incomplete
+unlike the previous time, this one should be compatible with savegames
 
-in LS, the way for cars to go up the ramp is a bit tight, peds have trouble 
-getting the car up not-damaged\
-in LV, the floor has some issues, and the parking is too far so you'll be 
-out of range on the way
+it does make use of some unused global variables, but you can change them to some others if you know how ^^
 
-I took out the valet loop and mission from MAIN and changed some things 
-from original, as follows:
+you can't do valet in these 'new' locations because it's pretty "buggy"\
+in LS the pathway is a bit too tight\
+in LV the parking lot is way too far
 
-* made it so you can start the mission in LS and LV (obvious)
-* expanded down area in LV to still be on mission
-* now taxi and police car can be valet'd, but I'll try to make this toggleable, 
-also should fix the code there because I broke it and didn't notice at the time
-* only the valet mission is available currently, and you'll need to start a 
-new game for this to work
+I did change the valet code a bit, but it was mostly to remove some repeats\
+a few other changes were imported from `SFSA`
 
-* also included is a cleo scriprt for teleport menu and 'fast travel' with 
-a kart (need to change so it just appears in front of you), open with `~`
+the cleo script is to initialize the variables, idk how else to do it
 
-TODO: you spawn at GroveSt (of course) by default, and have to drive all the 
-way to valet, and there's no car nearby, I'll have to make one
+usage: place all of these in a modloader folder

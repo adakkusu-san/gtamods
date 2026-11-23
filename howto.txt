@@ -1,0 +1,100 @@
+replace the 'VALET_L' script with this
+(everything from `:VALET_L` to `goto @VALET_L_11`)
+
+```
+:VALET_L
+script_name 'VALET_L'
+
+:VALET_L_11
+wait 0
+  is_player_playing $player1
+goto_if_false @VALET_L_179
+$number_of_instances_of_streamed_script = get_number_of_instances_of_streamed_script 72
+  $number_of_instances_of_streamed_script == 0
+goto_if_false @VALET_L_179
+  $im_players_city > 0
+goto_if_false @VALET_L_154
+set_var_int_to_var_int $i = $im_players_city
+$i -= 1
+  is_char_in_area_2d $scplayer $1764($i,3f) $1767($i,3f) $1770($i,3f) $1773($i,3f) False
+goto_if_false @VALET_L_147
+set_var_int_to_var_int $val_Area = $im_players_city
+stream_script 72
+  has_streamed_script_loaded 72
+goto_if_false @VALET_L_147
+start_new_streamed_script 72
+
+:VALET_L_147
+goto @VALET_L_179
+
+:VALET_L_154
+  $val_Area > 0
+goto_if_false @VALET_L_179
+mark_streamed_script_as_no_longer_needed 72
+$val_Area = 0
+
+:VALET_L_179
+goto @VALET_L_11
+hex
+00(18) // padding
+end
+```
+
+optional: replace the `IMPND_L` script with this
+(everything from `:IMPND_L` to `goto @IMPND_L_11`)
+
+```
+:IMPND_L
+script_name 'IMPND_L'
+
+:IMPND_L_11
+wait 100
+if 
+  is_player_playing $player1
+goto_if_false @IMPND_L_254
+$number_of_instances_of_streamed_script = get_number_of_instances_of_streamed_script 71
+if 
+  $number_of_instances_of_streamed_script == 0
+goto_if_false @IMPND_L_254
+if 
+  $im_players_city > 0
+goto_if_false @IMPND_L_200
+set_var_int_to_var_int $i = $im_players_city
+$i -= 1
+if 
+  locate_char_any_means_3d $scplayer $334($i,3f) $337($i,3f) $340($i,3f) 120.0 120.0 80.0 False
+goto_if_false @IMPND_L_193
+if 
+  $tlf_underway == 0
+goto_if_false @IMPND_L_193
+set_var_int_to_var_int $impound_area = $im_players_city
+stream_script 71
+if 
+  has_streamed_script_loaded 71
+goto_if_false @IMPND_L_193
+start_new_streamed_script 71
+
+:IMPND_L_193
+goto @IMPND_L_254
+
+:IMPND_L_200
+if 
+  $tlf_underway == 2
+goto_if_false @IMPND_L_225
+$tlf_underway = 0
+
+:IMPND_L_225
+if 
+  $impound_area > 0
+goto_if_false @IMPND_L_254
+mark_streamed_script_as_no_longer_needed 71
+$impound_area = 0
+
+:IMPND_L_254
+goto @IMPND_L_11
+hex
+00(452) // padding
+end
+```
+
+TODO: figure out how to patch the `MAIN` script in the game memory with these things

@@ -101,20 +101,11 @@ cleo_call @copy_sub 3 99724 101622 @openup_buffer
 terminate_this_custom_script
 
 :copy_sub
-var
-0@ : int // from_start
-1@ : int // to_end
-2@ : int // label_name
-3@ : int // start_address
-4@ : int // byte_size
-5@ : int // label_pointer
-end
-3@ = main_address
-3@ += 0@
-4@ = 3@
-4@ -= 1@
-5@ = get_label_pointer 2@
-copy_memory 5@ 3@ 4@
+int start_address,byte_size,the_label_pointer
+byte_size -= start_address 
+start_address += main_address
+the_label_pointer = get_label_pointer the_label_pointer
+copy_memory the_label_pointer start_address byte_size
 cleo_return
 
 // I wanted to make it so I don't have to 
